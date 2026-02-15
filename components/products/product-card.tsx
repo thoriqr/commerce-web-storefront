@@ -4,14 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  discount?: number;
-};
+import { Product } from "@/lib/products/types";
 
 export function ProductCard({ product }: { product: Product }) {
   const finalPrice = product.discount ? product.price - (product.price * product.discount) / 100 : product.price;

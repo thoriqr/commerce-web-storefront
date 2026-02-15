@@ -29,7 +29,7 @@ export function PopularCategories({ categories }: Props) {
             <div className="space-y-2">
               <h3 className="text-sm font-medium group-hover:underline">{cat.name}</h3>
 
-              {cat.children && cat.children.length > 0 && <p className="text-xs text-muted-foreground">{cat.children.length} subcategories</p>}
+              <span className="text-xs text-muted-foreground">Explore →</span>
             </div>
           </Link>
         ))}

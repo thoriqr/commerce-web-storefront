@@ -1,7 +1,7 @@
 "use client";
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ProductCard } from "./product-card";
+import { ProductCard } from "../products/product-card";
 import { Button } from "@/components/ui/button";
 
 type Product = {

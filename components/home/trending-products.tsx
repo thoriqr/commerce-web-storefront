@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { ProductCard } from "./product-card";
+import { ProductCard } from "../products/product-card";
 
 type Product = {
   id: number;

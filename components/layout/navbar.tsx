@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NavbarSearch } from "./navbar-search";
 import { CategoryMegaMenu } from "./category-mega-menu";
-import { mockCategories } from "@/constants/mocks";
+
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu";
 import { MobileCategoryMenu } from "./mobile-category-menu";
+import { mockCategories } from "@/lib/category/mock/mock-categories";
 
 export function Navbar() {
   return (

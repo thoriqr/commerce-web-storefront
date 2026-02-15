@@ -2,7 +2,11 @@ import { FeaturedCollection } from "@/components/home/featured-collection";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { PopularCategories } from "@/components/home/popular-categories";
 import { TrendingProducts } from "@/components/home/trending-products";
-import { mockCategories, mockProducts } from "@/constants/mocks";
+
+import { mockCategories } from "@/lib/category/mock/mock-categories";
+import { mockProducts } from "@/lib/products/mock/mock-products";
+
+// fetch all any related about this component
 
 export default function HomePage() {
   return (
