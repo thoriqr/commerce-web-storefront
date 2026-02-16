@@ -2,7 +2,7 @@ import { CategoryBreadcrumb } from "./category-breadcrumb";
 import { SubcategoryGrid } from "./subcategory-grid";
 import { findCategoryBySlugPath } from "@/lib/category/category-tree";
 import { notFound } from "next/navigation";
-import { mockCategories } from "@/lib/category/mock/mock-categories";
+import { mockCategories } from "@/lib/category/mock-categories";
 
 type Props = {
   slug: string[];

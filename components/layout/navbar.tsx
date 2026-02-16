@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ShoppingCart, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +7,7 @@ import { CategoryMegaMenu } from "./category-mega-menu";
 
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu";
 import { MobileCategoryMenu } from "./mobile-category-menu";
-import { mockCategories } from "@/lib/category/mock/mock-categories";
+import { mockCategories } from "@/lib/category/mock-categories";
 
 export function Navbar() {
   return (
@@ -73,7 +71,7 @@ export function Navbar() {
           </Link>
 
           {/* Navigation */}
-          <NavigationMenu>
+          <NavigationMenu viewport={false}>
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Categories</NavigationMenuTrigger>

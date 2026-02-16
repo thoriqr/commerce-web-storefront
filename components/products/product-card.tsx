@@ -10,7 +10,7 @@ export function ProductCard({ product }: { product: Product }) {
   const finalPrice = product.discount ? product.price - (product.price * product.discount) / 100 : product.price;
 
   return (
-    <Link href={`/products/${product.id}`}>
+    <Link href={`/products/${product.slug}?variant=${product.initialVariantId}`}>
       <Card className="group overflow-hidden transition hover:shadow-md">
         <div className="relative aspect-square w-full overflow-hidden bg-muted">
           <Image src={product.image} alt={product.name} fill className="object-cover transition group-hover:scale-105" />

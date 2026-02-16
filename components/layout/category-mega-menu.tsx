@@ -15,7 +15,7 @@ type Props = {
 
 export function CategoryMegaMenu({ categories }: Props) {
   return (
-    <div className="w-1000 max-w-[90vw] p-4">
+    <div className="w-200  p-4">
       <div className="grid grid-cols-4 gap-10">
         {categories.map((root) => {
           const lvl2Children = root.children ?? [];

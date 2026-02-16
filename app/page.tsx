@@ -3,8 +3,8 @@ import { HeroCarousel } from "@/components/home/hero-carousel";
 import { PopularCategories } from "@/components/home/popular-categories";
 import { TrendingProducts } from "@/components/home/trending-products";
 
-import { mockCategories } from "@/lib/category/mock/mock-categories";
-import { mockProducts } from "@/lib/products/mock/mock-products";
+import { mockCategories } from "@/lib/category/mock-categories";
+import { mockProducts } from "@/lib/products/mock-products";
 
 // fetch all any related about this component
 
