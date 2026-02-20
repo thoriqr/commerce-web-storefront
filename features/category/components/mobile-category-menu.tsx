@@ -1,17 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-  children?: Category[];
-};
+import { CategoryTree } from "@/features/category/types";
 
 type Props = {
-  categories: Category[];
+  categories: CategoryTree[];
 };
 
 export function MobileCategoryMenu({ categories }: Props) {

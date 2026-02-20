@@ -1,21 +1,13 @@
-"use client";
-
+import { CategoryTree } from "@/features/category/types";
 import Link from "next/link";
 
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-  children?: Category[];
-};
-
 type Props = {
-  categories: Category[];
+  categories: CategoryTree[];
 };
 
 export function CategoryMegaMenu({ categories }: Props) {
   return (
-    <div className="w-200  p-4">
+    <div className="w-200 p-4">
       <div className="grid grid-cols-4 gap-10">
         {categories.map((root) => {
           const lvl2Children = root.children ?? [];

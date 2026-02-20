@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  generateEtags: false,
   images: {
     remotePatterns: [
       {
@@ -8,6 +9,10 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         port: "",
         pathname: "**"
+      },
+      {
+        protocol: "https",
+        hostname: "img.commerce.web.id"
       }
     ]
   }
