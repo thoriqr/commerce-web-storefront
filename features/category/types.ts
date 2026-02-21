@@ -4,3 +4,23 @@ export type CategoryTree = {
   slug: string;
   children: CategoryTree[];
 };
+
+export type Category = {
+  id: number;
+  name: string;
+  slugPath: string;
+};
+
+export type CategoryTopLevel = Category;
+
+export type CategoryDetail = {
+  category: {
+    id: number;
+    name: string;
+    description: string;
+    slug: string;
+    slugPath: string;
+  };
+  breadcrumb: Category[];
+  children: Category[];
+};

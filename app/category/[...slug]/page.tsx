@@ -1,5 +1,5 @@
 import CategoryHeader from "@/components/category/category-header";
-import { CategoryHeaderSkeleton } from "@/components/category/category-header-skeleton";
+import { CategoryHeaderSkeleton } from "@/features/category/components/category-header-skeleton";
 import { CategoryProducts } from "@/components/category/category-products";
 import { ProductListingSkeleton } from "@/components/products/product-listing-skeleton";
 

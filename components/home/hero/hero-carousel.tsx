@@ -19,8 +19,8 @@ export function HeroCarousel({ banners }: Props) {
     <section className="w-full">
       <Carousel plugins={[plugin.current]} opts={{ loop: true }} className="relative w-full">
         {/* FRAME */}
-        <div className="overflow-hidden rounded-xl">
-          <CarouselContent className="ml-0">
+        <div className="overflow-hidden rounded-lg">
+          <CarouselContent>
             {banners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <Link href={banner.url ?? "#"}>
