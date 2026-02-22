@@ -4,7 +4,7 @@ export function HeroCarouselSkeleton() {
   return (
     <section className="w-full">
       <div className="overflow-hidden rounded-xl">
-        <div className="relative aspect-16/6 w-full">
+        <div className="relative aspect-3/1 w-full">
           <Skeleton className="absolute inset-0 h-full w-full" />
 
           <div className="absolute inset-0 flex items-end md:items-center">

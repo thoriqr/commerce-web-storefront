@@ -24,7 +24,7 @@ export function HeroCarousel({ banners }: Props) {
             {banners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <Link href={banner.url ?? "#"}>
-                  <div className="relative aspect-16/6 w-full">
+                  <div className="relative aspect-3/1 w-full">
                     <Image
                       src={getImageUrl(banner.imageKey)}
                       alt={banner.title}

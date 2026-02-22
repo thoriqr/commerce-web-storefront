@@ -1,5 +1,5 @@
 import { CategoryBreadcrumb } from "./category-breadcrumb";
-import { SubcategoryGrid } from "../../features/category/components/subcategory-grid";
+import { SubcategoryGrid } from "@/features/category/components/subcategory-grid";
 import { getCategoryDetail } from "@/features/category/api";
 
 type Props = {

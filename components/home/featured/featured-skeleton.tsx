@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProductCarouselSkeleton } from "@/features/product/components/product-carousel-skeleton";
+import { ProductCarouselSkeleton } from "@/features/product/components/skeletons/product-carousel-skeleton";
 
 export default function FeaturedSkeleton() {
   return (

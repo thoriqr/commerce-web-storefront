@@ -11,7 +11,7 @@ type Props = {
 export function ProductSortSelect({ value, onChange }: Props) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-200">
+      <SelectTrigger className="w-60">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent>
