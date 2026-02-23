@@ -23,11 +23,11 @@ export type DimensionFilter = {
   }[];
 };
 
-export type ProductQueryParams = {
+export type ProductListingQueryParams = {
   cursor?: string;
   limit?: number;
   priceMin?: number;
   priceMax?: number;
-  sortBy?: "created_at" | "price";
-  sortDir?: "asc" | "desc";
-};
+  sortBy?: string;
+  sortDir?: string;
+} & Record<string, string | number | undefined>;

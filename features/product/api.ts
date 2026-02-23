@@ -1,16 +1,20 @@
 import { apiFetch } from "@/lib/api";
-import { ProductListing, ProductQueryParams } from "./types";
+import { ProductListing, ProductListingQueryParams } from "./types";
 
 const BASE_URL = "/products";
 
-export async function getProductsByCategory(slugPath: string, params?: ProductQueryParams) {
+export async function getProductsByCategory(slugPath: string, params?: ProductListingQueryParams) {
   const search = new URLSearchParams();
 
   search.set("slugPath", slugPath);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value === undefined || value === null) return;
+
+      if (Array.isArray(value)) {
+        search.set(key, value.join(","));
+      } else {
         search.set(key, String(value));
       }
     });
