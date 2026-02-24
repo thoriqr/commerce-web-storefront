@@ -31,3 +31,57 @@ export type ProductListingQueryParams = {
   sortBy?: string;
   sortDir?: string;
 } & Record<string, string | number | undefined>;
+
+export type ProductDimensionValue = {
+  key: string;
+  label: string;
+  hexColor: string | null;
+};
+
+export type ProductDimension = {
+  key: string;
+  label: string;
+  values: ProductDimensionValue[];
+};
+
+export type ProductVariantOption = {
+  id: number;
+  options: { dimensionKey: string; valueKey: string }[];
+};
+
+export type ProductImageSignature = { dimensionKey: string; valueKey: string };
+
+export type ProductImage = {
+  id: number;
+  imageKey: string;
+  type: "product" | "variant";
+  signature: ProductImageSignature;
+};
+
+export type ProductDetail = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  status: "ACTIVE" | "INACTIVE";
+  isVariant: boolean;
+  initialVariantId: number;
+  category: {
+    name: string;
+    slugPath: string;
+  };
+  dimensions: ProductDimension[];
+  variants: ProductVariantOption[];
+  images: ProductImage[];
+};
+
+export type ProductVariantDetail = {
+  variantId: number;
+  price: number;
+  stock: number;
+  sku: string | null;
+  currency: string;
+  weight: number;
+  weightUnit: string;
+  isAvailable: boolean;
+};

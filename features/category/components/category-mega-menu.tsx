@@ -1,3 +1,4 @@
+import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { CategoryTree } from "@/features/category/types";
 import Link from "next/link";
 
@@ -15,9 +16,9 @@ export function CategoryMegaMenu({ categories }: Props) {
           return (
             <div key={root.id} className="space-y-4">
               {/* Root */}
-              <Link href={`/category/${root.slug}`} className="block text-sm font-semibold tracking-wide hover:text-primary">
-                {root.name}
-              </Link>
+              <NavigationMenuLink disableDefaultStyle className="block text-sm font-semibold tracking-wide hover:text-primary" asChild>
+                <Link href={`/category/${root.slug}`}>{root.name}</Link>
+              </NavigationMenuLink>
 
               {/* Divider */}
               <div className="h-px bg-border" />
@@ -29,23 +30,25 @@ export function CategoryMegaMenu({ categories }: Props) {
 
                   return (
                     <div key={lvl2.id} className="space-y-1">
-                      <Link
-                        href={`/category/${root.slug}/${lvl2.slug}`}
+                      <NavigationMenuLink
+                        asChild
+                        disableDefaultStyle
                         className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {lvl2.name}
-                      </Link>
+                        <Link href={`/category/${root.slug}/${lvl2.slug}`}>{lvl2.name}</Link>
+                      </NavigationMenuLink>
 
                       {lvl3Children.length > 0 && (
                         <div className="space-y-1 pl-3 border-l border-muted">
                           {lvl3Children.map((lvl3) => (
-                            <Link
+                            <NavigationMenuLink
+                              disableDefaultStyle
                               key={lvl3.id}
-                              href={`/category/${root.slug}/${lvl2.slug}/${lvl3.slug}`}
+                              asChild
                               className="block text-sm text-muted-foreground/80 hover:text-foreground transition-colors"
                             >
-                              {lvl3.name}
-                            </Link>
+                              <Link href={`/category/${root.slug}/${lvl2.slug}/${lvl3.slug}`}>{lvl3.name}</Link>
+                            </NavigationMenuLink>
                           ))}
                         </div>
                       )}

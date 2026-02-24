@@ -1,23 +1,28 @@
 "use client";
 
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { DimensionFilter } from "../types";
+
+type DimensionLike = {
+  name: string;
+};
 
 type Options = {
-  dimensions?: DimensionFilter[];
+  dimensions?: DimensionLike[];
   mode?: "instant" | "draft";
 };
 
 export function useListingFilterController({ dimensions, mode = "instant" }: Options) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const hasSyncedRef = useRef(false);
 
   // =========================
   // CURRENT URL STATE
   // =========================
   const currentDimensions = useMemo(() => {
     if (!dimensions) return {};
+
     return Object.fromEntries(dimensions.map((dim) => [dim.name, searchParams.get(dim.name)?.split(",") ?? []]));
   }, [dimensions, searchParams]);
 
@@ -28,40 +33,51 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
   // DRAFT STATE (mobile)
   // =========================
   const [draftDimensions, setDraftDimensions] = useState(currentDimensions);
-
   const [minDraft, setMinDraft] = useState(currentPriceMin);
-
   const [maxDraft, setMaxDraft] = useState(currentPriceMax);
-
   const [priceError, setPriceError] = useState<string | null>(null);
 
-  // Sync draft when URL changes (mobile only)
-  useEffect(() => {
-    if (mode === "draft") {
-      setDraftDimensions(currentDimensions);
-      setMinDraft(currentPriceMin);
-      setMaxDraft(currentPriceMax);
+  // =========================
+  // 🔥 REALTIME PRICE VALIDATION
+  // =========================
+  const validatePrice = (min: string, max: string) => {
+    const minNum = min ? Number(min) : undefined;
+    const maxNum = max ? Number(max) : undefined;
+
+    if (minNum !== undefined && maxNum !== undefined && minNum > maxNum) {
+      return "Min price cannot exceed max price";
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return null;
+  };
 
-  // =========================
-  // REALTIME PRICE VALIDATION
-  // =========================
   useEffect(() => {
-    const min = minDraft ? Number(minDraft) : undefined;
-    const max = maxDraft ? Number(maxDraft) : undefined;
-
-    if (min !== undefined && max !== undefined && min > max) {
-      setPriceError("Min price cannot exceed max price");
-    } else {
-      setPriceError(null);
-    }
+    const error = validatePrice(minDraft, maxDraft);
+    setPriceError(error);
   }, [minDraft, maxDraft]);
 
   // =========================
-  // UPDATE URL (desktop)
+  // 🔥 MANUAL SYNC (for drawer open)
+  // =========================
+  const syncFromUrl = () => {
+    if (mode !== "draft") return;
+
+    // ync sekali tiap open cycle
+    if (hasSyncedRef.current) return;
+
+    setDraftDimensions(currentDimensions);
+    setMinDraft(currentPriceMin);
+    setMaxDraft(currentPriceMax);
+
+    hasSyncedRef.current = true;
+  };
+
+  const resetSyncFlag = () => {
+    hasSyncedRef.current = false;
+  };
+
+  // =========================
+  // UPDATE URL
   // =========================
   const updateParams = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -87,7 +103,6 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
   const toggleDimension = (dimension: string, value: string) => {
     if (mode === "instant") {
       const current = searchParams.get(dimension)?.split(",") ?? [];
-
       const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
 
       updateParams({
@@ -95,7 +110,6 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
       });
     } else {
       const current = draftDimensions[dimension] ?? [];
-
       const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
 
       setDraftDimensions({
@@ -109,14 +123,13 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
   // DESKTOP PRICE COMMIT
   // =========================
   const commitPrice = () => {
+    if (mode !== "instant") return;
     if (priceError) return;
 
-    if (mode === "instant") {
-      updateParams({
-        priceMin: minDraft || null,
-        priceMax: maxDraft || null
-      });
-    }
+    updateParams({
+      priceMin: minDraft || null,
+      priceMax: maxDraft || null
+    });
   };
 
   // =========================
@@ -128,7 +141,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
 
     const params = new URLSearchParams(searchParams.toString());
 
-    // Hapus filter lama dulu
+    // clear old filters
     dimensions?.forEach((dim) => {
       params.delete(dim.name);
     });
@@ -136,7 +149,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     params.delete("priceMin");
     params.delete("priceMax");
 
-    // Tambahkan draft baru
+    // apply draft
     Object.entries(draftDimensions).forEach(([key, values]) => {
       if (values.length) {
         params.set(key, values.join(","));
@@ -157,27 +170,31 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
   };
 
   // =========================
-  // RESET (cleaner)
+  // RESET
   // =========================
   const resetAll = () => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // Hapus dimension
     dimensions?.forEach((dim) => {
       params.delete(dim.name);
     });
 
-    // Hapus price
     params.delete("priceMin");
     params.delete("priceMax");
 
     router.replace(`?${params.toString()}`, {
       scroll: false
     });
+
+    if (mode === "draft") {
+      setDraftDimensions({});
+      setMinDraft("");
+      setMaxDraft("");
+    }
   };
 
   // =========================
-  // FILTER COUNT
+  // COUNTS
   // =========================
   const activeCount = useMemo(() => {
     let count = 0;
@@ -205,11 +222,8 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     if (maxDraft) count++;
 
     return count;
-  }, [mode, draftDimensions, minDraft, maxDraft, activeCount]);
+  }, [draftDimensions, minDraft, maxDraft, mode, activeCount]);
 
-  // =========================
-  // DETECT CHANGES
-  // =========================
   const hasChanges = useMemo(() => {
     if (mode !== "draft") return false;
 
@@ -218,7 +232,9 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     const draftParams = new URLSearchParams();
 
     Object.entries(draftDimensions).forEach(([key, values]) => {
-      if (values.length) draftParams.set(key, values.join(","));
+      if (values.length) {
+        draftParams.set(key, values.join(","));
+      }
     });
 
     if (minDraft) draftParams.set("priceMin", minDraft);
@@ -244,6 +260,8 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     draftCount,
     hasChanges,
 
-    resetAll
+    resetAll,
+    syncFromUrl,
+    resetSyncFlag
   };
 }

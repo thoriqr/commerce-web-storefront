@@ -5,14 +5,18 @@ import { ProductGrid } from "@/features/product/components/product-grid";
 import { ProductListEmpty } from "@/features/product/components/product-list-empty";
 import { ProductListError } from "@/features/product/components/product-list-error";
 import { ProductGridSkeleton } from "@/features/product/components/skeletons/product-grid-skeleton";
+import { useListingFilterController } from "@/features/product/hooks/use-listing-filter-controller";
 import { ProductListing } from "@/features/product/types";
 import { buildListingParams } from "@/features/product/utils/build-listing-params";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function CategoryProductList({ slugPath }: { slugPath: string }) {
   const searchParams = useSearchParams();
-  const router = useRouter();
+
+  const { resetAll } = useListingFilterController({
+    mode: "instant"
+  });
 
   const listingParams = buildListingParams(new URLSearchParams(searchParams.toString()));
 
@@ -34,19 +38,13 @@ export default function CategoryProductList({ slugPath }: { slugPath: string }) 
   }
 
   if (isError) {
-    return (
-      <ProductListError
-        message={(error as Error)?.message}
-        onRetry={() => refetch()}
-        onResetFilters={() => router.replace(`/category/${slugPath}`)}
-      />
-    );
+    return <ProductListError message={(error as Error)?.message} onRetry={() => refetch()} onResetFilters={resetAll} />;
   }
 
   const products = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (products.length === 0) {
-    return <ProductListEmpty onResetFilters={() => router.replace(`/category/${slugPath}`)} />;
+    return <ProductListEmpty onResetFilters={resetAll} />;
   }
 
   return <ProductGrid products={products} hasMore={hasNextPage} onLoadMore={fetchNextPage} isLoadingMore={isFetchingNextPage} />;

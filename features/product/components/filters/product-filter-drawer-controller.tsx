@@ -23,6 +23,8 @@ export function ProductFilterDrawerController({ dimensions }: Props) {
       hasChanges={filter.hasChanges && !filter.priceError}
       onApply={filter.apply}
       onReset={filter.resetAll}
+      onOpen={filter.syncFromUrl}
+      onClose={filter.resetSyncFlag}
     >
       <ProductPriceFilter
         min={filter.minDraft ? Number(filter.minDraft) : undefined}

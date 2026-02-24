@@ -2,6 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { DimensionFilter } from "../../types";
+import { Label } from "@/components/ui/label";
 
 type Props = {
   dimensions: DimensionFilter[];
@@ -24,9 +25,17 @@ export function ProductDimensionFilter({ dimensions, selected, onToggle }: Props
                 <div key={val.value} className="flex items-center gap-2">
                   <Checkbox id={`${dim.name}-${val.value}`} checked={checked} onCheckedChange={() => onToggle(dim.name, val.value)} />
 
-                  <label htmlFor={`${dim.name}-${val.value}`} className="text-sm text-muted-foreground">
+                  <Label
+                    htmlFor={`${dim.name}-${val.value}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onToggle(dim.name, val.value);
+                    }}
+                    className="text-sm text-muted-foreground"
+                  >
                     {val.label} ({val.count})
-                  </label>
+                  </Label>
                 </div>
               );
             })}

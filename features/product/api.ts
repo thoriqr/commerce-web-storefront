@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import { ProductListing, ProductListingQueryParams } from "./types";
+import { ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
 
 const BASE_URL = "/products";
 
@@ -29,4 +29,12 @@ export async function getProductsByCollection(slug: string) {
 
 export async function getProductsBySearch(q: string) {
   return apiFetch<ProductListing>(`${BASE_URL}/by-search?q=${q}`);
+}
+
+export async function getProductBySlug(slug: string) {
+  return apiFetch<ProductDetail>(`${BASE_URL}/${slug}`);
+}
+
+export async function getVariantByProductSlugAndVariantId(productSlug: string, variantId: number) {
+  return apiFetch<ProductVariantDetail>(`${BASE_URL}/${productSlug}/variants/${variantId}`);
 }
