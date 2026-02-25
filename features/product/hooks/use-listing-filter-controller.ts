@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { clampPrice } from "../utils/clamp-price";
 
 type DimensionLike = {
   name: string;
@@ -56,13 +57,42 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     setPriceError(error);
   }, [minDraft, maxDraft]);
 
+  // Sync price state in instant mode when URL changes
+  useEffect(() => {
+    if (mode !== "instant") return;
+
+    setMinDraft(currentPriceMin);
+    setMaxDraft(currentPriceMax);
+  }, [currentPriceMin, currentPriceMax, mode]);
+
+  useEffect(() => {
+    if (mode !== "instant") return;
+
+    const fixMin = clampPrice(currentPriceMin);
+    const fixMax = clampPrice(currentPriceMax);
+
+    if (fixMin !== currentPriceMin || fixMax !== currentPriceMax) {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (fixMin) params.set("priceMin", fixMin);
+      else params.delete("priceMin");
+
+      if (fixMax) params.set("priceMax", fixMax);
+      else params.delete("priceMax");
+
+      router.replace(`?${params.toString()}`, {
+        scroll: false
+      });
+    }
+  }, [currentPriceMin, currentPriceMax, mode, router, searchParams]);
+
   // =========================
   // 🔥 MANUAL SYNC (for drawer open)
   // =========================
   const syncFromUrl = () => {
     if (mode !== "draft") return;
 
-    // ync sekali tiap open cycle
+    // sync sekali tiap open cycle
     if (hasSyncedRef.current) return;
 
     setDraftDimensions(currentDimensions);

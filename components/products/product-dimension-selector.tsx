@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ProductDetail } from "@/lib/products/types";
+import { ProductDetail } from "@/features/product/types";
 
 type Props = {
   product: ProductDetail;
@@ -14,23 +14,25 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
   const searchParams = useSearchParams();
 
   // 🔥 Ambil active variant
-  const activeVariant = product.variants.find((v) => v.id === activeVariantId);
+  const activeVariant = product.variants.find((v) => String(v.id) === activeVariantId);
 
   if (!activeVariant) return null;
 
-  const handleSelect = (dimensionId: string, valueId: string) => {
+  const handleSelect = (dimensionKey: string, valueKey: string) => {
     // 🔥 Bangun selection baru berdasarkan active variant
-    const nextSelection = activeVariant.options.map((opt) => (opt.dimensionId === dimensionId ? { ...opt, valueId } : opt));
+    const nextSelection = activeVariant.options.map((opt) => (opt.dimensionKey === dimensionKey ? { ...opt, valueKey } : opt));
 
     // 🔥 Cari variant yang match seluruh selection
     const matchingVariant = product.variants.find((variant) =>
-      nextSelection.every((selected) => variant.options.some((opt) => opt.dimensionId === selected.dimensionId && opt.valueId === selected.valueId))
+      nextSelection.every((selected) =>
+        variant.options.some((opt) => opt.dimensionKey === selected.dimensionKey && opt.valueKey === selected.valueKey)
+      )
     );
 
     if (!matchingVariant) return;
 
     const params = new URLSearchParams(searchParams.toString());
-    params.set("variant", matchingVariant.id);
+    params.set("variant", String(matchingVariant.id));
 
     router.push(`?${params.toString()}`, { scroll: false });
   };
@@ -38,19 +40,19 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
   return (
     <div className="space-y-6">
       {product.dimensions.map((dimension) => {
-        const selectedOption = activeVariant.options.find((opt) => opt.dimensionId === dimension.id);
+        const selectedOption = activeVariant.options.find((opt) => opt.dimensionKey === dimension.key);
 
         return (
-          <div key={dimension.id} className="space-y-2">
-            <p className="text-sm font-medium">{dimension.name}</p>
+          <div key={dimension.key} className="space-y-2">
+            <p className="text-sm font-medium">{dimension.label}</p>
 
             <div className="flex flex-wrap gap-2">
               {dimension.values.map((value) => {
-                const isActive = selectedOption?.valueId === value.id;
+                const isActive = selectedOption?.valueKey === value.key;
 
                 return (
-                  <Button key={value.id} variant={isActive ? "default" : "outline"} size="sm" onClick={() => handleSelect(dimension.id, value.id)}>
-                    {value.name}
+                  <Button key={value.key} variant={isActive ? "default" : "outline"} size="sm" onClick={() => handleSelect(dimension.key, value.key)}>
+                    {value.label}
                   </Button>
                 );
               })}

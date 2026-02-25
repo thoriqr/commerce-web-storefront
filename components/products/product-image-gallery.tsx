@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
-import { ProductDetail, ProductImage } from "@/lib/products/types";
+
+import { ProductDetail } from "@/features/product/types";
+import { getImageUrl } from "@/lib/media";
 
 type Props = {
   product: ProductDetail;
@@ -14,11 +16,15 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  const isInitial = activeVariantId === product.initialVariantId;
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const initialVariantId = String(product.initialVariantId);
+
+  const isInitial = activeVariantId === initialVariantId;
 
   // 🔥 Cari active variant
   const activeVariant = useMemo(() => {
-    return product.variants.find((v) => v.id === activeVariantId);
+    return product.variants.find((v) => String(v.id) === activeVariantId);
   }, [product.variants, activeVariantId]);
 
   // 🔥 Cari image index berdasarkan signature
@@ -28,7 +34,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
     return product.images.findIndex((img) => {
       if (img.type !== "variant" || !img.signature) return false;
 
-      return activeVariant.options.some((opt) => opt.dimensionId === img.signature?.dimensionId && opt.valueId === img.signature?.valueId);
+      return activeVariant.options.some((opt) => opt.dimensionKey === img.signature?.dimensionKey && opt.valueKey === img.signature?.valueKey);
     });
   }, [product.images, activeVariant]);
 
@@ -55,15 +61,34 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
     }
   }, [api, variantImageIndex, isInitial]);
 
+  useEffect(() => {
+    const el = thumbRefs.current[current];
+
+    if (el) {
+      el.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+      });
+    }
+  }, [current]);
+
   return (
     <div className="space-y-4">
       {/* MAIN CAROUSEL */}
       <Carousel setApi={setApi} opts={{ align: "start" }} className="w-full">
         <CarouselContent>
-          {product.images.map((img) => (
+          {product.images.map((img, idx) => (
             <CarouselItem key={img.id}>
               <div className="relative aspect-square w-full overflow-hidden rounded-xl border bg-muted">
-                <Image src={img.url} alt="" fill className="object-cover" />
+                <Image
+                  src={getImageUrl(img.imageKey)}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={idx === 0}
+                  className="object-cover"
+                />
               </div>
             </CarouselItem>
           ))}
@@ -74,20 +99,19 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
       </Carousel>
 
       {/* THUMBNAILS */}
-      <div className="w-full overflow-x-auto">
-        <div className="flex justify-center gap-3 p-1 min-w-max">
+      <div className="w-full overflow-x-auto scroll-smooth">
+        <div className="flex gap-3 p-1 w-max">
           {product.images.map((img, index) => (
             <button
+              ref={(el) => {
+                thumbRefs.current[index] = el;
+              }}
               key={img.id}
               onClick={() => api?.scrollTo(index)}
-              className={`
-          relative h-16 w-16 shrink-0 rounded-md border
-          transition
-          ${current === index ? "ring-2 ring-primary" : "hover:ring-1 hover:ring-muted-foreground"}
-        `}
+              className={` relative h-16 w-16 shrink-0 rounded-md border transition ${current === index ? "ring-2 ring-primary" : "hover:ring-1 hover:ring-muted-foreground"}`}
             >
               <div className="relative h-full w-full overflow-hidden rounded-md">
-                <Image src={img.url} alt="" fill className="object-cover" />
+                <Image src={getImageUrl(img.imageKey)} alt={product.name} fill sizes="(max-width: 768px) 25vw, 10vw" className="object-cover" />
               </div>
             </button>
           ))}

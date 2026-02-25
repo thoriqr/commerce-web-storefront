@@ -1,24 +1,5 @@
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function NotFound() {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4">
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Category Not Found</EmptyTitle>
-          <EmptyDescription>The category you are looking for does not exist or may have been removed.</EmptyDescription>
-        </EmptyHeader>
-
-        <EmptyContent>
-          <div className="flex gap-2">
-            <Button asChild size="sm">
-              <Link href="/">Back to Home</Link>
-            </Button>
-          </div>
-        </EmptyContent>
-      </Empty>
-    </div>
-  );
+  return <EmptyState title="Category Not Found" description="The category you are looking for does not exist or may have been removed." />;
 }
