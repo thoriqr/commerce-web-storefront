@@ -1,4 +1,4 @@
-import { ProductDetail } from "@/components/products/product-detail";
+import { ProductDetail } from "@/features/product/components/product-detail";
 import { getProductBySlug } from "@/features/product/api";
 import { truncate } from "@/lib/truncate";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";

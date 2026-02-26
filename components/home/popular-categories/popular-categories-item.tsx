@@ -7,11 +7,13 @@ type Props = {
 
 export default function PopularCategoriesItem({ category }: Props) {
   return (
-    <Link href={`/category/${category.slug}`} className="group rounded-lg border bg-background p-6">
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight">{category.name}</h3>
+    <Link href={`/category/${category.slug}`} className="group rounded-lg border bg-background">
+      <div className="flex items-start p-4 gap-4 min-w-0">
+        <div className="space-y-1 min-w-0 flex-1">
+          <h3 className="text-base sm:text-lg font-semibold leading-snug line-clamp-2">{category.name}</h3>
 
-        <span className="text-sm text-muted-foreground transition-colors group-hover:text-primary">Explore →</span>
+          <span className="text-sm text-muted-foreground">Explore →</span>
+        </div>
       </div>
     </Link>
   );

@@ -13,16 +13,15 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🔥 Ambil active variant
   const activeVariant = product.variants.find((v) => String(v.id) === activeVariantId);
 
   if (!activeVariant) return null;
 
   const handleSelect = (dimensionKey: string, valueKey: string) => {
-    // 🔥 Bangun selection baru berdasarkan active variant
+    // build new selection based on active variant
     const nextSelection = activeVariant.options.map((opt) => (opt.dimensionKey === dimensionKey ? { ...opt, valueKey } : opt));
 
-    // 🔥 Cari variant yang match seluruh selection
+    // find match variant whole selection
     const matchingVariant = product.variants.find((variant) =>
       nextSelection.every((selected) =>
         variant.options.some((opt) => opt.dimensionKey === selected.dimensionKey && opt.valueKey === selected.valueKey)

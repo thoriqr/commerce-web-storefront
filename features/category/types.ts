@@ -11,7 +11,11 @@ export type Category = {
   slugPath: string;
 };
 
-export type CategoryTopLevel = Category;
+export type CategoryTopLevel = {
+  id: number;
+  name: string;
+  slug: string;
+};
 
 export type CategoryDetail = {
   category: {
