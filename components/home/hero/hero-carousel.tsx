@@ -29,21 +29,10 @@ export function HeroCarousel({ banners }: Props) {
                       src={getImageUrl(banner.imageKey)}
                       alt={banner.title}
                       fill
+                      loading="eager"
                       priority={idx === 0}
-                      className="object-cover transition-transform duration-700 hover:scale-105"
+                      className="object-contain"
                     />
-
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent" />
-
-                    <div className="absolute inset-0 flex items-end md:items-center">
-                      <div className="mx-auto w-full max-w-7xl px-6 pb-8 md:pb-0">
-                        <div className="max-w-2xl">
-                          <h2 className="text-3xl font-semibold leading-tight text-white drop-shadow-lg md:text-5xl md:leading-[1.1]">
-                            {banner.title}
-                          </h2>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </Link>
               </CarouselItem>
