@@ -17,10 +17,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
   const [current, setCurrent] = useState(0);
 
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const initialVariantId = String(product.initialVariantId);
-
-  const isInitial = activeVariantId === initialVariantId;
+  const hasMountedRef = useRef(false);
 
   // 🔥 Cari active variant
   const activeVariant = useMemo(() => {
@@ -56,10 +53,15 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
   useEffect(() => {
     if (!api) return;
 
-    if (!isInitial && variantImageIndex >= 0) {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return; // skip only first mount
+    }
+
+    if (variantImageIndex >= 0) {
       api.scrollTo(variantImageIndex);
     }
-  }, [api, variantImageIndex, isInitial]);
+  }, [api, variantImageIndex]);
 
   useEffect(() => {
     const el = thumbRefs.current[current];
