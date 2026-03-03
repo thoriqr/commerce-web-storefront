@@ -8,10 +8,16 @@ import {
 import Link from "next/link";
 import { NavbarSearch } from "./navbar-search";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User } from "lucide-react";
-import { NavbarCategoriesBoundary } from "./navbar-categories-boundary";
+import { ShoppingCart } from "lucide-react";
+import { CategoryTree } from "@/features/category/types";
+import { CategoryMegaMenu } from "@/features/category/components/category-mega-menu";
+import { AuthStatus } from "@/features/auth/components/auth-status";
 
-export default function NavbarDesktop() {
+type Props = {
+  categories: CategoryTree[];
+};
+
+export default function NavbarDesktop({ categories }: Props) {
   return (
     <div className="hidden h-16 grid-cols-[auto_auto_1fr_auto] items-center gap-6 md:grid">
       {/* Logo */}
@@ -26,7 +32,7 @@ export default function NavbarDesktop() {
             <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
 
             <NavigationMenuContent>
-              <NavbarCategoriesBoundary />
+              <CategoryMegaMenu categories={categories} />
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
@@ -45,9 +51,7 @@ export default function NavbarDesktop() {
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" size="icon">
-          <User className="h-5 w-5" />
-        </Button>
+        <AuthStatus variant="desktop" />
       </div>
     </div>
   );

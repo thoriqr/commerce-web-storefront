@@ -1,11 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, User } from "lucide-react";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, ShoppingCart } from "lucide-react";
 import { NavbarSearch } from "./navbar-search";
 import Link from "next/link";
-import { NavbarCategoriesBoundary } from "./navbar-categories-boundary";
+import { CategoryTree } from "@/features/category/types";
+import { MobileCategoryMenu } from "@/features/category/components/mobile-category-menu";
+import { AuthStatus } from "@/features/auth/components/auth-status";
 
-export default function NavbarMobile() {
+type Props = {
+  categories: CategoryTree[];
+};
+
+export default function NavbarMobile({ categories }: Props) {
   return (
     <>
       <div className="flex h-16 items-center justify-between md:hidden">
@@ -27,23 +33,23 @@ export default function NavbarMobile() {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[85%] max-w-sm overflow-y-auto ">
+            <SheetContent side="right" className="overflow-y-auto ">
               <SheetHeader>
                 <SheetTitle>Browse</SheetTitle>
+                <SheetDescription className="sr-only">Browse categories and navigate your account and cart.</SheetDescription>
               </SheetHeader>
 
-              <div className="mt-6 space-y-6 px-5">
-                <NavbarCategoriesBoundary />
+              <div className="mt-3 space-y-6 px-5">
+                <MobileCategoryMenu categories={categories} />
 
-                <div className="border-t pt-4 space-y-4">
-                  <Link href="/account" className="flex items-center gap-2 text-sm font-medium">
-                    <User className="h-4 w-4" />
-                    Account
-                  </Link>
+                <div className="border-t pt-4 space-y-2">
+                  <AuthStatus variant="mobile" />
 
-                  <Link href="/cart" className="flex items-center gap-2 text-sm font-medium">
-                    <ShoppingCart className="h-4 w-4" />
-                    Cart
+                  <Link href="/cart">
+                    <Button variant="ghost" className="w-full justify-start gap-3 px-2">
+                      <ShoppingCart className="h-4 w-4" />
+                      <span>Cart</span>
+                    </Button>
                   </Link>
                 </div>
               </div>

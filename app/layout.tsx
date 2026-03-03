@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/navbar/navbar";
 import QueryProviders from "@/providers/query-providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -23,8 +22,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background text-foreground">
         <QueryProviders>
-          <Navbar />
-          <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+          <main>{children}</main>
         </QueryProviders>
       </body>
     </html>
