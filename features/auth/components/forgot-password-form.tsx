@@ -6,24 +6,24 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRegister } from "../hooks/use-register";
+import { usePasswordResetRequest } from "../hooks/use-password-reset-request";
 import { useState } from "react";
 import { extractFieldError } from "../utils/extract-field-error";
 
-export default function RegisterForm() {
+export default function ForgotPasswordForm() {
   const router = useRouter();
-  const register = useRegister();
+  const requestReset = usePasswordResetRequest();
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    register.mutate(
+    requestReset.mutate(
       { email },
       {
         onSuccess: (result) => {
           if (result.ok) {
-            router.push("/register/success");
+            router.push("/forgot-password/success");
           }
         }
       }
@@ -31,13 +31,13 @@ export default function RegisterForm() {
   };
 
   function handleEmailChange(value: string) {
-    if (register.isError || register.data) {
-      register.reset();
+    if (requestReset.isError || requestReset.data) {
+      requestReset.reset();
     }
     setEmail(value);
   }
 
-  const apiError = register.data && !register.data.ok ? register.data.error : undefined;
+  const apiError = requestReset.data && !requestReset.data.ok ? requestReset.data.error : undefined;
 
   const emailError = extractFieldError(apiError, "email");
 
@@ -46,8 +46,8 @@ export default function RegisterForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Create your account</CardTitle>
-        <CardDescription>Enter your email below to create your account</CardDescription>
+        <CardTitle className="text-xl">Reset Your Password</CardTitle>
+        <CardDescription>Enter your email and we&apos;ll send you a link to reset your password.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
@@ -62,7 +62,7 @@ export default function RegisterForm() {
                 required
                 value={email}
                 onChange={(e) => handleEmailChange(e.target.value)}
-                disabled={register.isPending}
+                disabled={requestReset.isPending}
               />
 
               {emailError && <p className="text-sm text-destructive mt-2">{emailError}</p>}
@@ -71,11 +71,11 @@ export default function RegisterForm() {
             </Field>
 
             <Field>
-              <Button type="submit" disabled={register.isPending}>
-                {register.isPending ? "Creating..." : "Create Account"}
+              <Button type="submit" disabled={requestReset.isPending}>
+                {requestReset.isPending ? "Sending..." : "Reset password"}
               </Button>
               <FieldDescription className="text-center">
-                Already have an account? <Link href="/login">Login</Link>
+                Back to <Link href="/login">Login</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

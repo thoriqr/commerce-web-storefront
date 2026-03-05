@@ -17,7 +17,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(e: React.ChangeEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const result = await loginMutation.mutateAsync({
@@ -87,7 +87,7 @@ export default function LoginForm() {
             <Field>
               <div className="flex items-center">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Link href="/reset-password" className="ml-auto text-sm underline-offset-4 hover:underline">
+                <Link href="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline">
                   Forgot your password?
                 </Link>
               </div>

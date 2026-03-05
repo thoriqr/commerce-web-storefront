@@ -1,5 +1,5 @@
 import { MeResponse } from "@/lib/types";
-import type { ApiResult, ApiError, LoginInput } from "./types";
+import type { ApiResult, ApiError, LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput } from "./types";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/auth`;
 
@@ -35,6 +35,34 @@ async function authApiRequest(path: string, options: RequestInit): Promise<ApiRe
 
 export function loginRequest(input: LoginInput): Promise<ApiResult> {
   return authApiRequest("/login", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function registerRequest(input: RegisterInput) {
+  return authApiRequest("/register", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function verifyEmailConfirm(input: VerifyEmailInput) {
+  return authApiRequest("/verify-email", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function resetPasswordRequest(input: RegisterInput) {
+  return authApiRequest("/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function resetPasswordConfirm(input: ResetPasswordInput) {
+  return authApiRequest("/reset-password", {
     method: "POST",
     body: JSON.stringify(input)
   });

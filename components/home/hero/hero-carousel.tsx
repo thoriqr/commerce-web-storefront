@@ -25,7 +25,7 @@ export function HeroCarousel({ banners }: Props) {
               <CarouselItem key={banner.id} className="pl-0">
                 <Link href={banner.url ?? "#"}>
                   <div className="relative aspect-3/1 w-full">
-                    <Image src={getImageUrl(banner.imageKey)} alt={banner.title} fill loading="eager" priority={idx === 0} className="object-cover" />
+                    <Image src={getImageUrl(banner.imageKey)} alt={banner.title} fill loading="eager" className="object-cover" />
                   </div>
                 </Link>
               </CarouselItem>

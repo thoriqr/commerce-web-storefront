@@ -88,7 +88,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  priority={idx === 0}
+                  loading="eager"
                   className="object-cover"
                 />
               </div>

@@ -19,3 +19,14 @@ export type LoginInput = {
 export type RegisterInput = {
   email: string;
 };
+
+export type VerifyEmailInput = {
+  token: string;
+  displayName: string;
+  password: string;
+};
+
+export type ResetPasswordInput = {
+  token: string;
+  password: string;
+};

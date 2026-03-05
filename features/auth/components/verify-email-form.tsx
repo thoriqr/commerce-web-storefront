@@ -1,24 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useResetPassword } from "../hooks/use-reset-password";
-import { extractFieldError } from "../utils/extract-field-error";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useVerifyEmail } from "../hooks/use-verify-email";
+import { useState } from "react";
+import { extractFieldError } from "../utils/extract-field-error";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type Props = {
   token: string;
 };
 
-export default function ResetPasswordForm({ token }: Props) {
+export default function VerifyEmailForm({ token }: Props) {
   const router = useRouter();
-  const resetPassword = useResetPassword();
+  const verifyMutation = useVerifyEmail();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [localError, setLocalError] = useState("");
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -29,8 +30,9 @@ export default function ResetPasswordForm({ token }: Props) {
       return;
     }
 
-    const result = await resetPassword.mutateAsync({
+    const result = await verifyMutation.mutateAsync({
       token,
+      displayName,
       password
     });
 
@@ -39,29 +41,52 @@ export default function ResetPasswordForm({ token }: Props) {
     router.push("/");
   }
 
+  function handleNameChange(value: string) {
+    if (verifyMutation.isError || verifyMutation.data) {
+      verifyMutation.reset();
+    }
+    setDisplayName(value);
+  }
+
   function handlePasswordChange(value: string) {
-    if (resetPassword.isError || resetPassword.data) {
-      resetPassword.reset();
+    if (verifyMutation.isError || verifyMutation.data) {
+      verifyMutation.reset();
     }
     setPassword(value);
   }
 
-  const apiError = resetPassword.data && !resetPassword.data.ok ? resetPassword.data.error : undefined;
+  const apiError = verifyMutation.data && !verifyMutation.data.ok ? verifyMutation.data.error : undefined;
 
+  const nameError = extractFieldError(apiError, "displayName");
   const passwordError = extractFieldError(apiError, "password");
   const tokenError = extractFieldError(apiError, "token");
 
-  const generalError = !passwordError || !tokenError ? apiError?.message : undefined;
+  const generalError = !passwordError || !nameError || !tokenError ? apiError?.message : undefined;
 
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Set a new password</CardTitle>
-        <CardDescription>Enter a new password for your account.</CardDescription>
+        <CardTitle className="text-xl">Set up your account</CardTitle>
+        <CardDescription>Choose a display name and password to finish creating your account.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
           <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="display-name">Display Name</FieldLabel>
+              <Input
+                id="display-name"
+                type="text"
+                placeholder="John Doe"
+                required
+                value={displayName}
+                onChange={(e) => handleNameChange(e.target.value)}
+                disabled={verifyMutation.isPending}
+              />
+
+              {nameError && <p className="text-sm text-destructive mt-2">{nameError}</p>}
+            </Field>
+
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
@@ -71,7 +96,7 @@ export default function ResetPasswordForm({ token }: Props) {
                 required
                 value={password}
                 onChange={(e) => handlePasswordChange(e.target.value)}
-                disabled={resetPassword.isPending}
+                disabled={verifyMutation.isPending}
               />
 
               {passwordError && <p className="text-sm text-destructive mt-2">{passwordError}</p>}
@@ -86,12 +111,12 @@ export default function ResetPasswordForm({ token }: Props) {
                 required
                 value={confirmPassword}
                 onChange={(e) => {
-                  if (resetPassword.isError || resetPassword.data) {
+                  if (verifyMutation.isError || verifyMutation.data) {
                     setLocalError("");
                   }
                   setConfirmPassword(e.target.value);
                 }}
-                disabled={resetPassword.isPending}
+                disabled={verifyMutation.isPending}
               />
 
               {localError && <p className="text-sm text-destructive mt-2">{localError}</p>}
@@ -100,8 +125,8 @@ export default function ResetPasswordForm({ token }: Props) {
             </Field>
 
             <Field>
-              <Button type="submit" disabled={resetPassword.isPending}>
-                {resetPassword.isPending ? "Resetting..." : "Reset Password"}
+              <Button type="submit" disabled={verifyMutation.isPending}>
+                {verifyMutation.isPending ? "Setting up..." : "Complete Setup"}
               </Button>
             </Field>
           </FieldGroup>
