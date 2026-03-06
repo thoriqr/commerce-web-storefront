@@ -1,6 +1,6 @@
 export type MeResponse = {
   id: string;
   email: string;
-  role: string;
+  hasPassword: boolean;
   displayName: string | null;
 };

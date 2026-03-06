@@ -30,3 +30,18 @@ export type ResetPasswordInput = {
   token: string;
   password: string;
 };
+
+export type ChangePasswordInput = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export type ChangeEmailInput = {
+  email: string;
+};
+
+export type ConfirmEmailInput = { token: string };
+
+export type SetPasswordInput = {
+  password: string;
+};

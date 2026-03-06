@@ -1,5 +1,16 @@
 import { MeResponse } from "@/lib/types";
-import type { ApiResult, ApiError, LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput } from "./types";
+import type {
+  ApiResult,
+  ApiError,
+  LoginInput,
+  RegisterInput,
+  VerifyEmailInput,
+  ResetPasswordInput,
+  ChangePasswordInput,
+  ChangeEmailInput,
+  ConfirmEmailInput,
+  SetPasswordInput
+} from "./types";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/auth`;
 
@@ -63,6 +74,34 @@ export function resetPasswordRequest(input: RegisterInput) {
 
 export function resetPasswordConfirm(input: ResetPasswordInput) {
   return authApiRequest("/reset-password", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function setPasswordRequest(input: SetPasswordInput) {
+  return authApiRequest("/set-password", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function changePasswordRequest(input: ChangePasswordInput) {
+  return authApiRequest("/change-password", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function changeEmailRequest(input: ChangeEmailInput) {
+  return authApiRequest("/change-email", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export function confirmEmailChange(input: ConfirmEmailInput) {
+  return authApiRequest("/confirm-email-change", {
     method: "POST",
     body: JSON.stringify(input)
   });

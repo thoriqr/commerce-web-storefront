@@ -61,7 +61,7 @@ export default function VerifyEmailForm({ token }: Props) {
   const passwordError = extractFieldError(apiError, "password");
   const tokenError = extractFieldError(apiError, "token");
 
-  const generalError = !passwordError || !nameError || !tokenError ? apiError?.message : undefined;
+  const generalError = !passwordError && !nameError && !tokenError ? apiError?.message : undefined;
 
   return (
     <Card>

@@ -51,7 +51,7 @@ export default function ResetPasswordForm({ token }: Props) {
   const passwordError = extractFieldError(apiError, "password");
   const tokenError = extractFieldError(apiError, "token");
 
-  const generalError = !passwordError || !tokenError ? apiError?.message : undefined;
+  const generalError = !passwordError && !tokenError ? apiError?.message : undefined;
 
   return (
     <Card>

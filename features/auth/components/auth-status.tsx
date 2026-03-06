@@ -11,6 +11,8 @@ import { useLogout } from "../hooks/use-logout";
 import { AccountFormDialog } from "./account-form-dialog";
 import ChangeEmailForm from "./change-email-form";
 import ChangePasswordForm from "./change-password-form";
+import SetPasswordForm from "./set-password-form";
+import { MeResponse } from "@/lib/types";
 
 type Props = {
   variant: "desktop" | "mobile";
@@ -43,10 +45,11 @@ export function AuthStatus({ variant }: Props) {
   return <ProfileDialog user={user} variant={variant} />;
 }
 
-function ProfileDialog({ user, variant }: { user: { displayName: string | null; email: string }; variant: "desktop" | "mobile" }) {
+function ProfileDialog({ user, variant }: { user: MeResponse; variant: "desktop" | "mobile" }) {
   const [open, setOpen] = useState(false);
   const [changeEmailOpen, setChangeEmailOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [NewPasswordOpen, setNewPasswordOpen] = useState(false);
   const logoutMutation = useLogout();
 
   const name = user.displayName?.trim() || user.email || "User";
@@ -59,16 +62,17 @@ function ProfileDialog({ user, variant }: { user: { displayName: string | null; 
 
   function handleChangeEmail() {
     setOpen(false);
-    setChangePasswordOpen(false);
     setChangeEmailOpen(true);
-    // nanti kita buka dialog change email
   }
 
   function handleChangePassword() {
     setOpen(false);
-    setChangeEmailOpen(false);
     setChangePasswordOpen(true);
-    // nanti kita buka dialog change password
+  }
+
+  function handleNewPassword() {
+    setOpen(false);
+    setNewPasswordOpen(true);
   }
 
   return (
@@ -108,9 +112,15 @@ function ProfileDialog({ user, variant }: { user: { displayName: string | null; 
                 Change Email
               </Button>
 
-              <Button variant="outline" className="w-full justify-start" onClick={handleChangePassword}>
-                Change Password
-              </Button>
+              {user.hasPassword ? (
+                <Button variant="outline" className="w-full justify-start" onClick={handleChangePassword}>
+                  Change Password
+                </Button>
+              ) : (
+                <Button variant="outline" className="w-full justify-start" onClick={handleNewPassword}>
+                  Set Password
+                </Button>
+              )}
             </div>
 
             {/* Logout */}
@@ -122,22 +132,29 @@ function ProfileDialog({ user, variant }: { user: { displayName: string | null; 
         </DialogContent>
       </Dialog>
 
-      <AccountFormDialog
-        open={changeEmailOpen}
-        onOpenChange={setChangeEmailOpen}
-        title="Change email"
-        description="Enter a new email address. We'll send a confirmation link."
-      >
-        <ChangeEmailForm />
+      <AccountFormDialog open={changeEmailOpen} onOpenChange={setChangeEmailOpen}>
+        <ChangeEmailForm
+          currentEmail={user.email}
+          onClose={() => {
+            setChangeEmailOpen(false);
+          }}
+        />
       </AccountFormDialog>
 
-      <AccountFormDialog
-        open={changePasswordOpen}
-        onOpenChange={setChangePasswordOpen}
-        title="Change password"
-        description="Enter your new password below."
-      >
-        <ChangePasswordForm />
+      <AccountFormDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+        <ChangePasswordForm
+          onClose={() => {
+            setChangePasswordOpen(false);
+          }}
+        />
+      </AccountFormDialog>
+
+      <AccountFormDialog open={NewPasswordOpen} onOpenChange={setNewPasswordOpen}>
+        <SetPasswordForm
+          onClose={() => {
+            setNewPasswordOpen(false);
+          }}
+        />
       </AccountFormDialog>
     </>
   );
