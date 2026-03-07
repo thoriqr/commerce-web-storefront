@@ -5,8 +5,8 @@ import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/di
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useChangeEmail } from "../hooks/use-change-email";
-import { extractFieldError } from "../utils/extract-field-error";
+import { useChangeEmail } from "../../hooks/use-change-email";
+import { extractFieldError } from "../../utils/extract-field-error";
 
 type Props = {
   currentEmail: string;

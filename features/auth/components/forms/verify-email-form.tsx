@@ -2,12 +2,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { useVerifyEmail } from "../hooks/use-verify-email";
 import { useState } from "react";
-import { extractFieldError } from "../utils/extract-field-error";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { extractFieldError } from "../../utils/extract-field-error";
+import { useVerifyEmail } from "../../hooks/use-verify-email";
 
 type Props = {
   token: string;
@@ -26,7 +26,7 @@ export default function VerifyEmailForm({ token }: Props) {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setLocalError("Passwords do not match");
+      setLocalError("Confirm Password do not match");
       return;
     }
 
@@ -38,7 +38,7 @@ export default function VerifyEmailForm({ token }: Props) {
 
     if (!result.ok) return;
 
-    router.push("/");
+    router.replace("/");
   }
 
   function handleNameChange(value: string) {

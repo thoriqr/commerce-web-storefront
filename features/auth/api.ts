@@ -107,6 +107,15 @@ export function confirmEmailChange(input: ConfirmEmailInput) {
   });
 }
 
+export function googleLoginRequest(idToken: string) {
+  return authApiRequest("/google", {
+    method: "POST",
+    body: JSON.stringify({
+      idToken
+    })
+  });
+}
+
 export async function logoutRequest(): Promise<void> {
   await fetch(`${BASE_URL}/logout`, {
     method: "POST",

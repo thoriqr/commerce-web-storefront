@@ -6,9 +6,10 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRegister } from "../hooks/use-register";
+
 import { useState } from "react";
-import { extractFieldError } from "../utils/extract-field-error";
+import { useRegister } from "../../hooks/use-register";
+import { extractFieldError } from "../../utils/extract-field-error";
 
 export default function RegisterForm() {
   const router = useRouter();

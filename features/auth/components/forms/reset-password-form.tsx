@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useResetPassword } from "../hooks/use-reset-password";
-import { extractFieldError } from "../utils/extract-field-error";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useResetPassword } from "../../hooks/use-reset-password";
+import { extractFieldError } from "../../utils/extract-field-error";
 
 type Props = {
   token: string;
@@ -36,7 +37,7 @@ export default function ResetPasswordForm({ token }: Props) {
 
     if (!result.ok) return;
 
-    router.push("/");
+    router.replace("/");
   }
 
   function handlePasswordChange(value: string) {

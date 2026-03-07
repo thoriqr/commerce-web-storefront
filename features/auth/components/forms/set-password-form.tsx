@@ -5,8 +5,8 @@ import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/di
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useSetPassword } from "../hooks/use-set-password";
-import { extractFieldError } from "../utils/extract-field-error";
+import { useSetPassword } from "../../hooks/use-set-password";
+import { extractFieldError } from "../../utils/extract-field-error";
 
 type Props = {
   onClose: () => void;

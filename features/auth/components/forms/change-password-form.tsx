@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useChangePassword } from "../hooks/use-change-password";
-import { extractFieldError } from "../utils/extract-field-error";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { extractFieldError } from "../../utils/extract-field-error";
+import { useChangePassword } from "../../hooks/use-change-password";
 
 type Props = {
   onClose: () => void;

@@ -6,9 +6,10 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { usePasswordResetRequest } from "../hooks/use-password-reset-request";
+
 import { useState } from "react";
-import { extractFieldError } from "../utils/extract-field-error";
+import { usePasswordResetRequest } from "../../hooks/use-password-reset-request";
+import { extractFieldError } from "../../utils/extract-field-error";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function ForgotPasswordForm() {
       {
         onSuccess: (result) => {
           if (result.ok) {
-            router.push("/forgot-password/success");
+            router.replace("/forgot-password/success");
           }
         }
       }

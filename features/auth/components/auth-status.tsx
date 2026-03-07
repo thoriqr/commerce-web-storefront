@@ -1,18 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { User, LogOut } from "lucide-react";
+import { User } from "lucide-react";
 import { useMe } from "../hooks/use-me";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useLogout } from "../hooks/use-logout";
-import { AccountFormDialog } from "./account-form-dialog";
-import ChangeEmailForm from "./change-email-form";
-import ChangePasswordForm from "./change-password-form";
-import SetPasswordForm from "./set-password-form";
-import { MeResponse } from "@/lib/types";
+import ProfileDialog from "./profile/profile-dialog";
 
 type Props = {
   variant: "desktop" | "mobile";
@@ -43,119 +36,4 @@ export function AuthStatus({ variant }: Props) {
   }
 
   return <ProfileDialog user={user} variant={variant} />;
-}
-
-function ProfileDialog({ user, variant }: { user: MeResponse; variant: "desktop" | "mobile" }) {
-  const [open, setOpen] = useState(false);
-  const [changeEmailOpen, setChangeEmailOpen] = useState(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  const [NewPasswordOpen, setNewPasswordOpen] = useState(false);
-  const logoutMutation = useLogout();
-
-  const name = user.displayName?.trim() || user.email || "User";
-  const initial = name.charAt(0).toUpperCase();
-
-  async function handleLogout() {
-    await logoutMutation.mutateAsync();
-    setOpen(false);
-  }
-
-  function handleChangeEmail() {
-    setOpen(false);
-    setChangeEmailOpen(true);
-  }
-
-  function handleChangePassword() {
-    setOpen(false);
-    setChangePasswordOpen(true);
-  }
-
-  function handleNewPassword() {
-    setOpen(false);
-    setNewPasswordOpen(true);
-  }
-
-  return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        {variant === "desktop" ? (
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setOpen(true)}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-              {initial}
-            </div>
-          </Button>
-        ) : (
-          <Button variant="ghost" className="w-full justify-start gap-3 px-2" onClick={() => setOpen(true)}>
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
-              {initial}
-            </div>
-            <span className="truncate text-sm font-medium">{name}</span>
-          </Button>
-        )}
-
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>My Account</DialogTitle>
-            <DialogDescription>Manage your account settings</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-4">
-            {/* User info */}
-            <div className="space-y-1">
-              <p className="text-sm font-medium">{name}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-
-            {/* Account actions */}
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" onClick={handleChangeEmail}>
-                Change Email
-              </Button>
-
-              {user.hasPassword ? (
-                <Button variant="outline" className="w-full justify-start" onClick={handleChangePassword}>
-                  Change Password
-                </Button>
-              ) : (
-                <Button variant="outline" className="w-full justify-start" onClick={handleNewPassword}>
-                  Set Password
-                </Button>
-              )}
-            </div>
-
-            {/* Logout */}
-            <Button variant="destructive" className="w-full gap-2" onClick={handleLogout} disabled={logoutMutation.isPending}>
-              <LogOut className="h-4 w-4" />
-              {logoutMutation.isPending ? "Logging out..." : "Logout"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <AccountFormDialog open={changeEmailOpen} onOpenChange={setChangeEmailOpen}>
-        <ChangeEmailForm
-          currentEmail={user.email}
-          onClose={() => {
-            setChangeEmailOpen(false);
-          }}
-        />
-      </AccountFormDialog>
-
-      <AccountFormDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
-        <ChangePasswordForm
-          onClose={() => {
-            setChangePasswordOpen(false);
-          }}
-        />
-      </AccountFormDialog>
-
-      <AccountFormDialog open={NewPasswordOpen} onOpenChange={setNewPasswordOpen}>
-        <SetPasswordForm
-          onClose={() => {
-            setNewPasswordOpen(false);
-          }}
-        />
-      </AccountFormDialog>
-    </>
-  );
 }
