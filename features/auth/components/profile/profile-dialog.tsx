@@ -1,3 +1,5 @@
+"use client";
+
 import { MeResponse } from "@/lib/types";
 import { useState } from "react";
 import { useLogout } from "../../hooks/use-logout";
