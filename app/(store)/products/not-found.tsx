@@ -9,20 +9,22 @@ import { useState } from "react";
 const SUGGESTIONS = ["shoes", "hoodie", "jacket", "t-shirt"];
 
 export default function NotFound() {
-  const router = useRouter();
   const [query, setQuery] = useState("");
+
+  function navigate(q: string) {
+    const value = q.trim();
+    if (!value) return;
+
+    window.location.replace(`/products?q=${encodeURIComponent(value)}`);
+  }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    const q = query.trim();
-    if (!q) return;
-
-    router.push(`/products?q=${encodeURIComponent(q)}`);
+    navigate(query);
   }
 
   function handleSuggestion(value: string) {
-    router.push(`/products?q=${encodeURIComponent(value)}`);
+    navigate(value);
   }
 
   return (
@@ -43,7 +45,6 @@ export default function NotFound() {
             </InputGroupAddon>
           </InputGroup>
 
-          {/* Suggestions */}
           <div className="text-sm text-muted-foreground flex flex-wrap justify-center gap-2">
             <span>Try:</span>
             {SUGGESTIONS.map((item) => (

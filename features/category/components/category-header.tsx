@@ -16,7 +16,7 @@ export default async function CategoryHeader({ slug }: Props) {
       <CategoryBreadcrumb breadcrumb={category.breadcrumb} />
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-semibold">{category.category.name}</h1>
+        <h1 className="text-xl font-semibold">{category.category.name}</h1>
         <p className="text-sm text-muted-foreground">Showing products in {category.category.name}</p>
       </div>
 

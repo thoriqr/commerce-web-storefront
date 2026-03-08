@@ -37,7 +37,6 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <div className="space-y-8">
       <Suspense fallback={<CategoryHeaderSkeleton />}>
-        {/* <CategoryHeaderSkeleton /> */}
         <CategoryHeader slug={slug} />
       </Suspense>
 

@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CATEGORY_SORT_OPTIONS, CATEGORY_SORT_MAP, CategorySortKey } from "../constants/category-sort";
 import { ProductSortSelect } from "@/features/product/components/filters/product-sort-select";
 
-export function CategorySortControl() {
+export default function CategorySortControl() {
   const searchParams = useSearchParams();
   const router = useRouter();
 

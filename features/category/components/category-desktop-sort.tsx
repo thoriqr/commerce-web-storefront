@@ -1,6 +1,6 @@
 "use client";
 
-import { CategorySortControl } from "./category-sort-control";
+import CategorySortControl from "./category-sort-control";
 
 export default function CategoryDesktopSort() {
   return (

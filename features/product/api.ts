@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api";
-import { ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
+import { DimensionFilter, ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
+import { appendQueryParams } from "./utils/append-query-params";
 
 const BASE_URL = "/products";
 
@@ -8,27 +9,23 @@ export async function getProductsByCategory(slugPath: string, params?: ProductLi
 
   search.set("slugPath", slugPath);
 
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null) return;
-
-      if (Array.isArray(value)) {
-        search.set(key, value.join(","));
-      } else {
-        search.set(key, String(value));
-      }
-    });
-  }
+  appendQueryParams(search, params);
 
   return apiFetch<ProductListing>(`/products/by-category?${search.toString()}`);
 }
 
-export async function getProductsByCollection(slug: string) {
-  return apiFetch<ProductListing>(`${BASE_URL}/by-collection?slug=${slug}`);
+export async function getProductsBySearch(q: string, params?: ProductListingQueryParams) {
+  const search = new URLSearchParams();
+
+  search.set("q", q);
+
+  appendQueryParams(search, params);
+
+  return apiFetch<ProductListing>(`${BASE_URL}/by-search?${search.toString()}`);
 }
 
-export async function getProductsBySearch(q: string) {
-  return apiFetch<ProductListing>(`${BASE_URL}/by-search?q=${q}`);
+export async function getProductsByCollection(slug: string) {
+  return apiFetch<ProductListing>(`${BASE_URL}/by-collection?slug=${slug}`);
 }
 
 export async function getProductBySlug(slug: string) {
@@ -37,4 +34,8 @@ export async function getProductBySlug(slug: string) {
 
 export async function getVariantByProductSlugAndVariantId(productSlug: string, variantId: number) {
   return apiFetch<ProductVariantDetail>(`${BASE_URL}/${productSlug}/variants/${variantId}`);
+}
+
+export async function getSearchProductDimensionFilter(query: string) {
+  return apiFetch<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`);
 }
