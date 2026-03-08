@@ -7,7 +7,7 @@ import { ProductFilterDrawer } from "./product-filter-drawer";
 import { ProductPriceFilter } from "./product-price-filter";
 
 type Props = {
-  dimensions: DimensionFilter[];
+  dimensions?: DimensionFilter[];
 };
 
 export function ProductFilterDrawerController({ dimensions }: Props) {

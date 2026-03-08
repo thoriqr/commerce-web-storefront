@@ -7,3 +7,10 @@ export type CollectionPreview = {
   hasMoreProducts: boolean;
   products: ProductCard[];
 };
+
+export type CollectionDetail = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+};
