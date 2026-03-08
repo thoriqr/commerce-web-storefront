@@ -1,4 +1,11 @@
-export type UserProvider = "GOOGLE" | "GITHUB";
+export type Provider = "GOOGLE" | "GITHUB";
+
+export type UserProvider = {
+  provider: Provider;
+  email: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
 
 export type MeResponse = {
   id: string;
