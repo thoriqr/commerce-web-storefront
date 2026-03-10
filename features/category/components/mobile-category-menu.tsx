@@ -4,9 +4,10 @@ import { CategoryTree } from "@/features/category/types";
 
 type Props = {
   categories: CategoryTree[];
+  onClose: () => void;
 };
 
-export function MobileCategoryMenu({ categories }: Props) {
+export function MobileCategoryMenu({ categories, onClose }: Props) {
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold text-muted-foreground">Categories</h3>
@@ -19,14 +20,18 @@ export function MobileCategoryMenu({ categories }: Props) {
             <AccordionContent>
               <div className="space-y-3 pl-4">
                 {/* View all root */}
-                <Link href={`/category/${root.slug}`} className="block text-sm font-medium hover:underline">
+                <Link href={`/category/${root.slug}`} onClick={() => onClose()} className="block text-sm font-medium hover:underline">
                   View all
                 </Link>
 
                 {/* Level 2 */}
                 {root.children?.map((lvl2) => (
                   <div key={lvl2.id} className="space-y-2">
-                    <Link href={`/category/${root.slug}/${lvl2.slug}`} className="block text-sm text-muted-foreground hover:text-foreground">
+                    <Link
+                      href={`/category/${root.slug}/${lvl2.slug}`}
+                      onClick={() => onClose()}
+                      className="block text-sm text-muted-foreground hover:text-foreground"
+                    >
                       {lvl2.name}
                     </Link>
 
@@ -38,6 +43,7 @@ export function MobileCategoryMenu({ categories }: Props) {
                             key={lvl3.id}
                             href={`/category/${root.slug}/${lvl2.slug}/${lvl3.slug}`}
                             className="block text-sm text-muted-foreground hover:text-foreground"
+                            onClick={() => onClose()}
                           >
                             {lvl3.name}
                           </Link>

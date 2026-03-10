@@ -24,8 +24,14 @@ export async function getProductsBySearch(q: string, params?: ProductListingQuer
   return apiFetch<ProductListing>(`${BASE_URL}/by-search?${search.toString()}`);
 }
 
-export async function getProductsByCollection(slug: string) {
-  return apiFetch<ProductListing>(`${BASE_URL}/by-collection?slug=${slug}`);
+export async function getProductsByCollection(slug: string, params?: ProductListingQueryParams) {
+  const search = new URLSearchParams();
+
+  search.set("slug", slug);
+
+  appendQueryParams(search, params);
+
+  return apiFetch<ProductListing>(`${BASE_URL}/by-collection?${search.toString()}`);
 }
 
 export async function getProductBySlug(slug: string) {

@@ -35,7 +35,7 @@ export function NavbarSearch() {
           <Search className="h-4 w-4" />
         </button>
 
-        <Input placeholder="Search products..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
+        <Input id="search-products" placeholder="Search products..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
       </div>
     </form>
   );

@@ -20,6 +20,7 @@ export function ProductFilterController({ dimensions }: Props) {
       {/* PRICE */}
       <div className="space-y-2">
         <ProductPriceFilter
+          mode="desktop"
           min={minDraft ? Number(minDraft) : undefined}
           max={maxDraft ? Number(maxDraft) : undefined}
           onChangeMin={setMinDraft}

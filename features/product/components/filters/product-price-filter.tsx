@@ -10,9 +10,10 @@ type Props = {
   onChangeMin: (value: string) => void;
   onChangeMax: (value: string) => void;
   onBlur?: () => void;
+  mode: "desktop" | "mobile";
 };
 
-export function ProductPriceFilter({ min, max, onChangeMin, onChangeMax, onBlur }: Props) {
+export function ProductPriceFilter({ min, max, onChangeMin, onChangeMax, onBlur, mode }: Props) {
   const handleChange = (raw: string, setter: (v: string) => void) => {
     const sanitized = sanitizeNumber(raw);
     setter(sanitized);
@@ -28,6 +29,7 @@ export function ProductPriceFilter({ min, max, onChangeMin, onChangeMax, onBlur 
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">Rp</span>
 
           <Input
+            id={`price-min-${mode}`}
             placeholder="Min"
             inputMode="numeric"
             className="pl-9"
@@ -42,6 +44,7 @@ export function ProductPriceFilter({ min, max, onChangeMin, onChangeMax, onBlur 
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">Rp</span>
 
           <Input
+            id={`price-max-${mode}`}
             placeholder="Max"
             inputMode="numeric"
             className="pl-9"

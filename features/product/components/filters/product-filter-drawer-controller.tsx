@@ -27,6 +27,7 @@ export function ProductFilterDrawerController({ dimensions }: Props) {
       onClose={filter.resetSyncFlag}
     >
       <ProductPriceFilter
+        mode="mobile"
         min={filter.minDraft ? Number(filter.minDraft) : undefined}
         max={filter.maxDraft ? Number(filter.maxDraft) : undefined}
         onChangeMin={filter.setMinDraft}
