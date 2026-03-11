@@ -8,7 +8,7 @@ export type UserProvider = {
 };
 
 export type MeResponse = {
-  id: string;
+  id: number;
   email: string;
   hasPassword: boolean;
   displayName: string | null;
