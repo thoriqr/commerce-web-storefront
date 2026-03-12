@@ -20,7 +20,7 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
 
   const isDisabled = isVariantLoading || isOutOfStock;
 
-  // 🔥 SAFE QTY (anti stale)
+  // SAFE QTY (anti stale)
   const numericQty = Number(qty);
   const safeQty = isOutOfStock ? 0 : isNaN(numericQty) ? 1 : Math.min(Math.max(numericQty, 1), stock);
 

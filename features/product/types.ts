@@ -63,7 +63,7 @@ export type ProductDetail = {
   name: string;
   slug: string;
   description: string;
-  status: "ACTIVE" | "INACTIVE";
+  isAvailable: boolean;
   isVariant: boolean;
   initialVariantId: number;
   category: {
