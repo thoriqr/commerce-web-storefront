@@ -9,14 +9,12 @@ import ConnectedProviders from "./connected-providers";
 import AccountActions from "./account-actions";
 import LogoutButton from "./logout-button";
 import { AccountFormDialog } from "../account-form-dialog";
-import ChangeEmailForm from "../forms/change-email-form";
 import ChangePasswordForm from "../forms/change-password-form";
 import SetPasswordForm from "../forms/set-password-form";
 import AccountAvatarButton from "./account-avatar-button";
 
 export default function ProfileDialog({ user, variant }: { user: MeResponse; variant: "desktop" | "mobile" }) {
   const [open, setOpen] = useState(false);
-  const [changeEmailOpen, setChangeEmailOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [newPasswordOpen, setNewPasswordOpen] = useState(false);
   const logoutMutation = useLogout();
@@ -48,10 +46,6 @@ export default function ProfileDialog({ user, variant }: { user: MeResponse; var
 
               <AccountActions
                 hasPassword={user.hasPassword}
-                onChangeEmail={() => {
-                  setOpen(false);
-                  setChangeEmailOpen(true);
-                }}
                 onChangePassword={() => {
                   setOpen(false);
                   setChangePasswordOpen(true);
@@ -68,9 +62,6 @@ export default function ProfileDialog({ user, variant }: { user: MeResponse; var
         </Dialog>
 
         {/* dialogs */}
-        <AccountFormDialog open={changeEmailOpen} onOpenChange={setChangeEmailOpen}>
-          <ChangeEmailForm currentEmail={user.email} onClose={() => setChangeEmailOpen(false)} />
-        </AccountFormDialog>
 
         <AccountFormDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
           <ChangePasswordForm onClose={() => setChangePasswordOpen(false)} />

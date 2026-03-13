@@ -7,11 +7,10 @@ import {
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
 import { NavbarSearch } from "./navbar-search";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
 import { CategoryTree } from "@/features/category/types";
 import { CategoryMegaMenu } from "@/features/category/components/category-mega-menu";
 import { AuthStatus } from "@/features/auth/components/auth-status";
+import CartButton from "@/features/cart/components/cart-button";
 
 type Props = {
   categories: CategoryTree[];
@@ -47,9 +46,7 @@ export default function NavbarDesktop({ categories }: Props) {
 
       {/* Right actions */}
       <div className="flex justify-end gap-2">
-        <Button variant="ghost" size="icon">
-          <ShoppingCart className="h-5 w-5" />
-        </Button>
+        <CartButton />
 
         <AuthStatus variant="desktop" />
       </div>

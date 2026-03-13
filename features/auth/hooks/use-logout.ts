@@ -7,7 +7,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logoutRequest,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      await Promise.all([queryClient.invalidateQueries({ queryKey: ["me"] }), queryClient.invalidateQueries({ queryKey: ["cart"] })]);
     }
   });
 }

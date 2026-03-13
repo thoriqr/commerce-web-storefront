@@ -8,7 +8,7 @@ export function useVerifyEmail() {
     mutationFn: verifyEmailConfirm,
     onSuccess: async (result) => {
       if (result.ok) {
-        await queryClient.invalidateQueries({ queryKey: ["me"] });
+        await Promise.all([queryClient.invalidateQueries({ queryKey: ["me"] }), queryClient.invalidateQueries({ queryKey: ["cart"] })]);
       }
     }
   });

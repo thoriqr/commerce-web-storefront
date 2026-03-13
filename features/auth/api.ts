@@ -1,114 +1,61 @@
 import { MeResponse } from "@/lib/types";
-import type {
-  ApiResult,
-  ApiError,
-  LoginInput,
-  RegisterInput,
-  VerifyEmailInput,
-  ResetPasswordInput,
-  ChangePasswordInput,
-  ChangeEmailInput,
-  ConfirmEmailInput,
-  SetPasswordInput
-} from "./types";
+import type { LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput, ChangePasswordInput, SetPasswordInput } from "./types";
+import { apiRequest } from "@/lib/api";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/auth`;
+const AUTH_URL = "/auth";
 
-async function authApiRequest(path: string, options: RequestInit): Promise<ApiResult> {
-  try {
-    const res = await fetch(`${BASE_URL}${path}`, {
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers
-      },
-      ...options
-    });
-
-    const json = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      const error: ApiError = json?.error ?? {
-        message: "Something went wrong"
-      };
-
-      return { ok: false, error };
-    }
-
-    return { ok: true };
-  } catch {
-    return {
-      ok: false,
-      error: { message: "Network error. Please try again." }
-    };
-  }
-}
-
-export function loginRequest(input: LoginInput): Promise<ApiResult> {
-  return authApiRequest("/login", {
+export function loginRequest(input: LoginInput) {
+  return apiRequest<void>(`${AUTH_URL}/login`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function registerRequest(input: RegisterInput) {
-  return authApiRequest("/register", {
+  return apiRequest<void>(`${AUTH_URL}/register`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function verifyEmailConfirm(input: VerifyEmailInput) {
-  return authApiRequest("/verify-email", {
+  return apiRequest<void>(`${AUTH_URL}/verify-email`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function resetPasswordRequest(input: RegisterInput) {
-  return authApiRequest("/request-password-reset", {
+  return apiRequest<void>(`${AUTH_URL}/request-reset-password`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function resetPasswordConfirm(input: ResetPasswordInput) {
-  return authApiRequest("/reset-password", {
+  return apiRequest<void>(`${AUTH_URL}/reset-password`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function setPasswordRequest(input: SetPasswordInput) {
-  return authApiRequest("/set-password", {
+  return apiRequest<void>(`${AUTH_URL}/set-password`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function changePasswordRequest(input: ChangePasswordInput) {
-  return authApiRequest("/change-password", {
-    method: "POST",
-    body: JSON.stringify(input)
-  });
-}
-
-export function changeEmailRequest(input: ChangeEmailInput) {
-  return authApiRequest("/change-email", {
-    method: "POST",
-    body: JSON.stringify(input)
-  });
-}
-
-export function confirmEmailChange(input: ConfirmEmailInput) {
-  return authApiRequest("/confirm-email-change", {
+  return apiRequest<void>(`${AUTH_URL}/change-password`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function googleLoginRequest(idToken: string) {
-  return authApiRequest("/google", {
+  return apiRequest<void>(`${AUTH_URL}/google`, {
     method: "POST",
     body: JSON.stringify({
       idToken
@@ -117,7 +64,7 @@ export function googleLoginRequest(idToken: string) {
 }
 
 export async function logoutRequest(): Promise<void> {
-  await fetch(`${BASE_URL}/logout`, {
+  await apiRequest<void>(`${AUTH_URL}/logout`, {
     method: "POST",
     credentials: "include"
   });

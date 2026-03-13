@@ -14,3 +14,16 @@ export type MeResponse = {
   displayName: string | null;
   providers: UserProvider[];
 };
+
+export type ApiFieldError = {
+  field: string;
+  message: string;
+};
+
+export type ApiError = {
+  code?: string;
+  message: string;
+  errors?: ApiFieldError[];
+};
+
+export type ApiResult<T = void> = { ok: true; data?: T } | { ok: false; error: ApiError };
