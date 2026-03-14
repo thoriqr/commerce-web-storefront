@@ -1,5 +1,5 @@
 import { ProductDetail } from "@/features/product/components/product-detail";
-import { getProductBySlug } from "@/features/product/api";
+import { getProductBySlug, getVariantByProductSlugAndVariantId } from "@/features/product/api";
 import { truncate } from "@/lib/truncate";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Metadata } from "next";
@@ -32,15 +32,25 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { variant } = await searchParams;
 
-  await queryClient.prefetchQuery({
+  // prefetch product
+  const product = await queryClient.fetchQuery({
     queryKey: ["product", slug],
     queryFn: () => getProductBySlug(slug)
+  });
+
+  // resolve active variant
+  const activeVariantId = variant ?? String(product.initialVariantId);
+
+  // prefetch variant
+  await queryClient.prefetchQuery({
+    queryKey: ["variant", slug, activeVariantId],
+    queryFn: () => getVariantByProductSlugAndVariantId(slug, Number(activeVariantId))
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-8">
-        <ProductDetail slug={slug} variantId={variant} />
+        <ProductDetail slug={slug} activeVariantId={activeVariantId} />
       </div>
     </HydrationBoundary>
   );

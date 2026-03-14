@@ -113,7 +113,14 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
               className={` relative h-16 w-16 shrink-0 rounded-md border transition ${current === index ? "ring-2 ring-primary" : "hover:ring-1 hover:ring-muted-foreground"}`}
             >
               <div className="relative h-full w-full overflow-hidden rounded-md">
-                <Image src={getImageUrl(img.imageKey)} alt={product.name} fill sizes="(max-width: 768px) 25vw, 10vw" className="object-cover" />
+                <Image
+                  src={getImageUrl(img.imageKey)}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 25vw, 10vw"
+                  loading="eager"
+                  className="object-cover"
+                />
               </div>
             </button>
           ))}

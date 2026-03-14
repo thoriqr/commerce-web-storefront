@@ -12,24 +12,20 @@ import { Skeleton } from "../../../components/ui/skeleton";
 
 type Props = {
   slug: string;
-  variantId?: string;
+  activeVariantId: string;
 };
 
-export function ProductDetail({ slug, variantId }: Props) {
+export function ProductDetail({ slug, activeVariantId }: Props) {
   // Product query
   const { data: product, isLoading: isProductLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => getProductBySlug(slug)
   });
 
-  // Resolve activeVariantId (safe fallback)
-  const activeVariantId = variantId ?? String(product?.initialVariantId ?? "");
-
   // Variant query (always declared)
   const { data: variant, isLoading: isVariantLoading } = useQuery({
     queryKey: ["variant", slug, activeVariantId],
-    queryFn: () => getVariantByProductSlugAndVariantId(slug, Number(activeVariantId)),
-    enabled: !!product && !!activeVariantId
+    queryFn: () => getVariantByProductSlugAndVariantId(slug, Number(activeVariantId))
   });
 
   // EARLY RETURNS AFTER ALL HOOKS
@@ -37,9 +33,13 @@ export function ProductDetail({ slug, variantId }: Props) {
 
   if (!product) notFound();
 
-  if (!isVariantLoading && !variant) {
-    notFound();
-  }
+  if (!variant && !isVariantLoading) notFound();
+
+  const productUnavailable = !product.isAvailable;
+  const variantUnavailable = variant?.isAvailable === false;
+  const outOfStock = variant?.stock === 0;
+
+  const disablePurchase = isVariantLoading || productUnavailable || variantUnavailable || outOfStock;
 
   return (
     <div className="space-y-8 pb-24 md:pb-0">
@@ -53,6 +53,7 @@ export function ProductDetail({ slug, variantId }: Props) {
         <div className="space-y-4 sm:space-y-6">
           <h1 className="text-lg sm:text-xl font-semibold leading-tight">{product.name}</h1>
 
+          {/* PRICE + STOCK TEXT */}
           <div className="space-y-1 min-h-14">
             <div className="text-xl sm:text-2xl font-bold">
               {isVariantLoading ? <Skeleton className="h-6 w-32" /> : <>Rp {variant!.price.toLocaleString("id-ID")}</>}
@@ -61,7 +62,9 @@ export function ProductDetail({ slug, variantId }: Props) {
             <div className="text-xs sm:text-sm">
               {isVariantLoading ? (
                 <Skeleton className="h-3 w-20" />
-              ) : variant!.stock === 0 ? (
+              ) : productUnavailable || variantUnavailable ? (
+                <span className="text-destructive font-medium">Unavailable</span>
+              ) : outOfStock ? (
                 <span className="text-destructive font-medium">Out of stock</span>
               ) : (
                 <span className="text-muted-foreground">{variant!.stock} available</span>
@@ -74,14 +77,33 @@ export function ProductDetail({ slug, variantId }: Props) {
           <ProductDimensionSelector product={product} activeVariantId={activeVariantId} />
 
           <div className="hidden md:block">
-            <ProductPurchaseSection price={variant?.price ?? 0} stock={variant?.stock ?? 0} isVariantLoading={isVariantLoading} />
+            <ProductPurchaseSection
+              variantId={Number(activeVariantId)}
+              price={variant?.price ?? 0}
+              stock={variant?.stock ?? 0}
+              isVariantLoading={isVariantLoading}
+              productUnavailable={productUnavailable}
+              variantUnavailable={variantUnavailable}
+              outOfStock={outOfStock}
+              disablePurchase={disablePurchase}
+            />
           </div>
         </div>
       </div>
 
       {/* Mobile Sticky Purchase */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background p-4 md:hidden">
-        <ProductPurchaseSection price={variant?.price ?? 0} stock={variant?.stock ?? 0} isVariantLoading={isVariantLoading} mobile />
+        <ProductPurchaseSection
+          variantId={Number(activeVariantId)}
+          price={variant?.price ?? 0}
+          stock={variant?.stock ?? 0}
+          isVariantLoading={isVariantLoading}
+          productUnavailable={productUnavailable}
+          variantUnavailable={variantUnavailable}
+          outOfStock={outOfStock}
+          disablePurchase={disablePurchase}
+          mobile
+        />
       </div>
     </div>
   );

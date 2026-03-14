@@ -31,3 +31,12 @@ export type AddItemInput = {
   variantId: number;
   quantity: number;
 };
+
+export type UpdateCartItemInput = {
+  variantId: number;
+  quantity: number;
+};
+
+export type DeleteCartItemInput = {
+  variantId: number;
+};

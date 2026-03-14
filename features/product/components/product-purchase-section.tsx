@@ -5,32 +5,57 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "../utils/format-currency";
+import { useAddItem } from "@/features/cart/hooks/use-add-item";
 
 type Props = {
+  variantId: number;
   price: number;
   stock: number;
   mobile?: boolean;
   isVariantLoading: boolean;
+  productUnavailable: boolean;
+  variantUnavailable: boolean;
+  outOfStock: boolean;
+  disablePurchase: boolean;
 };
 
-export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile }: Props) {
+export function ProductPurchaseSection({
+  variantId,
+  price,
+  stock,
+  isVariantLoading,
+  productUnavailable,
+  variantUnavailable,
+  outOfStock,
+  disablePurchase,
+  mobile
+}: Props) {
   const [qty, setQty] = useState<string>(stock > 0 ? "1" : "0");
+  const addItem = useAddItem();
+  const isMutating = addItem.isPending;
 
-  const isOutOfStock = stock === 0;
-
-  const isDisabled = isVariantLoading || isOutOfStock;
-
-  // SAFE QTY (anti stale)
+  // SAFE QTY
   const numericQty = Number(qty);
-  const safeQty = isOutOfStock ? 0 : isNaN(numericQty) ? 1 : Math.min(Math.max(numericQty, 1), stock);
+  const buttonDisabled = disablePurchase || isMutating;
+  const safeQty = outOfStock ? 0 : isNaN(numericQty) ? 1 : Math.min(Math.max(numericQty, 1), stock);
+
+  const handleAddToCart = () => {
+    if (disablePurchase) return;
+
+    addItem.mutate({
+      variantId,
+      quantity: safeQty
+    });
+  };
 
   const decrease = () => {
-    if (isOutOfStock) return;
+    if (outOfStock) return;
     setQty(String(Math.max(safeQty - 1, 1)));
   };
 
   const increase = () => {
-    if (isOutOfStock) return;
+    if (outOfStock) return;
     setQty(String(Math.min(safeQty + 1, stock)));
   };
 
@@ -47,7 +72,7 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
   };
 
   const handleBlur = () => {
-    if (isOutOfStock) {
+    if (outOfStock) {
       setQty("0");
       return;
     }
@@ -57,11 +82,18 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
     }
   };
 
+  const statusText = isVariantLoading
+    ? "Loading..."
+    : productUnavailable || variantUnavailable
+      ? "Unavailable"
+      : outOfStock
+        ? "Out of Stock"
+        : "Add to Cart";
+
   // ================= MOBILE =================
   if (mobile) {
     return (
       <div className="space-y-3">
-        {/* PRICE + STOCK */}
         <div className="space-y-1">
           {isVariantLoading ? (
             <>
@@ -70,9 +102,11 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
             </>
           ) : (
             <>
-              <p className="text-base font-semibold">Rp {price.toLocaleString("id-ID")}</p>
+              <p className="text-base font-semibold">Rp {formatCurrency(price)}</p>
 
-              {isOutOfStock ? (
+              {productUnavailable || variantUnavailable ? (
+                <p className="text-xs text-destructive font-medium">Unavailable</p>
+              ) : outOfStock ? (
                 <p className="text-xs text-destructive font-medium">Out of stock</p>
               ) : (
                 <p className="text-xs text-muted-foreground">{stock} available</p>
@@ -81,10 +115,9 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
           )}
         </div>
 
-        {/* QTY + BUTTON */}
         <div className="flex items-center gap-3">
           <div className="flex items-center border rounded-md shrink-0">
-            <Button variant="ghost" size="icon" onClick={decrease} disabled={isDisabled || safeQty <= 1} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={decrease} disabled={buttonDisabled || safeQty <= 1} className="h-8 w-8">
               <Minus className="h-4 w-4" />
             </Button>
 
@@ -92,18 +125,18 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
               value={safeQty}
               onChange={(e) => handleChange(e.target.value)}
               onBlur={handleBlur}
-              disabled={isDisabled}
-              className="w-10 text-center text-sm outline-none disabled:opacity-50"
+              disabled={buttonDisabled}
+              className="w-10 text-center text-sm"
               inputMode="numeric"
             />
 
-            <Button variant="ghost" size="icon" onClick={increase} disabled={isDisabled || safeQty >= stock} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={increase} disabled={buttonDisabled || safeQty >= stock} className="h-8 w-8">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
 
-          <Button className="flex-1" disabled={isDisabled}>
-            {isVariantLoading ? "Loading..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          <Button className="flex-1" disabled={buttonDisabled}>
+            {statusText}
           </Button>
         </div>
       </div>
@@ -113,16 +146,27 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
   // ================= DESKTOP =================
   return (
     <div className="space-y-4 border rounded-lg p-4">
-      <div className="min-h-5">
-        {isVariantLoading ? (
-          <Skeleton className="h-4 w-24" />
-        ) : (
-          <p className="text-sm text-muted-foreground">{isOutOfStock ? "Out of stock" : `${stock} available`}</p>
-        )}
-      </div>
+      {isVariantLoading ? (
+        <div className="space-y-1">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <p className="text-base font-semibold">Rp {formatCurrency(price)}</p>
+
+          {productUnavailable || variantUnavailable ? (
+            <p className="text-xs text-destructive font-medium">Unavailable</p>
+          ) : outOfStock ? (
+            <p className="text-xs text-destructive font-medium">Out of stock</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">{stock} available</p>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center border rounded-md w-fit">
-        <Button variant="ghost" size="icon" onClick={decrease} disabled={isDisabled || safeQty <= 1}>
+        <Button variant="ghost" size="icon" onClick={decrease} disabled={buttonDisabled || safeQty <= 1}>
           <Minus className="h-4 w-4" />
         </Button>
 
@@ -130,18 +174,18 @@ export function ProductPurchaseSection({ price, stock, isVariantLoading, mobile 
           value={safeQty}
           onChange={(e) => handleChange(e.target.value)}
           onBlur={handleBlur}
-          disabled={isDisabled}
-          className="w-10 text-center text-sm outline-none disabled:opacity-50"
+          disabled={buttonDisabled}
+          className="w-10 text-center text-sm"
           inputMode="numeric"
         />
 
-        <Button variant="ghost" size="icon" onClick={increase} disabled={isDisabled || safeQty >= stock}>
+        <Button variant="ghost" size="icon" onClick={increase} disabled={buttonDisabled || safeQty >= stock}>
           <Plus className="h-4 w-4" />
         </Button>
       </div>
 
-      <Button className="w-full" disabled={isDisabled}>
-        {isVariantLoading ? "Loading..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+      <Button onClick={handleAddToCart} className="w-full" disabled={buttonDisabled}>
+        {statusText}
       </Button>
     </div>
   );

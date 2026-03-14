@@ -3,6 +3,7 @@ import CartSkeleton from "./cart-skeleton";
 import { Cart } from "../types";
 import CartItemRow from "./cart-item-row";
 import CartSummary from "./cart-summary";
+import { useIsMutating } from "@tanstack/react-query";
 
 type Props = {
   isLoading: boolean;
@@ -11,6 +12,12 @@ type Props = {
 };
 
 export default function CartContent({ data, isLoading, onClose }: Props) {
+  const isUpdating = useIsMutating({ mutationKey: ["cart-update"] }) > 0;
+  const isDeleting = useIsMutating({ mutationKey: ["cart-delete"] }) > 0;
+  const isAdding = useIsMutating({ mutationKey: ["cart-add"] }) > 0;
+
+  const isMutating = isUpdating || isDeleting || isAdding;
+
   if (isLoading) {
     return <CartSkeleton />;
   }
@@ -29,6 +36,12 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
     );
   }
 
+  const hasUnavailableItem = cart.items.some((i) => !i.isAvailable);
+
+  const hasOutOfStock = cart.items.some((i) => i.stockWarning === "OUT_OF_STOCK");
+
+  const hasInsufficientStock = cart.items.some((i) => i.stockWarning === "INSUFFICIENT_STOCK");
+
   return (
     <div className="flex h-full flex-col">
       {/* Scrollable items */}
@@ -39,7 +52,13 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
       </div>
 
       {/* Sticky summary */}
-      <CartSummary summary={cart.summary} />
+      <CartSummary
+        summary={cart.summary}
+        isMutating={isMutating}
+        hasUnavailableItem={hasUnavailableItem}
+        hasOutOfStock={hasOutOfStock}
+        hasInsufficientStock={hasInsufficientStock}
+      />
     </div>
   );
 }
