@@ -135,7 +135,7 @@ export function ProductPurchaseSection({
             </Button>
           </div>
 
-          <Button className="flex-1" disabled={buttonDisabled}>
+          <Button onClick={handleAddToCart} className="flex-1" disabled={buttonDisabled}>
             {statusText}
           </Button>
         </div>

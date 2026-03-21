@@ -5,7 +5,7 @@ export function useCart() {
   return useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
-    staleTime: 60_000,
+    staleTime: 0,
     retry: false,
     refetchOnWindowFocus: true
   });
