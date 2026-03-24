@@ -1,5 +1,5 @@
-import UserProfile from "@/features/user/components/user-profile";
+import { ProfileTab } from "@/features/user/components/profile-tab";
 
 export default function UserPage() {
-  return <UserProfile />;
+  return <ProfileTab />;
 }

@@ -46,7 +46,7 @@ export default function NavbarMobile({ categories }: Props) {
                   <MobileCategoryMenu categories={categories} onClose={() => setOpen(false)} />
 
                   <div className="border-t pt-4 space-y-2">
-                    <AuthStatus variant="mobile" />
+                    <AuthStatus variant="mobile" onClose={() => setOpen(false)} />
                   </div>
                 </div>
               </SheetContent>

@@ -1,6 +1,9 @@
-import { apiFetch } from "@/lib/api";
 import { DimensionFilter, ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
 import { appendQueryParams } from "./utils/append-query-params";
+import { fetchStore } from "@/shared/lib/fetch-store";
+import { fetchServer } from "@/shared/lib/fetch-server";
+import { FetchError } from "@/shared/types/api-error";
+import { notFound } from "next/navigation";
 
 const BASE_URL = "/products";
 
@@ -11,7 +14,7 @@ export async function getProductsByCategory(slugPath: string, params?: ProductLi
 
   appendQueryParams(search, params);
 
-  return apiFetch<ProductListing>(`/products/by-category?${search.toString()}`);
+  return fetchStore<ProductListing>(`/products/by-category?${search.toString()}`);
 }
 
 export async function getProductsBySearch(q: string, params?: ProductListingQueryParams) {
@@ -21,7 +24,7 @@ export async function getProductsBySearch(q: string, params?: ProductListingQuer
 
   appendQueryParams(search, params);
 
-  return apiFetch<ProductListing>(`${BASE_URL}/by-search?${search.toString()}`);
+  return fetchStore<ProductListing>(`${BASE_URL}/by-search?${search.toString()}`);
 }
 
 export async function getProductsByCollection(slug: string, params?: ProductListingQueryParams) {
@@ -31,17 +34,28 @@ export async function getProductsByCollection(slug: string, params?: ProductList
 
   appendQueryParams(search, params);
 
-  return apiFetch<ProductListing>(`${BASE_URL}/by-collection?${search.toString()}`);
+  return fetchStore<ProductListing>(`${BASE_URL}/by-collection?${search.toString()}`);
 }
 
 export async function getProductBySlug(slug: string) {
-  return apiFetch<ProductDetail>(`${BASE_URL}/${slug}`);
+  return fetchStore<ProductDetail>(`${BASE_URL}/${slug}`);
+}
+
+export async function getProductOrFail(slug: string) {
+  try {
+    return await getProductBySlug(slug);
+  } catch (err) {
+    if (err instanceof FetchError && err.status === 404) {
+      notFound();
+    }
+    throw err;
+  }
 }
 
 export async function getVariantByProductSlugAndVariantId(productSlug: string, variantId: number) {
-  return apiFetch<ProductVariantDetail>(`${BASE_URL}/${productSlug}/variants/${variantId}`);
+  return fetchStore<ProductVariantDetail>(`${BASE_URL}/${productSlug}/variants/${variantId}`);
 }
 
 export async function getSearchProductDimensionFilter(query: string) {
-  return apiFetch<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`);
+  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`);
 }

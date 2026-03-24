@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { clampPrice } from "../utils/clamp-price";
 
 type DimensionLike = {
@@ -15,6 +15,7 @@ type Options = {
 
 export function useListingFilterController({ dimensions, mode = "instant" }: Options) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
   const hasSyncedRef = useRef(false);
 
@@ -38,9 +39,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
   const [maxDraft, setMaxDraft] = useState(currentPriceMax);
   const [priceError, setPriceError] = useState<string | null>(null);
 
-  // =========================
-  // 🔥 REALTIME PRICE VALIDATION
-  // =========================
+  // REALTIME PRICE VALIDATION
   const validatePrice = (min: string, max: string) => {
     const minNum = min ? Number(min) : undefined;
     const maxNum = max ? Number(max) : undefined;
@@ -86,13 +85,11 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     }
   }, [currentPriceMin, currentPriceMax, mode, router, searchParams]);
 
-  // =========================
-  // 🔥 MANUAL SYNC (for drawer open)
-  // =========================
+  // MANUAL SYNC (for drawer open)
   const syncFromUrl = () => {
     if (mode !== "draft") return;
 
-    // sync sekali tiap open cycle
+    // sync once open cycle
     if (hasSyncedRef.current) return;
 
     setDraftDimensions(currentDimensions);
@@ -106,9 +103,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     hasSyncedRef.current = false;
   };
 
-  // =========================
   // UPDATE URL
-  // =========================
   const updateParams = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -127,9 +122,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     });
   };
 
-  // =========================
   // DIMENSION TOGGLE
-  // =========================
   const toggleDimension = (dimension: string, value: string) => {
     if (mode === "instant") {
       const current = searchParams.get(dimension)?.split(",") ?? [];
@@ -149,9 +142,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     }
   };
 
-  // =========================
   // DESKTOP PRICE COMMIT
-  // =========================
   const commitPrice = () => {
     if (mode !== "instant") return;
     if (priceError) return;
@@ -162,9 +153,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     });
   };
 
-  // =========================
   // MOBILE APPLY
-  // =========================
   const apply = () => {
     if (mode !== "draft") return;
     if (priceError) return;
@@ -199,22 +188,9 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     });
   };
 
-  // =========================
   // RESET
-  // =========================
   const resetAll = () => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    dimensions?.forEach((dim) => {
-      params.delete(dim.name);
-    });
-
-    params.delete("priceMin");
-    params.delete("priceMax");
-
-    router.replace(`?${params.toString()}`, {
-      scroll: false
-    });
+    router.replace(pathname, { scroll: false });
 
     if (mode === "draft") {
       setDraftDimensions({});
@@ -223,9 +199,7 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     }
   };
 
-  // =========================
   // COUNTS
-  // =========================
   const activeCount = useMemo(() => {
     let count = 0;
 

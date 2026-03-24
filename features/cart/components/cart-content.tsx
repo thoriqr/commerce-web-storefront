@@ -1,4 +1,3 @@
-import { ApiResult } from "@/lib/types";
 import CartSkeleton from "./cart-skeleton";
 import { Cart } from "../types";
 import CartItemRow from "./cart-item-row";
@@ -7,7 +6,7 @@ import { useIsMutating } from "@tanstack/react-query";
 
 type Props = {
   isLoading: boolean;
-  data: ApiResult<Cart> | undefined;
+  data: Cart | undefined;
   onClose: () => void;
 };
 
@@ -22,11 +21,11 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
     return <CartSkeleton />;
   }
 
-  if (!data?.ok) {
+  if (!data) {
     return <div className="py-10 px-5 text-center text-sm text-muted-foreground">Failed to load cart.</div>;
   }
 
-  const cart = data.data;
+  const cart = data;
 
   if (!cart || cart.items.length === 0) {
     return (

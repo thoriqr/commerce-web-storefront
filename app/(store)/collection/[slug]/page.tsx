@@ -31,7 +31,7 @@ export default async function CollectionPage({ params }: Props) {
   const { slug } = await params;
 
   if (!slug) {
-    return notFound();
+    notFound();
   }
 
   return (

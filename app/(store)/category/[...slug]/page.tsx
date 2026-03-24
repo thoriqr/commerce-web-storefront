@@ -31,7 +31,7 @@ export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
 
   if (!slug || slug.length === 0) {
-    return notFound();
+    notFound();
   }
 
   return (

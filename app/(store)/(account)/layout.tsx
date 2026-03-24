@@ -1,3 +1,10 @@
+import AccountTabs from "@/features/user/components/account-tabs";
+
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <div className="space-y-6 mx-auto max-w-3xl">
+      <AccountTabs />
+      {children}
+    </div>
+  );
 }

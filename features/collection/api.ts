@@ -1,12 +1,12 @@
-import { apiFetch } from "@/lib/api";
 import { CollectionDetail, CollectionPreview } from "./types";
+import { fetchServer } from "@/shared/lib/fetch-server";
 
 const BASE_URL = "/collections";
 
 export async function getCollectionPreview() {
-  return apiFetch<CollectionPreview[]>(`${BASE_URL}/preview`);
+  return fetchServer<CollectionPreview[]>(`${BASE_URL}/preview`);
 }
 
 export async function getCollectionDetail(slug: string) {
-  return apiFetch<CollectionDetail>(`${BASE_URL}/${slug}`);
+  return fetchServer<CollectionDetail>(`${BASE_URL}/${slug}`);
 }

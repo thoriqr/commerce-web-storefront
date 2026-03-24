@@ -1,6 +1,5 @@
 "use client";
 
-import { notFound } from "next/navigation";
 import { ProductImageGallery } from "./product-image-gallery";
 import ProductBreadcrumb from "./product-breadcrumb";
 import { ProductDimensionSelector } from "./product-dimension-selector";
@@ -16,25 +15,27 @@ type Props = {
 };
 
 export function ProductDetail({ slug, activeVariantId }: Props) {
-  // Product query
-  const { data: product, isLoading: isProductLoading } = useQuery({
+  const {
+    data: product,
+    isLoading: isProductLoading,
+    error: productError
+  } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => getProductBySlug(slug)
   });
 
-  // Variant query (always declared)
   const { data: variant, isLoading: isVariantLoading } = useQuery({
     queryKey: ["variant", slug, activeVariantId],
     queryFn: () => getVariantByProductSlugAndVariantId(slug, Number(activeVariantId))
   });
 
-  // EARLY RETURNS AFTER ALL HOOKS
   if (isProductLoading) return <ProductDetailSkeleton />;
 
-  if (!product) notFound();
+  if (productError) throw productError;
 
-  if (!variant && !isVariantLoading) notFound();
+  if (!product) return null;
 
+  // product guaranteed exist here
   const productUnavailable = !product.isAvailable;
   const variantUnavailable = variant?.isAvailable === false;
   const outOfStock = variant?.stock === 0;

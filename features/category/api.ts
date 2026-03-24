@@ -1,21 +1,21 @@
-import { apiFetch } from "@/lib/api";
 import { CategoryDetail, CategoryTopLevel, CategoryTree } from "./types";
 import { DimensionFilter } from "../product/types";
+import { fetchServer } from "@/shared/lib/fetch-server";
 
 const BASE_URL = "/categories";
 
 export async function getCategoryTree() {
-  return apiFetch<CategoryTree[]>(`${BASE_URL}/mega-menu`);
+  return fetchServer<CategoryTree[]>(`${BASE_URL}/mega-menu`);
 }
 
 export async function getPopularCategories() {
-  return apiFetch<CategoryTopLevel[]>(`${BASE_URL}/popular`);
+  return fetchServer<CategoryTopLevel[]>(`${BASE_URL}/popular`);
 }
 
 export async function getCategoryDetail(slugPath: string) {
-  return apiFetch<CategoryDetail>(`${BASE_URL}/detail?slugPath=${slugPath}`);
+  return fetchServer<CategoryDetail>(`${BASE_URL}/detail?slugPath=${slugPath}`);
 }
 
 export async function getCategoryDimensionFilter(slugPath: string) {
-  return apiFetch<DimensionFilter[]>(`${BASE_URL}/filters?slugPath=${slugPath}`);
+  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?slugPath=${slugPath}`);
 }

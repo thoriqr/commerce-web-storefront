@@ -28,3 +28,9 @@ export type ConfirmEmailInput = { token: string };
 export type SetPasswordInput = {
   password: string;
 };
+
+export type MeResponse = {
+  id: number;
+  email: string;
+  displayName: string | null;
+};

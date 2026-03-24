@@ -11,7 +11,7 @@ export default function CartButton() {
   const [open, setOpen] = useState(false);
   const { data, isLoading } = useCart();
 
-  const totalItems = data?.ok ? (data.data?.summary.totalItems ?? 0) : 0;
+  const totalItems = data ? (data?.summary.totalItems ?? 0) : 0;
 
   return (
     <>

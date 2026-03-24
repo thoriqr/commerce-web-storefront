@@ -1,6 +1,6 @@
-import { apiFetch } from "@/lib/api";
 import { Banner, BannerPlacement } from "./types";
+import { fetchServer } from "@/shared/lib/fetch-server";
 
 export async function getBannerPlacement(placement: BannerPlacement) {
-  return apiFetch<Banner[]>(`/marketing/banners?placement=${placement}`);
+  return fetchServer<Banner[]>(`/marketing/banners?placement=${placement}`);
 }

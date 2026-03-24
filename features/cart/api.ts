@@ -1,30 +1,34 @@
-import { apiRequest } from "@/lib/api";
 import { AddItemInput, Cart, DeleteCartItemInput, UpdateCartItemInput } from "./types";
+import { fetchStore } from "@/shared/lib/fetch-store";
+import { fetchAction } from "@/shared/lib/fetch-action";
 
 const CART_URL = "/store/cart";
 
-export function getCart() {
-  return apiRequest<Cart>(`${CART_URL}`, {
-    method: "GET"
+export async function getCart() {
+  return fetchStore<Cart>(`/cart`, {
+    credentials: "include"
   });
 }
 
 export function addItem(input: AddItemInput) {
-  return apiRequest<void>(`${CART_URL}/items`, {
+  return fetchAction<void>(`${CART_URL}/items`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function updateItem({ variantId, quantity }: UpdateCartItemInput) {
-  return apiRequest<void>(`${CART_URL}/items/${variantId}`, {
+  return fetchAction<void>(`${CART_URL}/items/${variantId}`, {
     method: "PATCH",
-    body: JSON.stringify({ quantity })
+    body: JSON.stringify({ quantity }),
+    withAuth: true
   });
 }
 
 export function deleteItem({ variantId }: DeleteCartItemInput) {
-  return apiRequest<void>(`${CART_URL}/items/${variantId}`, {
-    method: "DELETE"
+  return fetchAction<void>(`${CART_URL}/items/${variantId}`, {
+    method: "DELETE",
+    withAuth: true
   });
 }

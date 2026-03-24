@@ -3,21 +3,21 @@ export type User = {
   email: string;
   displayName: string | null;
   role: string;
-  status: string;
+  status: "ACTIVE" | "SUSPENDED";
   hasPassword: boolean;
   defaultAddress: {
     id: number;
-    recipientName: string;
-    phone: string;
-    addressLine: string;
-    cityName: string;
-    provinceName: string;
+    recipientName: string | null;
+    phone: string | null;
+    addressLine: string | null;
+    cityName: string | null;
+    provinceName: string | null;
     postalCode: string;
   } | null;
   providers: {
-    provider: string;
-    provider_email: string;
-    provider_display_name: string;
-    provider_avatar_url: string | null;
+    provider: "GOOGLE" | "GITHUB";
+    providerEmail: string;
+    providerDisplayName: string | null;
+    providerAvatarUrl: string | null;
   }[];
 };

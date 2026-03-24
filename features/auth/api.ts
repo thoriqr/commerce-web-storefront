@@ -1,72 +1,77 @@
-import { MeResponse } from "@/lib/types";
-import type { LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput, ChangePasswordInput, SetPasswordInput } from "./types";
-import { apiRequest } from "@/lib/api";
+import type { LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput, ChangePasswordInput, SetPasswordInput, MeResponse } from "./types";
+import { fetchAction } from "@/shared/lib/fetch-action";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/auth`;
 const AUTH_URL = "/auth";
 
 export function loginRequest(input: LoginInput) {
-  return apiRequest<void>(`${AUTH_URL}/login`, {
+  return fetchAction<void>(`${AUTH_URL}/login`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function registerRequest(input: RegisterInput) {
-  return apiRequest<void>(`${AUTH_URL}/register`, {
+  return fetchAction<void>(`${AUTH_URL}/register`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function verifyEmailConfirm(input: VerifyEmailInput) {
-  return apiRequest<void>(`${AUTH_URL}/verify-email`, {
+  return fetchAction<void>(`${AUTH_URL}/verify-email`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function resetPasswordRequest(input: RegisterInput) {
-  return apiRequest<void>(`${AUTH_URL}/request-password-reset`, {
+  return fetchAction<void>(`${AUTH_URL}/request-password-reset`, {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
 export function resetPasswordConfirm(input: ResetPasswordInput) {
-  return apiRequest<void>(`${AUTH_URL}/reset-password`, {
+  return fetchAction<void>(`${AUTH_URL}/reset-password`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function setPasswordRequest(input: SetPasswordInput) {
-  return apiRequest<void>(`${AUTH_URL}/set-password`, {
+  return fetchAction<void>(`${AUTH_URL}/set-password`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function changePasswordRequest(input: ChangePasswordInput) {
-  return apiRequest<void>(`${AUTH_URL}/change-password`, {
+  return fetchAction<void>(`${AUTH_URL}/change-password`, {
     method: "POST",
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
+    withAuth: true
   });
 }
 
 export function googleLoginRequest(idToken: string) {
-  return apiRequest<void>(`${AUTH_URL}/google`, {
+  return fetchAction<void>(`${AUTH_URL}/google`, {
     method: "POST",
     body: JSON.stringify({
       idToken
-    })
+    }),
+    withAuth: true
   });
 }
 
 export async function logoutRequest(): Promise<void> {
-  await apiRequest<void>(`${AUTH_URL}/logout`, {
+  await fetchAction<void>(`${AUTH_URL}/logout`, {
     method: "POST",
-    credentials: "include"
+    withAuth: true
   });
 }
 

@@ -1,39 +1,126 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User } from "../types";
+"use client";
 
-export function ProfileTab({ user }: { user: User }) {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProfile } from "../hooks/use-profile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { ProfileTabSkeleton } from "./skeletons/profile-tab-skeleton";
+
+const providerMeta = {
+  GOOGLE: {
+    label: "Google",
+    icon: "/google-icon-logo.svg"
+  },
+  GITHUB: {
+    label: "GitHub",
+    icon: "/github.svg"
+  }
+} as const;
+
+export function ProfileTab() {
+  const { data: user, isLoading, error } = useProfile();
+
+  if (isLoading) return <ProfileTabSkeleton />;
+  if (error) throw error;
+  if (!user) return null;
+
+  const displayName = user.displayName ?? "User";
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Profile Info</CardTitle>
+      {/* HEADER */}
+      <CardHeader className="space-y-2">
+        <CardTitle className="flex items-center justify-between">
+          <span>{displayName}</span>
+
+          <Badge variant={user.status === "ACTIVE" ? "default" : "destructive"}>{user.status === "ACTIVE" ? "Verified" : "Suspended"}</Badge>
+        </CardTitle>
+
+        <p className="text-sm text-muted-foreground">{user.email}</p>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <div>
+      <CardContent className="space-y-6">
+        {/* DISPLAY NAME */}
+        <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Display Name</p>
-          <p className="font-medium">{user.displayName ?? "-"}</p>
+
+          <div className="flex items-center justify-between">
+            <p className="font-medium">{displayName}</p>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                console.log("open edit display name dialog");
+              }}
+            >
+              Edit
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm text-muted-foreground">Email</p>
-          <p className="font-medium">{user.email}</p>
+        {/* PASSWORD */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Password</p>
+
+          <div className="flex items-center justify-between">
+            <p className="font-medium">{user.hasPassword ? "Password set" : "No password"}</p>
+
+            <Button size="sm" variant="outline">
+              {user.hasPassword ? "Change Password" : "Set Password"}
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm text-muted-foreground mb-1">Default Address</p>
+        {/* DEFAULT ADDRESS */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Default Address</p>
 
           {user.defaultAddress ? (
-            <div className="text-sm space-y-1 border rounded-md p-3">
-              <p className="font-medium">{user.defaultAddress.recipientName}</p>
-              <p>{user.defaultAddress.phone}</p>
-              <p>{user.defaultAddress.addressLine}</p>
+            <div className="border rounded-md p-3 text-sm space-y-1">
+              <p className="font-medium">{user.defaultAddress.recipientName ?? "-"}</p>
+
+              <p>{user.defaultAddress.phone ?? "-"}</p>
+
+              <p>{user.defaultAddress.addressLine ?? "-"}</p>
+
               <p>
                 {user.defaultAddress.cityName}, {user.defaultAddress.provinceName}
               </p>
+
               <p>{user.defaultAddress.postalCode}</p>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">No default address set</p>
+          )}
+        </div>
+
+        {/* PROVIDERS */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Connected Accounts</p>
+
+          {user.providers.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No connected accounts</p>
+          ) : (
+            <div className="space-y-2">
+              {user.providers.map((p) => {
+                const meta = providerMeta[p.provider];
+
+                return (
+                  <div key={p.provider} className="flex items-center justify-between border rounded-md p-3">
+                    <div className="flex items-center gap-3">
+                      <Image src={meta.icon} alt={meta.label} width={20} height={20} />
+
+                      <div>
+                        <p className="font-medium">{meta.label}</p>
+                        <p className="text-sm text-muted-foreground">{p.providerEmail}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </CardContent>
