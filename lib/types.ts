@@ -10,9 +10,7 @@ export type UserProvider = {
 export type MeResponse = {
   id: number;
   email: string;
-  hasPassword: boolean;
   displayName: string | null;
-  providers: UserProvider[];
 };
 
 export type ApiFieldError = {
@@ -26,4 +24,6 @@ export type ApiError = {
   errors?: ApiFieldError[];
 };
 
-export type ApiResult<T = void> = { ok: true; data?: T } | { ok: false; error: ApiError };
+export type ApiResult<T = void> = { ok: true; status: number; data?: T } | { ok: false; status: number; error: ApiError };
+
+export type FetchError = Error & { status?: number };

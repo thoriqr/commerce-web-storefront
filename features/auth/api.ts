@@ -27,7 +27,7 @@ export function verifyEmailConfirm(input: VerifyEmailInput) {
 }
 
 export function resetPasswordRequest(input: RegisterInput) {
-  return apiRequest<void>(`${AUTH_URL}/request-reset-password`, {
+  return apiRequest<void>(`${AUTH_URL}/request-password-reset`, {
     method: "POST",
     body: JSON.stringify(input)
   });

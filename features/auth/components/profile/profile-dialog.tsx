@@ -42,10 +42,9 @@ export default function ProfileDialog({ user, variant }: { user: MeResponse; var
             <div className="space-y-5">
               <AccountInfo name={name} email={user.email} />
 
-              <ConnectedProviders providers={user.providers} />
+              {/* <ConnectedProviders providers={user.providers} /> */}
 
               <AccountActions
-                hasPassword={user.hasPassword}
                 onChangePassword={() => {
                   setOpen(false);
                   setChangePasswordOpen(true);
