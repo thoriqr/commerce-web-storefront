@@ -40,11 +40,15 @@ export function ProfileTabSkeleton() {
           <Skeleton className="h-4 w-36" />
 
           <div className="border rounded-md p-3 space-y-2">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-24" />
+            {/* HEADER */}
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-16 rounded-full" /> {/* label */}
+              <Skeleton className="h-4 w-32" /> {/* recipient */}
+              <Skeleton className="h-5 w-16 rounded-full" /> {/* default badge */}
+            </div>
+            {/* BODY */}
+            <Skeleton className="h-4 w-32" /> {/* phone */}
+            <Skeleton className="h-4 w-full" /> {/* address 1 line */}
           </div>
         </div>
 

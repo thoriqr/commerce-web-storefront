@@ -76,7 +76,7 @@ export function AuthStatus({ variant, onClose }: Props) {
               Profile
             </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => router.push("/orders")}>
+            <DropdownMenuItem onClick={() => router.push("/user/orders")}>
               <Package />
               Orders
             </DropdownMenuItem>

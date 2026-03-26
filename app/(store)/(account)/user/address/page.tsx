@@ -1,3 +1,5 @@
+import AddressTab from "@/features/user/components/address-tab";
+
 export default function AddressPage() {
-  return <div>AddressPage</div>;
+  return <AddressTab />;
 }

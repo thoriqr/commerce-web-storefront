@@ -78,18 +78,31 @@ export function ProfileTab() {
           <p className="text-sm text-muted-foreground">Default Address</p>
 
           {user.defaultAddress ? (
-            <div className="border rounded-md p-3 text-sm space-y-1">
-              <p className="font-medium">{user.defaultAddress.recipientName ?? "-"}</p>
+            <div className="border rounded-md p-3 space-y-2 text-sm">
+              {/* HEADER */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {user.defaultAddress.label && (
+                  <Badge variant="secondary" className="font-normal">
+                    {user.defaultAddress.label}
+                  </Badge>
+                )}
 
-              <p>{user.defaultAddress.phone ?? "-"}</p>
+                <p className="font-medium">{user.defaultAddress.recipientName || "-"}</p>
 
-              <p>{user.defaultAddress.addressLine ?? "-"}</p>
+                <Badge>Default</Badge>
+              </div>
 
-              <p>
-                {user.defaultAddress.cityName}, {user.defaultAddress.provinceName}
-              </p>
+              {/* BODY */}
+              <div className="text-muted-foreground space-y-1">
+                <p>{user.defaultAddress.phone || "-"}</p>
 
-              <p>{user.defaultAddress.postalCode}</p>
+                <p>
+                  {[user.defaultAddress.addressLine, user.defaultAddress.districtName, user.defaultAddress.cityName, user.defaultAddress.provinceName]
+                    .filter(Boolean)
+                    .join(", ")}
+                  {user.defaultAddress.postalCode ? ` ${user.defaultAddress.postalCode}` : ""}
+                </p>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">No default address set</p>

@@ -7,17 +7,58 @@ export type User = {
   hasPassword: boolean;
   defaultAddress: {
     id: number;
-    recipientName: string | null;
-    phone: string | null;
-    addressLine: string | null;
-    cityName: string | null;
-    provinceName: string | null;
+    label: string;
+    recipientName: string;
+    phone: string;
+    addressLine: string;
+    cityName: string;
+    provinceName: string;
+    districtName: string;
     postalCode: string;
   } | null;
   providers: {
     provider: "GOOGLE" | "GITHUB";
     providerEmail: string;
-    providerDisplayName: string | null;
-    providerAvatarUrl: string | null;
+    providerDisplayName: string;
+    providerAvatarUrl: string;
   }[];
+};
+
+export type UserAddresses = {
+  addresses: {
+    id: number;
+    label: string;
+    recipientName: string;
+    phone: string;
+    addressLine: string;
+    provinceName: string;
+    cityName: string;
+    districtName: string;
+    postalCode: string;
+    isDefault: boolean;
+  }[];
+  limit: number;
+};
+
+export type UpsertAddressPayload = {
+  recipientName: string;
+  label: string;
+  phone: string;
+  addressLine: string;
+  shippingProvinceId: number;
+  shippingCityId: number;
+  shippingDistrictId: number;
+  postalCode: string;
+};
+
+export type AddressDetail = {
+  label: string;
+  shippingProvinceId: string;
+  shippingCityId: string;
+  shippingDistrictId: string;
+  recipientName: string;
+  phone: string;
+  postalCode: string;
+  addressLine: string;
+  isDefault: boolean;
 };
