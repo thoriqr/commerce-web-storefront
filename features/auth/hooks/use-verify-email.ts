@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { verifyEmailConfirm } from "../api";
+import { invalidateUserScope } from "@/shared/utils/invalidate";
 
 export function useVerifyEmail() {
   const queryClient = useQueryClient();
@@ -8,7 +9,7 @@ export function useVerifyEmail() {
     mutationFn: verifyEmailConfirm,
     onSuccess: async (result) => {
       if (result.ok) {
-        await Promise.all([queryClient.invalidateQueries({ queryKey: ["me"] }), queryClient.invalidateQueries({ queryKey: ["cart"] })]);
+        await invalidateUserScope(queryClient);
       }
     }
   });

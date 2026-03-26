@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import { usePasswordResetRequest } from "../../hooks/use-password-reset-request";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();

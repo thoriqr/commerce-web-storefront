@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAddress } from "../api";
-import { QUERY_KEYS } from "../constants";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 
 export function useCreateAddress() {
   const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export function useCreateAddress() {
     mutationFn: createAddress,
     onSuccess: async (result) => {
       if (result.ok) {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADDRESSES] });
+        queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.ADDRESSES });
       }
     }
   });

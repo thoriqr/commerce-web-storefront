@@ -5,7 +5,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import { useChangePassword } from "../../hooks/use-change-password";
 
 type Props = {
@@ -141,9 +141,14 @@ export default function ChangePasswordForm({ onClose }: Props) {
           </Field>
 
           <Field>
-            <Button type="submit" disabled={changePassword.isPending}>
-              {changePassword.isPending ? "Changing..." : "Change Password"}
-            </Button>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" disabled={changePassword.isPending} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={changePassword.isPending}>
+                {changePassword.isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
           </Field>
         </FieldGroup>
       </form>

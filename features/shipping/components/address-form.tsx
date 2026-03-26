@@ -8,6 +8,7 @@ import { AddressSelect } from "./address-select";
 import { AddressDetail } from "@/features/user/types";
 import { useUpdateAddress } from "@/features/user/hooks/use-update-address";
 import { useCreateAddress } from "@/features/user/hooks/use-create-address";
+import { extractFieldError } from "@/shared/utils/extract-field-error";
 
 type Props = {
   onCancel?: () => void;
@@ -75,6 +76,24 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
     onCancel?.();
   }
 
+  const activeMutation = isEdit ? updateMutation : createMutation;
+
+  const apiError = activeMutation.data && !activeMutation.data.ok ? activeMutation.data.error : undefined;
+
+  const labelError = extractFieldError(apiError, "label");
+  const recipientError = extractFieldError(apiError, "recipientName");
+  const phoneError = extractFieldError(apiError, "phone");
+  const addressLineError = extractFieldError(apiError, "addressLine");
+  const postalCodeError = extractFieldError(apiError, "postalCode");
+
+  const generalError = !recipientError && !phoneError && !addressLineError && !postalCodeError ? apiError?.message : undefined;
+
+  function resetMutationError() {
+    if (activeMutation.isError || activeMutation.data) {
+      activeMutation.reset();
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <FieldGroup>
@@ -82,18 +101,19 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           <FieldLabel htmlFor="label">Label (optional)</FieldLabel>
           <Input
             id="label"
-            autoFocus={false}
             type="text"
             placeholder="e.g. Home, Office"
             value={label}
             onChange={(e) => {
               if (e.target.value.length > 50) return;
+              resetMutationError();
               setLabel(e.target.value);
             }}
             disabled={mutationIsPending}
           />
 
           <p className="text-xs text-muted-foreground text-right">{label.length}/50</p>
+          {labelError && <p className="text-sm text-destructive mt-2">{labelError}</p>}
         </Field>
 
         <Field>
@@ -107,6 +127,7 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
             value={recipientName}
             onChange={(e) => {
               if (e.target.value.length > 120) return;
+              resetMutationError();
               setRecipientName(e.target.value);
             }}
             disabled={mutationIsPending}
@@ -114,6 +135,7 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           />
 
           <p className="text-xs text-muted-foreground text-right">{recipientName.length}/120</p>
+          {recipientError && <p className="text-sm text-destructive mt-2">{recipientError}</p>}
         </Field>
         <Field>
           <FieldLabel htmlFor="phone">Phone</FieldLabel>
@@ -122,7 +144,6 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
             type="text"
             placeholder="Phone number (e.g. 08123456789)"
             inputMode="numeric"
-            autoFocus={false}
             value={phone}
             onChange={(e) => {
               let val = e.target.value;
@@ -130,12 +151,15 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
               val = val.replace(/\D/g, "");
 
               if (val.length > 30) return;
+              resetMutationError();
 
               setPhone(val);
             }}
             disabled={mutationIsPending}
             required
           />
+
+          {phoneError && <p className="text-sm text-destructive mt-2">{phoneError}</p>}
         </Field>
 
         <Field>
@@ -143,11 +167,11 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           <Input
             id="address-line"
             type="text"
-            autoFocus={false}
             placeholder="Street address (e.g. Jl. Sudirman No. 10)"
             value={addressLine}
             onChange={(e) => {
               if (e.target.value.length > 255) return;
+              resetMutationError();
               setAddressLine(e.target.value);
             }}
             disabled={mutationIsPending}
@@ -155,6 +179,7 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           />
 
           <p className="text-xs text-muted-foreground text-right">{addressLine.length}/255</p>
+          {addressLineError && <p className="text-sm text-destructive mt-2">{addressLineError}</p>}
         </Field>
 
         <Field>
@@ -162,7 +187,6 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           <Input
             id="postal-code"
             type="text"
-            autoFocus={false}
             inputMode="numeric"
             placeholder="Postal code (e.g. 60123)"
             value={postalCode}
@@ -172,11 +196,12 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
               val = val.replace(/\D/g, "");
 
               if (val.length > 5) return;
-
+              resetMutationError();
               setPostalCode(val);
             }}
             disabled={mutationIsPending}
           />
+          {postalCodeError && <p className="text-sm text-destructive mt-2">{postalCodeError}</p>}
         </Field>
 
         <Field>
@@ -185,6 +210,7 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
           <AddressSelect
             value={address}
             onChange={(val) => {
+              resetMutationError();
               setAddress(val);
 
               // clear error
@@ -201,6 +227,8 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
             errors={errors}
           />
         </Field>
+
+        {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
 
         <Field>
           <div className="flex gap-2 justify-end">

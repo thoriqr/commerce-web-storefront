@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setPasswordRequest } from "../api";
+import { invalidateUserScope } from "@/shared/utils/invalidate";
 
 export function useSetPassword() {
   const queryClient = useQueryClient();
@@ -8,7 +9,7 @@ export function useSetPassword() {
     mutationFn: setPasswordRequest,
     onSuccess: async (result) => {
       if (result.ok) {
-        await Promise.all([queryClient.invalidateQueries({ queryKey: ["me"] }), queryClient.invalidateQueries({ queryKey: ["cart"] })]);
+        await invalidateUserScope(queryClient);
       }
     }
   });

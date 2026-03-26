@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import { useVerifyEmail } from "../../hooks/use-verify-email";
 
 type Props = {

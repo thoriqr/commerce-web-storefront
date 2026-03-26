@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "../api";
-import { QUERY_KEYS } from "../constants";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 
 export function useProfile() {
   return useQuery({
-    queryKey: [QUERY_KEYS.USER_PROFILE],
+    queryKey: USER_QUERY_KEYS.USER_PROFILE,
     queryFn: getUserProfile,
     staleTime: 0
   });

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogin } from "../../hooks/use-login";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import GoogleLoginButton from "../google-login-button";
 
 export default function LoginForm() {

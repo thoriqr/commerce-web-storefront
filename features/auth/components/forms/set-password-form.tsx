@@ -6,7 +6,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSetPassword } from "../../hooks/use-set-password";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 
 type Props = {
   onClose: () => void;

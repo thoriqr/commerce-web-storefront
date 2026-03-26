@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import AddressForm from "@/features/shipping/components/address-form";
 import { AddressTabSkeleton } from "./skeletons/address-tab-skeleton";
 import { useAddress } from "../hooks/use-address";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useDeleteAddress } from "../hooks/use-delete-address";
 import {
   AlertDialog,
@@ -30,7 +30,7 @@ export default function AddressTab() {
   const { data, isLoading } = useAddresses();
   const deleteMutation = useDeleteAddress();
   const setDefaultMutation = useSetDefaultAddress();
-  const { data: address, isLoading: AddressIsLoading } = useAddress(editingId);
+  const { data: address, isLoading: addressIsLoading, error: addressError, refetch: addressRefetch } = useAddress(editingId);
 
   if (isLoading) return <AddressTabSkeleton />;
 
@@ -46,6 +46,7 @@ export default function AddressTab() {
           <CardTitle>Addresses</CardTitle>
 
           <Button size="sm" disabled={isLimitReached} onClick={() => setOpen(true)}>
+            <Plus />
             Add Address
           </Button>
         </CardHeader>
@@ -56,7 +57,9 @@ export default function AddressTab() {
             <div className="text-sm text-muted-foreground space-y-3">
               <p>No address yet</p>
 
-              <Button size="sm">Create your first address</Button>
+              <Button size="sm" onClick={() => setOpen(true)}>
+                Create your first address
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -151,16 +154,31 @@ export default function AddressTab() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>{editingId ? "Update Address" : "Add New Address"}</DialogTitle>
             <DialogDescription>Enter your shipping details below. This address will be used for delivery.</DialogDescription>
           </DialogHeader>
 
           <div className="max-h-[70vh] overflow-y-auto pr-2">
-            {editingId && AddressIsLoading ? (
+            {editingId && addressIsLoading ? (
               <div className="flex items-center justify-center min-h-75">
                 <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : editingId && addressError ? (
+              <div className="flex flex-col items-center justify-center gap-2 min-h-75 text-center">
+                <p className="text-sm font-medium">Failed to load address</p>
+                <p className="text-xs text-muted-foreground">Please try again or reopen the dialog.</p>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    addressRefetch();
+                  }}
+                >
+                  Retry
+                </Button>
               </div>
             ) : (
               <AddressForm

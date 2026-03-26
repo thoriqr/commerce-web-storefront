@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import { useRegister } from "../../hooks/use-register";
-import { extractFieldError } from "../../utils/extract-field-error";
+import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 
 export default function RegisterForm() {
   const router = useRouter();

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logoutRequest } from "../api";
+import { invalidateUserScope } from "@/shared/utils/invalidate";
 
 export function useLogout() {
   const queryClient = useQueryClient();
@@ -7,7 +8,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logoutRequest,
     onSuccess: async () => {
-      await Promise.all([queryClient.invalidateQueries({ queryKey: ["me"] }), queryClient.invalidateQueries({ queryKey: ["cart"] })]);
+      await invalidateUserScope(queryClient);
     }
   });
 }

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteAddress } from "../api";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 import { QUERY_KEYS } from "../constants";
 
 export function useDeleteAddress() {
@@ -12,13 +13,15 @@ export function useDeleteAddress() {
       if (result.ok) {
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.USER_PROFILE]
-          }),
-          queryClient.invalidateQueries({
             queryKey: [QUERY_KEYS.ADDRESS, addressId]
           }),
+
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.ADDRESSES]
+            queryKey: USER_QUERY_KEYS.USER_PROFILE
+          }),
+
+          queryClient.invalidateQueries({
+            queryKey: USER_QUERY_KEYS.ADDRESSES
           })
         ]);
       }

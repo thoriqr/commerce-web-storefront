@@ -1,27 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { setDefaultAddress } from "../api";
+import { updateProfile } from "../api";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
-import { QUERY_KEYS } from "../constants";
 
-export function useSetDefaultAddress() {
+export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: setDefaultAddress,
+    mutationFn: updateProfile,
 
-    onSuccess: async (result, addressId) => {
+    onSuccess: async (result) => {
       if (result.ok) {
         await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.ADDRESS, addressId]
-          }),
-
           queryClient.invalidateQueries({
             queryKey: USER_QUERY_KEYS.USER_PROFILE
           }),
 
           queryClient.invalidateQueries({
-            queryKey: USER_QUERY_KEYS.ADDRESSES
+            queryKey: USER_QUERY_KEYS.ME
           })
         ]);
       }

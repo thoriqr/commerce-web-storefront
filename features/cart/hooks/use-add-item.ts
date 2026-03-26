@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addItem } from "../api";
 import { toast } from "sonner";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 
 export function useAddItem() {
   const queryClient = useQueryClient();
@@ -17,7 +18,7 @@ export function useAddItem() {
         return;
       }
 
-      await queryClient.invalidateQueries({ queryKey: ["cart"] });
+      await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 
     onError: () => {

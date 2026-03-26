@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ProfileTabSkeleton } from "./skeletons/profile-tab-skeleton";
+import ModalProfileForm from "./modal-profile-form";
+import ModalChangePasswordForm from "./modal-change-password-form";
 
 const providerMeta = {
   GOOGLE: {
@@ -48,15 +50,7 @@ export function ProfileTab() {
           <div className="flex items-center justify-between">
             <p className="font-medium">{displayName}</p>
 
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                console.log("open edit display name dialog");
-              }}
-            >
-              Edit
-            </Button>
+            <ModalProfileForm initialValue={displayName} />
           </div>
         </div>
 
@@ -67,9 +61,7 @@ export function ProfileTab() {
           <div className="flex items-center justify-between">
             <p className="font-medium">{user.hasPassword ? "Password set" : "No password"}</p>
 
-            <Button size="sm" variant="outline">
-              {user.hasPassword ? "Change Password" : "Set Password"}
-            </Button>
+            <ModalChangePasswordForm hasPassword={user.hasPassword} />
           </div>
         </div>
 
