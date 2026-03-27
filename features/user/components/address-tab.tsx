@@ -23,6 +23,7 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { useSetDefaultAddress } from "../hooks/use-set-default-address";
+import { toast } from "sonner";
 
 export default function AddressTab() {
   const [open, setOpen] = useState(false);
@@ -127,7 +128,10 @@ export default function AddressTab() {
 
                           <AlertDialogAction
                             onClick={async () => {
-                              await deleteMutation.mutateAsync(addr.id);
+                              const result = await deleteMutation.mutateAsync(addr.id);
+                              if (!result.ok) {
+                                toast.error("Cannot delete address");
+                              }
                             }}
                             className="bg-destructive text-destructive-foreground"
                           >

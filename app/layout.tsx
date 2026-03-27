@@ -24,7 +24,14 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <QueryProviders>
           <main>{children}</main>
-          <Toaster />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              classNames: {
+                description: "!text-foreground/80"
+              }
+            }}
+          />
         </QueryProviders>
       </body>
     </html>

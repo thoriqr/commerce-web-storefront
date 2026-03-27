@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useShippingCost } from "../hooks/use-shipping-cost";
 import { COURIERS } from "../constants";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSetShipping } from "../hooks/use-set-shipping";
 
 type Props = {
   sessionId: number;
@@ -15,6 +17,7 @@ export function ShippingSection({ sessionId, disabled }: Props) {
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
   const shippingMutation = useShippingCost();
+  const setShippingMutation = useSetShipping();
 
   const data = shippingMutation.data;
   const loading = shippingMutation.isPending;
@@ -47,17 +50,46 @@ export function ShippingSection({ sessionId, disabled }: Props) {
         ))}
       </div>
 
-      {/* LOADING */}
-      {loading && <p className="text-sm text-muted-foreground">Calculating shipping...</p>}
-      {/* SERVICES */}
-      {data?.services?.length ? (
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="border rounded-md p-3">
+              <div className="flex justify-between text-sm">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+
+                <Skeleton className="h-4 w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : data?.services?.length ? (
         <div className="space-y-2">
           {data.services.map((opt) => (
             <div
               key={opt.service}
-              onClick={() => setSelectedService(opt.service)}
-              className={`border rounded-md p-3 cursor-pointer transition
-                ${selectedService === opt.service ? "border-primary " : "hover:border-primary"}`}
+              onClick={async () => {
+                if (!courier || setShippingMutation.isPending) return;
+
+                setSelectedService(opt.service);
+
+                try {
+                  await setShippingMutation.mutateAsync({
+                    sessionId,
+                    payload: {
+                      courierCode: courier,
+                      courierService: opt.service
+                    }
+                  });
+                } catch {
+                  // optional: rollback UI
+                  setSelectedService(null);
+                }
+              }}
+              className={`border rounded-md p-3 cursor-pointer transition${selectedService === opt.service ? "border-primary bg-primary/5" : "hover:border-primary"}${setShippingMutation.isPending ? "opacity-60 pointer-events-none" : ""}
+`}
             >
               <div className="flex justify-between text-sm">
                 <div>

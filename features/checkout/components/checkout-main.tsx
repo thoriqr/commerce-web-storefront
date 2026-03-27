@@ -1,8 +1,8 @@
 "use client";
 
+import { EmptyState } from "@/components/ui/empty-state";
 import { useCheckoutSession } from "../hooks/use-checkout-session";
 import { AddressSection } from "./address-section";
-import { CheckoutEmptyState } from "./checkout-empty-state";
 import { CheckoutItems } from "./checkout-items";
 import { CheckoutMainSkeleton } from "./checkout-main-skeleton";
 import { CheckoutStatus } from "./checkout-status";
@@ -22,7 +22,7 @@ export function CheckoutMain({ sessionId }: Props) {
   }
 
   if (error || !data) {
-    return <CheckoutEmptyState />;
+    return <EmptyState title="Checkout not available" description="This checkout session is invalid or has expired." />;
   }
 
   return (
@@ -38,7 +38,7 @@ export function CheckoutMain({ sessionId }: Props) {
 
         {/* ADDRESS */}
         <SectionCard>
-          <AddressSection address={data.address} />
+          <AddressSection sessionId={data.sessionId} address={data.address} />
         </SectionCard>
 
         {/* SHIPPING */}
@@ -49,9 +49,11 @@ export function CheckoutMain({ sessionId }: Props) {
 
       {/* RIGHT SIDE */}
       <div className="space-y-6">
-        <SectionCard>
-          <OrderSummary data={data} />
-        </SectionCard>
+        <div className="lg:sticky lg:top-6 h-fit">
+          <SectionCard>
+            <OrderSummary data={data} />
+          </SectionCard>
+        </div>
       </div>
     </div>
   );

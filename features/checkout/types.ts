@@ -45,3 +45,8 @@ export type ShippingCost = {
   courier: string;
   services: { name: string; code: string; service: string; description: string; cost: number; etd: string }[];
 };
+
+export type SetShippingPayload = {
+  courierCode: string;
+  courierService: string;
+};
