@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CartSummary as Summary } from "../types";
 import { formatCurrency } from "@/features/product/utils/format-currency";
+import { useCreateCheckoutSession } from "@/features/checkout/hooks/use-create-checkout-session";
 
 type Props = {
   summary: Summary;
@@ -13,6 +14,8 @@ type Props = {
 };
 
 export default function CartSummary({ summary, isMutating, hasUnavailableItem, hasOutOfStock, hasInsufficientStock }: Props) {
+  const createCheckout = useCreateCheckoutSession();
+
   const disableCheckout = isMutating || hasUnavailableItem || hasOutOfStock || hasInsufficientStock;
 
   let message: string | null = null;
@@ -32,8 +35,8 @@ export default function CartSummary({ summary, isMutating, hasUnavailableItem, h
         <span className="font-medium">Rp {formatCurrency(summary.subtotal)}</span>
       </div>
 
-      <Button className="mt-4 w-full" disabled={disableCheckout}>
-        Checkout
+      <Button className="mt-4 w-full" disabled={disableCheckout || createCheckout.isPending} onClick={() => createCheckout.mutate()}>
+        {createCheckout.isPending ? "Processing..." : "Checkout"}
       </Button>
 
       {message && <p className="text-xs text-destructive mt-2 text-center">{message}</p>}

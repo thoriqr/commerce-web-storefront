@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "../hooks/use-profile";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ProfileTabSkeleton } from "./skeletons/profile-tab-skeleton";
 import ModalProfileForm from "./modal-profile-form";

@@ -2,19 +2,29 @@ import { FetchError, ApiErrorResponse } from "@/shared/types/api-error";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
 
-export async function fetchAuth<T>(path: string, retry = true): Promise<T> {
+type FetchAuthOptions = RequestInit & {
+  retry?: boolean;
+};
+
+export async function fetchAuth<T>(path: string, options?: FetchAuthOptions): Promise<T> {
+  const { retry = true, ...fetchOptions } = options ?? {};
+
   const res = await fetch(`${BASE_URL}${path}`, {
-    credentials: "include"
+    ...fetchOptions,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...fetchOptions.headers
+    }
   });
 
   const json = await res.json().catch(() => null);
 
   // retry once (token refresh)
   if (res.status === 401 && retry) {
-    return fetchAuth<T>(path, false);
+    return fetchAuth<T>(path, { ...options, retry: false });
   }
 
-  // still 401 → redirect
   if (res.status === 401) {
     if (typeof window !== "undefined") {
       window.location.href = "/login";
