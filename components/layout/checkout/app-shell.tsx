@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
+export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-svh bg-muted">
       {/* HEADER */}

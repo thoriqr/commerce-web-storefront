@@ -51,7 +51,7 @@ export function CheckoutMain({ sessionId }: Props) {
       <div className="space-y-6">
         <div className="lg:sticky lg:top-6 h-fit">
           <SectionCard>
-            <OrderSummary data={data} />
+            <OrderSummary data={data} sessionId={data.sessionId} />
           </SectionCard>
         </div>
       </div>

@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { CheckoutSession } from "../types";
 import { reasonMap } from "../constants";
+import { useConfirmCheckout } from "../hooks/use-confirm-chekout";
 
 type Props = {
   data: CheckoutSession;
+  sessionId: number;
 };
 
-export function OrderSummary({ data }: Props) {
+export function OrderSummary({ data, sessionId }: Props) {
   const hasShipping = !!data.courierCode;
+  const confirmMutation = useConfirmCheckout();
 
   return (
     <div className="rounded-md space-y-4">
@@ -48,8 +51,8 @@ export function OrderSummary({ data }: Props) {
       </div>
 
       {/* BUTTON */}
-      <Button className="w-full" disabled={!data.canPlaceOrder}>
-        Place Order
+      <Button className="w-full" disabled={!data.canPlaceOrder || confirmMutation.isPending} onClick={() => confirmMutation.mutate(sessionId)}>
+        {confirmMutation.isPending ? "Processing..." : "Place Order"}
       </Button>
 
       {/* BLOCK REASON */}

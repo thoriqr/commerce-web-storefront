@@ -33,3 +33,9 @@ export async function setShippingCheckoutSession(sessionId: number, payload: Set
     body: JSON.stringify(payload)
   });
 }
+
+export async function confirmCheckout(sessionId: number) {
+  return await fetchAuth<{ orderCode: string }>(`${BASE_URL}/${sessionId}/confirm`, {
+    method: "POST"
+  });
+}
