@@ -7,6 +7,17 @@ import { PaymentStatusBadge } from "./badge/payment-status-badge";
 import { OrderStatusBadge } from "./badge/order-status-badge";
 import { usePayOrder } from "../hooks/use-pay-order";
 import { useCancelOrder } from "../hooks/use-cancel-order";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 type Props = {
   data: OrderDetail;
@@ -14,8 +25,9 @@ type Props = {
 };
 
 export default function OrderStatus({ data, refetch }: Props) {
-  const expiresAt = new Date(data.expiresAt);
+  const [open, setOpen] = useState(false);
 
+  const expiresAt = new Date(data.expiresAt);
   const { formatted, isExpired } = useCountdown(expiresAt);
 
   const { handlePay, isLoading: isPaying } = usePayOrder(data.orderCode, refetch);
@@ -47,18 +59,39 @@ export default function OrderStatus({ data, refetch }: Props) {
 
           {/* CANCEL */}
           {canCancel && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={cancelMutation.isPending}
-              onClick={async () => {
-                if (!confirm("Are you sure you want to cancel this order?")) return;
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                  Cancel
+                </Button>
+              </DialogTrigger>
 
-                await cancelMutation.mutateAsync(data.orderCode);
-              }}
-            >
-              {cancelMutation.isPending ? "Cancelling..." : "Cancel"}
-            </Button>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Cancel this order?</DialogTitle>
+                  <DialogDescription>
+                    This will cancel your order and cannot be undone. You will need to create a new order if you wish to proceed.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="ghost">Keep Order</Button>
+                  </DialogClose>
+
+                  <Button
+                    variant="destructive"
+                    disabled={cancelMutation.isPending}
+                    onClick={async () => {
+                      await cancelMutation.mutateAsync(data.orderCode);
+                      setOpen(false);
+                    }}
+                  >
+                    {cancelMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
       </div>

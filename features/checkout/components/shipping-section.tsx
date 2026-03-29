@@ -6,11 +6,16 @@ import { useShippingCost } from "../hooks/use-shipping-cost";
 import { COURIERS } from "../constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSetShipping } from "../hooks/use-set-shipping";
+import { cn } from "@/lib/utils";
 
 type Props = {
   sessionId: number;
   disabled?: boolean;
 };
+
+function isValidService(opt: { service: string; cost: number; etd: string }) {
+  return opt.service && opt.cost > 0 && opt.etd && opt.etd.trim() !== "";
+}
 
 export function ShippingSection({ sessionId, disabled }: Props) {
   const [courier, setCourier] = useState<string | null>(null);
@@ -67,45 +72,54 @@ export function ShippingSection({ sessionId, disabled }: Props) {
         </div>
       ) : data?.services?.length ? (
         <div className="space-y-2">
-          {data.services.map((opt) => (
-            <div
-              key={opt.service}
-              onClick={async () => {
-                if (!courier || setShippingMutation.isPending) return;
+          {data.services.map((opt) => {
+            const isValid = isValidService(opt);
 
-                setSelectedService(opt.service);
+            return (
+              <div
+                key={opt.service}
+                onClick={async () => {
+                  if (!isValid || !courier || setShippingMutation.isPending) return;
 
-                try {
-                  await setShippingMutation.mutateAsync({
-                    sessionId,
-                    payload: {
-                      courierCode: courier,
-                      courierService: opt.service
-                    }
-                  });
-                } catch {
-                  // optional: rollback UI
-                  setSelectedService(null);
-                }
-              }}
-              className={`border rounded-md p-3 cursor-pointer transition${selectedService === opt.service ? "border-primary bg-primary/5" : "hover:border-primary"}${setShippingMutation.isPending ? "opacity-60 pointer-events-none" : ""}
-`}
-            >
-              <div className="flex justify-between text-sm">
-                <div>
-                  <p className="font-medium">
-                    {opt.name} - {opt.service}
-                  </p>
+                  setSelectedService(opt.service);
 
-                  <p className="text-xs text-muted-foreground">
-                    {opt.description} • {opt.etd}
-                  </p>
+                  try {
+                    await setShippingMutation.mutateAsync({
+                      sessionId,
+                      payload: {
+                        courierCode: courier,
+                        courierService: opt.service
+                      }
+                    });
+                  } catch {
+                    setSelectedService(null);
+                  }
+                }}
+                className={cn(
+                  "border rounded-md p-3 transition",
+                  isValid ? "cursor-pointer hover:border-primary" : "opacity-50 cursor-not-allowed",
+                  selectedService === opt.service && isValid && "border-primary bg-primary/5",
+                  setShippingMutation.isPending && "opacity-60 pointer-events-none"
+                )}
+              >
+                <div className="flex justify-between text-sm">
+                  <div>
+                    <p className="font-medium">
+                      {opt.name} - {opt.service}
+                    </p>
+
+                    <p className="text-xs text-muted-foreground">
+                      {opt.description} • {opt.etd || "No estimation"}
+                    </p>
+
+                    {!isValid && <p className="text-[11px] text-destructive mt-1">This shipping option is currently unavailable</p>}
+                  </div>
+
+                  <p className="font-medium">Rp {opt.cost.toLocaleString("id-ID")}</p>
                 </div>
-
-                <p className="font-medium">Rp {opt.cost.toLocaleString("id-ID")}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
     </div>

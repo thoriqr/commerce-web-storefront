@@ -2,7 +2,7 @@
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { useOrder } from "../hooks/use-order";
-import { SectionCard } from "@/features/checkout/components/section-card";
+import { SectionCard } from "@/components/section-card";
 import OrderStatus from "./order-status";
 import OrderItems from "./order-items";
 import ShippingAddress from "./shipping-address";

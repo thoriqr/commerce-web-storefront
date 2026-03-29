@@ -7,7 +7,7 @@ import { CheckoutItems } from "./checkout-items";
 import { CheckoutMainSkeleton } from "./checkout-main-skeleton";
 import { CheckoutStatus } from "./checkout-status";
 import { OrderSummary } from "./order-summary";
-import { SectionCard } from "./section-card";
+import { SectionCard } from "../../../components/section-card";
 import { ShippingSection } from "./shipping-section";
 
 type Props = {

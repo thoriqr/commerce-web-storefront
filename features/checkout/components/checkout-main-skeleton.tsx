@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { SectionCard } from "./section-card";
+import { SectionCard } from "../../../components/section-card";
 
 export function CheckoutMainSkeleton() {
   return (
