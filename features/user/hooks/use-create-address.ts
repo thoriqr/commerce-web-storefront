@@ -7,10 +7,8 @@ export function useCreateAddress() {
 
   return useMutation({
     mutationFn: createAddress,
-    onSuccess: async (result) => {
-      if (result.ok) {
-        queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.ADDRESSES });
-      }
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.ADDRESSES });
     }
   });
 }

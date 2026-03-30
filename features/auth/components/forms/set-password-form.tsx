@@ -2,53 +2,44 @@
 
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSetPassword } from "../../hooks/use-set-password";
-import { extractFieldError } from "../../../../shared/utils/extract-field-error";
+import { handleFormError } from "@/shared/utils/form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
+import { PasswordToggleButton } from "@/components/password-toggle-button";
+import { ResetPasswordFormSchema, resetPasswordSchema } from "../schema";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function SetPasswordForm({ onClose }: Props) {
-  const setPass = useSetPassword();
-
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [localError, setLocalError] = useState("");
+  const setMutation = useSetPassword();
+  const mutationIsPending = setMutation.isPending;
+  const passwordToggle = usePasswordToggle();
+  const confirmPasswordToggle = usePasswordToggle();
   const [success, setSuccess] = useState(false);
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setLocalError("Passwords do not match");
-      return;
+  const form = useForm<ResetPasswordFormSchema>({
+    resolver: standardSchemaResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: ""
     }
+  });
 
-    const result = await setPass.mutateAsync({
-      password
-    });
-
-    if (!result.ok) return;
-
-    setSuccess(true);
-  }
-
-  function handlePasswordChange(value: string) {
-    if (setPass.isError || setPass.data) {
-      setPass.reset();
+  async function onSubmit(values: ResetPasswordFormSchema) {
+    try {
+      await setMutation.mutateAsync({ password: values.password });
+      setSuccess(true);
+    } catch (err) {
+      handleFormError(err, form);
     }
-    setPassword(value);
   }
-
-  const apiError = setPass.data && !setPass.data.ok ? setPass.data.error : undefined;
-
-  const passwordError = extractFieldError(apiError, "password");
-
-  const generalError = !passwordError ? apiError?.message : undefined;
 
   if (success) {
     return (
@@ -77,47 +68,63 @@ export default function SetPasswordForm({ onClose }: Props) {
         <DialogTitle>Set a password</DialogTitle>
         <DialogDescription>Create a password so you can sign in with your email and password.</DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={passwordToggle.inputType}
+                    autoComplete="new-password"
+                    disabled={mutationIsPending}
+                  />
+
+                  <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
+                </div>
+
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="confirmPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={confirmPasswordToggle.inputType}
+                    autoComplete="new-password"
+                    disabled={mutationIsPending}
+                  />
+
+                  <PasswordToggleButton visible={confirmPasswordToggle.visible} onToggle={confirmPasswordToggle.toggle} />
+                </div>
+
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={password}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              disabled={setPass.isPending}
-            />
-
-            {passwordError && <p className="text-sm text-destructive mt-2">{passwordError}</p>}
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-            <Input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={confirmPassword}
-              onChange={(e) => {
-                if (setPass.isError || setPass.data) {
-                  setLocalError("");
-                }
-                setConfirmPassword(e.target.value);
-              }}
-              disabled={setPass.isPending}
-            />
-
-            {localError && <p className="text-sm text-destructive mt-2">{localError}</p>}
-            {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-          </Field>
-
-          <Field>
-            <Button type="submit" disabled={setPass.isPending}>
-              Set Password
+            <Button type="submit" disabled={mutationIsPending}>
+              {mutationIsPending ? "Setting up your password..." : "Set Password"}
             </Button>
           </Field>
         </FieldGroup>

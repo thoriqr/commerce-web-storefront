@@ -10,14 +10,7 @@ export function useAddItem() {
     mutationKey: ["cart-add"],
     mutationFn: addItem,
 
-    onSuccess: async (result) => {
-      if (!result.ok) {
-        toast.error(result.error.message ?? "Failed to add cart", {
-          position: "top-center"
-        });
-        return;
-      }
-
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 

@@ -10,14 +10,7 @@ export function useUpdateItem() {
     mutationKey: ["cart-update"],
     mutationFn: updateItem,
 
-    onSuccess: async (result) => {
-      if (!result.ok) {
-        toast.error(result.error.message ?? "Failed to update cart", {
-          position: "top-center"
-        });
-        return;
-      }
-
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 

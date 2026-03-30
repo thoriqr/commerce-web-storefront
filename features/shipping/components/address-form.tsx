@@ -1,14 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { AddressSelect } from "./address-select";
 import { AddressDetail } from "@/features/user/types";
 import { useUpdateAddress } from "@/features/user/hooks/use-update-address";
 import { useCreateAddress } from "@/features/user/hooks/use-create-address";
-import { extractFieldError } from "@/shared/utils/extract-field-error";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { handleFormError } from "@/shared/utils/form";
+import { AddressFormSchema, addressSchema } from "../schema";
+import AddressSelectForm from "./address-select-form";
 
 type Props = {
   onCancel?: () => void;
@@ -18,230 +20,154 @@ type Props = {
 
 export default function AddressForm({ onCancel, initialData, addressId }: Props) {
   const isEdit = !!addressId;
-  const [label, setLabel] = useState(initialData?.label ?? "");
-  const [recipientName, setRecipientName] = useState(initialData?.recipientName ?? "");
-  const [phone, setPhone] = useState(initialData?.phone ?? "");
-  const [addressLine, setAddressLine] = useState(initialData?.addressLine ?? "");
-  const [postalCode, setPostalCode] = useState(initialData?.postalCode ?? "");
-
   const updateMutation = useUpdateAddress();
   const createMutation = useCreateAddress();
-
-  const [address, setAddress] = useState({
-    provinceId: initialData?.shippingProvinceId ?? "",
-    cityId: initialData?.shippingCityId ?? "",
-    districtId: initialData?.shippingDistrictId ?? ""
-  });
-
-  const [errors, setErrors] = useState<{
-    province?: string;
-    city?: string;
-    district?: string;
-  }>({});
-
   const mutationIsPending = updateMutation.isPending || createMutation.isPending;
 
-  const buttonDisabled =
-    !recipientName || !phone || !addressLine || !address.provinceId || !address.cityId || !address.districtId || mutationIsPending;
-
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const newErrors: typeof errors = {};
-
-    if (!address.provinceId) newErrors.province = "Province is required";
-    if (!address.cityId) newErrors.city = "City is required";
-    if (!address.districtId) newErrors.district = "District is required";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
+  const form = useForm<AddressFormSchema>({
+    resolver: standardSchemaResolver(addressSchema),
+    defaultValues: {
+      label: initialData?.label ?? "",
+      recipientName: initialData?.recipientName ?? "",
+      phone: initialData?.phone ?? "",
+      addressLine: initialData?.addressLine ?? "",
+      postalCode: initialData?.postalCode ?? "",
+      shippingProvinceId: initialData?.shippingProvinceId ?? "",
+      shippingCityId: initialData?.shippingCityId ?? "",
+      shippingDistrictId: initialData?.shippingDistrictId ?? ""
     }
+  });
 
+  async function onSubmit(values: AddressFormSchema) {
     const payload = {
-      label,
-      recipientName,
-      phone,
-      addressLine,
-      postalCode,
-      shippingProvinceId: Number(address.provinceId),
-      shippingCityId: Number(address.cityId),
-      shippingDistrictId: Number(address.districtId)
+      ...values,
+      shippingProvinceId: Number(values.shippingProvinceId),
+      shippingCityId: Number(values.shippingCityId),
+      shippingDistrictId: Number(values.shippingDistrictId)
     };
 
-    const result = isEdit ? await updateMutation.mutateAsync({ addressId, payload }) : await createMutation.mutateAsync(payload);
+    try {
+      if (isEdit) {
+        await updateMutation.mutateAsync({ addressId, payload });
+      } else {
+        await createMutation.mutateAsync(payload);
+      }
 
-    if (!result.ok) return;
-
-    onCancel?.();
-  }
-
-  const activeMutation = isEdit ? updateMutation : createMutation;
-
-  const apiError = activeMutation.data && !activeMutation.data.ok ? activeMutation.data.error : undefined;
-
-  const labelError = extractFieldError(apiError, "label");
-  const recipientError = extractFieldError(apiError, "recipientName");
-  const phoneError = extractFieldError(apiError, "phone");
-  const addressLineError = extractFieldError(apiError, "addressLine");
-  const postalCodeError = extractFieldError(apiError, "postalCode");
-
-  const generalError = !recipientError && !phoneError && !addressLineError && !postalCodeError ? apiError?.message : undefined;
-
-  function resetMutationError() {
-    if (activeMutation.isError || activeMutation.data) {
-      activeMutation.reset();
+      onCancel?.();
+    } catch (err) {
+      handleFormError(err, form);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="label">Label (optional)</FieldLabel>
-          <Input
-            id="label"
-            type="text"
-            placeholder="e.g. Home, Office"
-            value={label}
-            onChange={(e) => {
-              if (e.target.value.length > 50) return;
-              resetMutationError();
-              setLabel(e.target.value);
-            }}
-            disabled={mutationIsPending}
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <Controller
+            name="label"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Label</FieldLabel>
+                <Input {...field} id={field.name} aria-invalid={fieldState.invalid} placeholder="e.g. Home, Office" disabled={mutationIsPending} />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
 
-          <p className="text-xs text-muted-foreground text-right">{label.length}/50</p>
-          {labelError && <p className="text-sm text-destructive mt-2">{labelError}</p>}
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="recipient-name">Recipient Name</FieldLabel>
-          <Input
-            id="recipient-name"
-            type="text"
-            autoFocus={!isEdit}
-            autoComplete="name"
-            placeholder="Full name (e.g. John Doe)"
-            value={recipientName}
-            onChange={(e) => {
-              if (e.target.value.length > 120) return;
-              resetMutationError();
-              setRecipientName(e.target.value);
-            }}
-            disabled={mutationIsPending}
-            required
+          <Controller
+            name="recipientName"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Recipient Name</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  autoFocus={!isEdit}
+                  autoComplete="name"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Full name (e.g. John Doe)"
+                  disabled={mutationIsPending}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
 
-          <p className="text-xs text-muted-foreground text-right">{recipientName.length}/120</p>
-          {recipientError && <p className="text-sm text-destructive mt-2">{recipientError}</p>}
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="phone">Phone</FieldLabel>
-          <Input
-            id="phone"
-            type="text"
-            placeholder="Phone number (e.g. 08123456789)"
-            inputMode="numeric"
-            value={phone}
-            onChange={(e) => {
-              let val = e.target.value;
-
-              val = val.replace(/\D/g, "");
-
-              if (val.length > 30) return;
-              resetMutationError();
-
-              setPhone(val);
-            }}
-            disabled={mutationIsPending}
-            required
+          <Controller
+            name="phone"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Phone</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Phone number (e.g. 08123456789)"
+                  inputMode="numeric"
+                  disabled={mutationIsPending}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
 
-          {phoneError && <p className="text-sm text-destructive mt-2">{phoneError}</p>}
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="address-line">Address Line</FieldLabel>
-          <Input
-            id="address-line"
-            type="text"
-            placeholder="Street address (e.g. Jl. Sudirman No. 10)"
-            value={addressLine}
-            onChange={(e) => {
-              if (e.target.value.length > 255) return;
-              resetMutationError();
-              setAddressLine(e.target.value);
-            }}
-            disabled={mutationIsPending}
-            required
+          <Controller
+            name="addressLine"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Address Line</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Street address (e.g. Jl. Sudirman No. 10)"
+                  disabled={mutationIsPending}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
 
-          <p className="text-xs text-muted-foreground text-right">{addressLine.length}/255</p>
-          {addressLineError && <p className="text-sm text-destructive mt-2">{addressLineError}</p>}
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="postal-code">Postal Code</FieldLabel>
-          <Input
-            id="postal-code"
-            type="text"
-            inputMode="numeric"
-            placeholder="Postal code (e.g. 60123)"
-            value={postalCode}
-            onChange={(e) => {
-              let val = e.target.value;
-
-              val = val.replace(/\D/g, "");
-
-              if (val.length > 5) return;
-              resetMutationError();
-              setPostalCode(val);
-            }}
-            disabled={mutationIsPending}
+          <Controller
+            name="postalCode"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Postal Code</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  inputMode="numeric"
+                  placeholder="Postal code (e.g. 60123)"
+                  disabled={mutationIsPending}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
-          {postalCodeError && <p className="text-sm text-destructive mt-2">{postalCodeError}</p>}
-        </Field>
 
-        <Field>
-          <FieldLabel>Address Location</FieldLabel>
+          <AddressSelectForm mutationIsPending={mutationIsPending} />
 
-          <AddressSelect
-            value={address}
-            onChange={(val) => {
-              resetMutationError();
-              setAddress(val);
+          {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
-              // clear error
-              setErrors((prev) => {
-                const next = { ...prev };
+          <Field>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={onCancel} disabled={mutationIsPending}>
+                Cancel
+              </Button>
 
-                if (val.provinceId) delete next.province;
-                if (val.cityId) delete next.city;
-                if (val.districtId) delete next.district;
-
-                return next;
-              });
-            }}
-            errors={errors}
-          />
-        </Field>
-
-        {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-
-        <Field>
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onCancel} disabled={mutationIsPending}>
-              Cancel
-            </Button>
-
-            <Button type="submit" disabled={buttonDisabled}>
-              {mutationIsPending ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </Field>
-      </FieldGroup>
-    </form>
+              <Button type="submit" disabled={mutationIsPending}>
+                {mutationIsPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </Field>
+        </FieldGroup>
+      </form>
+    </FormProvider>
   );
 }

@@ -7,10 +7,8 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: loginRequest,
-    onSuccess: async (result) => {
-      if (result.ok) {
-        await invalidateUserScope(queryClient);
-      }
+    onSuccess: async () => {
+      await invalidateUserScope(queryClient);
     }
   });
 }

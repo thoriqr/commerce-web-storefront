@@ -1,14 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useResetPassword } from "../../hooks/use-reset-password";
-import { extractFieldError } from "../../../../shared/utils/extract-field-error";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
+import { PasswordToggleButton } from "@/components/password-toggle-button";
+import { ResetPasswordFormSchema, resetPasswordSchema } from "../schema";
+import { handleFormError } from "@/shared/utils/form";
 
 type Props = {
   token: string;
@@ -16,43 +19,27 @@ type Props = {
 
 export default function ResetPasswordForm({ token }: Props) {
   const router = useRouter();
-  const resetPassword = useResetPassword();
+  const resetMutation = useResetPassword();
+  const mutationIsPending = resetMutation.isPending;
+  const passwordToggle = usePasswordToggle();
+  const confirmPasswordToggle = usePasswordToggle();
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [localError, setLocalError] = useState("");
-
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setLocalError("Passwords do not match");
-      return;
+  const form = useForm<ResetPasswordFormSchema>({
+    resolver: standardSchemaResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: ""
     }
+  });
 
-    const result = await resetPassword.mutateAsync({
-      token,
-      password
-    });
-
-    if (!result.ok) return;
-
-    router.replace("/");
-  }
-
-  function handlePasswordChange(value: string) {
-    if (resetPassword.isError || resetPassword.data) {
-      resetPassword.reset();
+  async function onSubmit(values: ResetPasswordFormSchema) {
+    try {
+      await resetMutation.mutateAsync({ password: values.password, token });
+      router.replace("/");
+    } catch (err) {
+      handleFormError(err, form);
     }
-    setPassword(value);
   }
-
-  const apiError = resetPassword.data && !resetPassword.data.ok ? resetPassword.data.error : undefined;
-
-  const passwordError = extractFieldError(apiError, "password");
-  const tokenError = extractFieldError(apiError, "token");
-
-  const generalError = !passwordError && !tokenError ? apiError?.message : undefined;
 
   return (
     <Card>
@@ -61,48 +48,63 @@ export default function ResetPasswordForm({ token }: Props) {
         <CardDescription>Enter a new password for your account.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      type={passwordToggle.inputType}
+                      autoComplete="new-password"
+                      disabled={mutationIsPending}
+                    />
+
+                    <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
+                  </div>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      type={confirmPasswordToggle.inputType}
+                      autoComplete="new-password"
+                      disabled={mutationIsPending}
+                    />
+
+                    <PasswordToggleButton visible={confirmPasswordToggle.visible} onToggle={confirmPasswordToggle.toggle} />
+                  </div>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                disabled={resetPassword.isPending}
-              />
-
-              {passwordError && <p className="text-sm text-destructive mt-2">{passwordError}</p>}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-              <Input
-                id="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => {
-                  if (resetPassword.isError || resetPassword.data) {
-                    setLocalError("");
-                  }
-                  setConfirmPassword(e.target.value);
-                }}
-                disabled={resetPassword.isPending}
-              />
-
-              {localError && <p className="text-sm text-destructive mt-2">{localError}</p>}
-              {tokenError && <p className="text-sm text-destructive mt-2">{tokenError}</p>}
-              {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-            </Field>
-
-            <Field>
-              <Button type="submit" disabled={resetPassword.isPending}>
-                {resetPassword.isPending ? "Resetting..." : "Reset Password"}
+              <Button type="submit" disabled={mutationIsPending}>
+                {mutationIsPending ? "Resetting..." : "Reset Password"}
               </Button>
             </Field>
           </FieldGroup>

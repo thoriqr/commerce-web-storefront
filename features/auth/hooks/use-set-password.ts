@@ -7,10 +7,8 @@ export function useSetPassword() {
 
   return useMutation({
     mutationFn: setPasswordRequest,
-    onSuccess: async (result) => {
-      if (result.ok) {
-        await invalidateUserScope(queryClient);
-      }
+    onSuccess: async () => {
+      await invalidateUserScope(queryClient);
     }
   });
 }

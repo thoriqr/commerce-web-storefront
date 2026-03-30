@@ -10,14 +10,7 @@ export function useDeleteItem() {
     mutationKey: ["cart-delete"],
     mutationFn: deleteItem,
 
-    onSuccess: async (result) => {
-      if (!result.ok) {
-        toast.error(result.error.message ?? "Failed to delete item", {
-          position: "top-center"
-        });
-        return;
-      }
-
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 

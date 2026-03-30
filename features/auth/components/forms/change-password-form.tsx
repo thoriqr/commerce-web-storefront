@@ -1,64 +1,47 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import { useChangePassword } from "../../hooks/use-change-password";
+import { ChangePasswordFormSchema, changePasswordSchema } from "../schema";
+import { handleFormError } from "@/shared/utils/form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
+import { PasswordToggleButton } from "@/components/password-toggle-button";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function ChangePasswordForm({ onClose }: Props) {
-  const changePassword = useChangePassword();
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [localError, setLocalError] = useState("");
+  const changeMutation = useChangePassword();
+  const mutationIsPending = changeMutation.isPending;
+  const currentPasswordToggle = usePasswordToggle();
+  const newPasswordToggle = usePasswordToggle();
+  const confirmNewPasswordToggle = usePasswordToggle();
   const [success, setSuccess] = useState(false);
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (newPassword !== confirmNewPassword) {
-      setLocalError("Confirm New Password do not match");
-      return;
+  const form = useForm<ChangePasswordFormSchema>({
+    resolver: standardSchemaResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: ""
     }
+  });
 
-    const result = await changePassword.mutateAsync({
-      currentPassword,
-      newPassword
-    });
-
-    if (!result.ok) return;
-
-    setSuccess(true);
+  async function onSubmit(values: ChangePasswordFormSchema) {
+    try {
+      await changeMutation.mutateAsync({ currentPassword: values.currentPassword, newPassword: values.newPassword });
+      setSuccess(true);
+    } catch (err) {
+      handleFormError(err, form);
+    }
   }
-
-  const handleCurrentPassword = (value: string) => {
-    if (changePassword.isError || changePassword.data) {
-      changePassword.reset();
-    }
-    setCurrentPassword(value);
-  };
-
-  function handleNewPasswordChange(value: string) {
-    if (changePassword.isError || changePassword.data) {
-      changePassword.reset();
-    }
-    setNewPassword(value);
-  }
-
-  const apiError = changePassword.data && !changePassword.data.ok ? changePassword.data.error : undefined;
-
-  const newPasswordError = extractFieldError(apiError, "newPassword");
-  const currentPasswordError = extractFieldError(apiError, "currentPassword");
-
-  const generalError = !newPasswordError && !currentPasswordError ? apiError?.message : undefined;
 
   if (success) {
     return (
@@ -87,66 +70,92 @@ export default function ChangePasswordForm({ onClose }: Props) {
         <DialogTitle>Change password</DialogTitle>
         <DialogDescription>Enter your new password below.</DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="current-password">Current Password</FieldLabel>
-            <Input
-              id="current-password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={currentPassword}
-              onChange={(e) => handleCurrentPassword(e.target.value)}
-              disabled={changePassword.isPending}
-            />
+          <Controller
+            name="currentPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
 
-            {currentPasswordError && <p className="text-sm text-destructive mt-2">{currentPasswordError}</p>}
-          </Field>
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={currentPasswordToggle.inputType}
+                    autoComplete="current-password"
+                    disabled={mutationIsPending}
+                  />
 
-          <Field>
-            <FieldLabel htmlFor="new-password">New Password</FieldLabel>
-            <Input
-              id="new-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={newPassword}
-              onChange={(e) => handleNewPasswordChange(e.target.value)}
-              disabled={changePassword.isPending}
-            />
+                  <PasswordToggleButton visible={currentPasswordToggle.visible} onToggle={currentPasswordToggle.toggle} />
+                </div>
 
-            {newPasswordError && <p className="text-sm text-destructive mt-2">{newPasswordError}</p>}
-          </Field>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field>
-            <FieldLabel htmlFor="confirm-new-password">Confirm New Password</FieldLabel>
-            <Input
-              id="confirm-new-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={confirmNewPassword}
-              onChange={(e) => {
-                if (changePassword.isError || changePassword.data) {
-                  setLocalError("");
-                }
-                setConfirmNewPassword(e.target.value);
-              }}
-              disabled={changePassword.isPending}
-            />
+          <Controller
+            name="newPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
 
-            {localError && <p className="text-sm text-destructive mt-2">{localError}</p>}
-            {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-          </Field>
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={newPasswordToggle.inputType}
+                    autoComplete="new-password"
+                    disabled={mutationIsPending}
+                  />
+
+                  <PasswordToggleButton visible={newPasswordToggle.visible} onToggle={newPasswordToggle.toggle} />
+                </div>
+
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="confirmNewPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Confirm New Password</FieldLabel>
+
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    type={confirmNewPasswordToggle.inputType}
+                    autoComplete="new-password"
+                    disabled={mutationIsPending}
+                  />
+
+                  <PasswordToggleButton visible={confirmNewPasswordToggle.visible} onToggle={confirmNewPasswordToggle.toggle} />
+                </div>
+
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
           <Field>
             <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" disabled={changePassword.isPending} onClick={onClose}>
+              <Button type="button" variant="outline" disabled={mutationIsPending} onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={changePassword.isPending}>
-                {changePassword.isPending ? "Saving..." : "Save"}
+              <Button type="submit" disabled={mutationIsPending}>
+                {mutationIsPending ? "Saving..." : "Save"}
               </Button>
             </div>
           </Field>

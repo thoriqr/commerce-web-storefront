@@ -8,18 +8,16 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: updateProfile,
 
-    onSuccess: async (result) => {
-      if (result.ok) {
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: USER_QUERY_KEYS.USER_PROFILE
-          }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: USER_QUERY_KEYS.USER_PROFILE
+        }),
 
-          queryClient.invalidateQueries({
-            queryKey: USER_QUERY_KEYS.ME
-          })
-        ]);
-      }
+        queryClient.invalidateQueries({
+          queryKey: USER_QUERY_KEYS.ME
+        })
+      ]);
     }
   });
 }

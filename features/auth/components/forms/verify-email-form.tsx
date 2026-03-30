@@ -2,12 +2,16 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import { useVerifyEmail } from "../../hooks/use-verify-email";
+import { handleFormError } from "@/shared/utils/form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
+import { PasswordToggleButton } from "@/components/password-toggle-button";
+import { VerifyEmailFormSchema, verifyEmailSchema } from "../schema";
 
 type Props = {
   token: string;
@@ -16,52 +20,27 @@ type Props = {
 export default function VerifyEmailForm({ token }: Props) {
   const router = useRouter();
   const verifyMutation = useVerifyEmail();
+  const mutationIsPending = verifyMutation.isPending;
+  const passwordToggle = usePasswordToggle();
+  const confirmPasswordToggle = usePasswordToggle();
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [localError, setLocalError] = useState("");
-
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setLocalError("Confirm Password do not match");
-      return;
+  const form = useForm<VerifyEmailFormSchema>({
+    resolver: standardSchemaResolver(verifyEmailSchema),
+    defaultValues: {
+      displayName: "",
+      password: "",
+      confirmPassword: ""
     }
+  });
 
-    const result = await verifyMutation.mutateAsync({
-      token,
-      displayName,
-      password
-    });
-
-    if (!result.ok) return;
-
-    router.replace("/");
-  }
-
-  function handleNameChange(value: string) {
-    if (verifyMutation.isError || verifyMutation.data) {
-      verifyMutation.reset();
+  async function onSubmit(values: VerifyEmailFormSchema) {
+    try {
+      await verifyMutation.mutateAsync({ displayName: values.displayName, password: values.password, token });
+      router.replace("/");
+    } catch (err) {
+      handleFormError(err, form);
     }
-    setDisplayName(value);
   }
-
-  function handlePasswordChange(value: string) {
-    if (verifyMutation.isError || verifyMutation.data) {
-      verifyMutation.reset();
-    }
-    setPassword(value);
-  }
-
-  const apiError = verifyMutation.data && !verifyMutation.data.ok ? verifyMutation.data.error : undefined;
-
-  const nameError = extractFieldError(apiError, "displayName");
-  const passwordError = extractFieldError(apiError, "password");
-  const tokenError = extractFieldError(apiError, "token");
-
-  const generalError = !passwordError && !nameError && !tokenError ? apiError?.message : undefined;
 
   return (
     <Card>
@@ -70,63 +49,75 @@ export default function VerifyEmailForm({ token }: Props) {
         <CardDescription>Choose a display name and password to finish creating your account.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
+            <Controller
+              name="displayName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Display Name</FieldLabel>
+                  <Input {...field} id={field.name} aria-invalid={fieldState.invalid} placeholder="John Doe" disabled={mutationIsPending} />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      type={passwordToggle.inputType}
+                      autoComplete="new-password"
+                      disabled={mutationIsPending}
+                    />
+
+                    <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
+                  </div>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      type={confirmPasswordToggle.inputType}
+                      autoComplete="new-password"
+                      disabled={mutationIsPending}
+                    />
+
+                    <PasswordToggleButton visible={confirmPasswordToggle.visible} onToggle={confirmPasswordToggle.toggle} />
+                  </div>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+
             <Field>
-              <FieldLabel htmlFor="display-name">Display Name</FieldLabel>
-              <Input
-                id="display-name"
-                type="text"
-                placeholder="John Doe"
-                required
-                value={displayName}
-                onChange={(e) => handleNameChange(e.target.value)}
-                disabled={verifyMutation.isPending}
-              />
-
-              {nameError && <p className="text-sm text-destructive mt-2">{nameError}</p>}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                disabled={verifyMutation.isPending}
-              />
-
-              {passwordError && <p className="text-sm text-destructive mt-2">{passwordError}</p>}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-              <Input
-                id="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => {
-                  if (verifyMutation.isError || verifyMutation.data) {
-                    setLocalError("");
-                  }
-                  setConfirmPassword(e.target.value);
-                }}
-                disabled={verifyMutation.isPending}
-              />
-
-              {localError && <p className="text-sm text-destructive mt-2">{localError}</p>}
-              {tokenError && <p className="text-sm text-destructive mt-2">{tokenError}</p>}
-              {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-            </Field>
-
-            <Field>
-              <Button type="submit" disabled={verifyMutation.isPending}>
-                {verifyMutation.isPending ? "Setting up..." : "Complete Setup"}
+              <Button type="submit" disabled={mutationIsPending}>
+                {mutationIsPending ? "Setting up..." : "Complete Setup"}
               </Button>
             </Field>
           </FieldGroup>

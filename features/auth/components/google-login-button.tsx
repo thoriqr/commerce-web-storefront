@@ -3,15 +3,15 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleLogin } from "../hooks/use-google-login";
 import { useRouter } from "next/navigation";
+import { FetchError } from "@/shared/types/api-error";
+import { toast } from "sonner";
 
 export default function GoogleLoginButton() {
   const router = useRouter();
   const googleLogin = useGoogleLogin();
 
-  const apiError = googleLogin.data && !googleLogin.data.ok ? googleLogin.data.error.message : undefined;
-
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2 relative">
       <GoogleLogin
         theme="outline"
         size="large"
@@ -21,18 +21,21 @@ export default function GoogleLoginButton() {
 
           if (!idToken) return;
 
-          const result = await googleLogin.mutateAsync(idToken);
-
-          if (!result.ok) return;
-
-          router.replace("/");
+          try {
+            await googleLogin.mutateAsync(idToken);
+            router.replace("/");
+          } catch (err) {
+            if (err instanceof FetchError) {
+              toast.error(err.message);
+            } else {
+              toast.error("Something went wrong");
+            }
+          }
         }}
         onError={() => {
           console.error("Google Login Failed");
         }}
       />
-
-      {apiError && <p className="text-sm text-destructive text-center">{apiError}</p>}
     </div>
   );
 }

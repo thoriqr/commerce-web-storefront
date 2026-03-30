@@ -52,13 +52,13 @@ export type UpsertAddressPayload = {
 };
 
 export type AddressDetail = {
+  recipientName: string;
   label: string;
+  phone: string;
+  addressLine: string;
   shippingProvinceId: string;
   shippingCityId: string;
   shippingDistrictId: string;
-  recipientName: string;
-  phone: string;
-  postalCode: string;
-  addressLine: string;
   isDefault: boolean;
+  postalCode: string;
 };

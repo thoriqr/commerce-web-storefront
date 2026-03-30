@@ -1,10 +1,19 @@
-import type { LoginInput, RegisterInput, VerifyEmailInput, ResetPasswordInput, ChangePasswordInput, SetPasswordInput, MeResponse } from "./types";
+import { EmailFormSchema, LoginFormSchema } from "./components/schema";
+import type {
+  RegisterInput,
+  VerifyEmailInput,
+  ResetPasswordInput,
+  ChangePasswordInput,
+  SetPasswordInput,
+  MeResponse,
+  VerificationToken
+} from "./types";
 import { fetchAction } from "@/shared/lib/fetch-action";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/auth`;
 const AUTH_URL = "/auth";
 
-export function loginRequest(input: LoginInput) {
+export function loginRequest(input: LoginFormSchema) {
   return fetchAction<void>(`${AUTH_URL}/login`, {
     method: "POST",
     body: JSON.stringify(input),
@@ -12,7 +21,7 @@ export function loginRequest(input: LoginInput) {
   });
 }
 
-export function registerRequest(input: RegisterInput) {
+export function registerRequest(input: EmailFormSchema) {
   return fetchAction<void>(`${AUTH_URL}/register`, {
     method: "POST",
     body: JSON.stringify(input)
@@ -86,4 +95,11 @@ export async function fetchMe(): Promise<MeResponse | null> {
   } catch {
     return null;
   }
+}
+
+export async function verificationToken(payload: VerificationToken) {
+  return fetchAction<{ expiresAt: Date }>(`${AUTH_URL}/check-verification-token`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 }

@@ -34,3 +34,8 @@ export type MeResponse = {
   email: string;
   displayName: string | null;
 };
+
+export type VerificationToken = {
+  token: string;
+  type: "REGISTER" | "RESET_PASSWORD";
+};

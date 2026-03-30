@@ -2,54 +2,41 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useLogin } from "../../hooks/use-login";
-import { extractFieldError } from "../../../../shared/utils/extract-field-error";
 import GoogleLoginButton from "../google-login-button";
+import { Controller, useForm } from "react-hook-form";
+import { LoginFormSchema, loginSchema } from "../schema";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { handleFormError } from "@/shared/utils/form";
+import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
+import { PasswordToggleButton } from "@/components/password-toggle-button";
 
 export default function LoginForm() {
   const router = useRouter();
   const loginMutation = useLogin();
+  const mutationIsPending = loginMutation.isPending;
+  const passwordToggle = usePasswordToggle();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const result = await loginMutation.mutateAsync({
-      email,
-      password
-    });
-
-    if (!result.ok) return;
-
-    router.replace("/");
-  }
-
-  function handleEmailChange(value: string) {
-    if (loginMutation.isError || loginMutation.data) {
-      loginMutation.reset();
+  const form = useForm<LoginFormSchema>({
+    resolver: standardSchemaResolver(loginSchema),
+    defaultValues: {
+      email: "testuser1@example.com",
+      password: "asdfasdf"
     }
-    setEmail(value);
-  }
+  });
 
-  function handlePasswordChange(value: string) {
-    if (loginMutation.isError || loginMutation.data) {
-      loginMutation.reset();
+  async function onSubmit(values: LoginFormSchema) {
+    try {
+      await loginMutation.mutateAsync(values);
+      router.replace("/");
+    } catch (err) {
+      handleFormError(err, form);
     }
-    setPassword(value);
   }
-
-  const apiError = loginMutation.data && !loginMutation.data.ok ? loginMutation.data.error : undefined;
-
-  const passwordError = extractFieldError(apiError, "password");
-
-  const generalError = !passwordError ? apiError?.message : undefined;
 
   return (
     <Card>
@@ -58,51 +45,67 @@ export default function LoginForm() {
         <CardDescription>Login with your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
               <GoogleLoginButton />
             </Field>
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or continue with</FieldSeparator>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="username"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => handleEmailChange(e.target.value)}
-                disabled={loginMutation.isPending}
-              />
-            </Field>
-            <Field>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Link href="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline">
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                disabled={loginMutation.isPending}
-              />
 
-              {/* Error Message */}
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="me@example.com"
+                    autoComplete="username"
+                    disabled={mutationIsPending}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
-              {passwordError && <p className="text-sm text-destructive mt-2">{passwordError}</p>}
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="flex justify-between">
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Link href="/forgot-password" className="text-sm text-primary underline-offset-2 hover:underline">
+                      Forgot your password?
+                    </Link>
+                  </div>
 
-              {generalError && <p className="text-sm text-destructive text-center mt-2">{generalError}</p>}
-            </Field>
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      type={passwordToggle.inputType}
+                      autoComplete="new-password"
+                      disabled={mutationIsPending}
+                    />
+
+                    <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
+                  </div>
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+
             <Field>
-              <Button type="submit" disabled={loginMutation.isPending} className="w-full">
-                {loginMutation.isPending ? "Logging in..." : "Login"}
+              <Button type="submit" disabled={mutationIsPending} className="w-full">
+                {mutationIsPending ? "Logging in..." : "Login"}
               </Button>
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <Link href="/register">Register</Link>

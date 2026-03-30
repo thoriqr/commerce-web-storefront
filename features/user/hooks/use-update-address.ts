@@ -15,24 +15,22 @@ export function useUpdateAddress() {
   return useMutation({
     mutationFn: ({ addressId, payload }: UpdateAddressPayload) => updateAddress(addressId, payload),
 
-    onSuccess: async (result, variables) => {
-      if (result.ok) {
-        const { addressId } = variables;
+    onSuccess: async (_, variables) => {
+      const { addressId } = variables;
 
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.ADDRESS, addressId]
-          }),
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.ADDRESS, addressId]
+        }),
 
-          queryClient.invalidateQueries({
-            queryKey: USER_QUERY_KEYS.USER_PROFILE
-          }),
+        queryClient.invalidateQueries({
+          queryKey: USER_QUERY_KEYS.USER_PROFILE
+        }),
 
-          queryClient.invalidateQueries({
-            queryKey: USER_QUERY_KEYS.ADDRESSES
-          })
-        ]);
-      }
+        queryClient.invalidateQueries({
+          queryKey: USER_QUERY_KEYS.ADDRESSES
+        })
+      ]);
     }
   });
 }
