@@ -65,7 +65,7 @@ export default function ModalProfileForm({ initialValue }: Props) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Display name</FieldLabel>
                   <Input {...field} id={field.name} aria-invalid={fieldState.invalid} disabled={mutationIsPending} />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
