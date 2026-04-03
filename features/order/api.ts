@@ -1,7 +1,7 @@
 import { fetchAuth } from "@/shared/lib/fetch-auth";
 import { OrderDetail } from "./types";
 
-const BASE_URL = "/orders";
+const BASE_URL = "/user/orders";
 
 export async function getOrder(orderCode: string) {
   return await fetchAuth<OrderDetail>(`${BASE_URL}/${orderCode}`);

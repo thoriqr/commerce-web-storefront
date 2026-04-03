@@ -1,9 +1,13 @@
 import { FetchError, ApiErrorResponse } from "@/shared/types/api-error";
 
-const STORE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/store`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
 
-export async function fetchStore<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${STORE_URL}${path}`, options);
+export async function fetchStore<T>(path: string, options?: RequestInit, config?: { useStorePrefix?: boolean }): Promise<T> {
+  const useStorePrefix = config?.useStorePrefix ?? true;
+
+  const baseUrl = useStorePrefix ? `${API_URL}/store` : API_URL;
+
+  const res = await fetch(`${baseUrl}${path}`, options);
 
   const json = await res.json().catch(() => null);
 

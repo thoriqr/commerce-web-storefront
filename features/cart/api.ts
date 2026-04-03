@@ -2,12 +2,18 @@ import { AddItemInput, Cart, DeleteCartItemInput, UpdateCartItemInput } from "./
 import { fetchStore } from "@/shared/lib/fetch-store";
 import { fetchAction } from "@/shared/lib/fetch-action";
 
-const CART_URL = "/store/cart";
+const CART_URL = "/cart";
 
 export async function getCart() {
-  return fetchStore<Cart>(`/cart`, {
-    credentials: "include"
-  });
+  return fetchStore<Cart>(
+    `/cart`,
+    {
+      credentials: "include"
+    },
+    {
+      useStorePrefix: false
+    }
+  );
 }
 
 export function addItem(input: AddItemInput) {

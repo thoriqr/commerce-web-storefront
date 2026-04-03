@@ -1,7 +1,7 @@
 import { fetchAuth } from "@/shared/lib/fetch-auth";
 import { CheckoutSession, SetShippingPayload, ShippingCost } from "./types";
 
-const BASE_URL = "/checkout-sessions";
+const BASE_URL = "/user/checkout-sessions";
 
 export async function getCheckoutSession(sessionId: number) {
   return await fetchAuth<CheckoutSession>(`${BASE_URL}/${sessionId}`);

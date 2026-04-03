@@ -2,11 +2,11 @@ import { ApiErrorResponse, FetchError } from "../types/api-error";
 
 export type FetchActionResult<T = void> = { ok: true; data?: T } | { ok: false; error: ApiErrorResponse };
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
 
 export async function fetchAction<T>(path: string, options: RequestInit & { withAuth?: boolean }): Promise<T> {
   try {
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(`${API_URL}${path}`, {
       ...options,
       credentials: options.withAuth ? "include" : "omit",
       headers: {

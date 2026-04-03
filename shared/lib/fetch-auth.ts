@@ -1,6 +1,6 @@
 import { FetchError, ApiErrorResponse } from "@/shared/types/api-error";
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL!}`;
 
 type FetchAuthOptions = RequestInit & {
   retry?: boolean;
@@ -9,7 +9,7 @@ type FetchAuthOptions = RequestInit & {
 export async function fetchAuth<T>(path: string, options?: FetchAuthOptions): Promise<T> {
   const { retry = true, ...fetchOptions } = options ?? {};
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${API_URL}${path}`, {
     ...fetchOptions,
     credentials: "include",
     headers: {
