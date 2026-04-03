@@ -33,17 +33,21 @@ export default function OrderStatus({ data, refetch }: Props) {
   const { handlePay, isLoading: isPaying } = usePayOrder(data.orderCode, refetch);
   const cancelMutation = useCancelOrder();
 
-  const canCancel = data.paymentStatus !== "PAID" && data.status !== "CANCELLED" && data.status !== "COMPLETED";
+  const isFinalPaymentState = ["PAID", "EXPIRED", "FAILED"].includes(data.paymentStatus);
+
+  const isFinalOrderState = ["CANCELLED", "COMPLETED", "SHIPPED", "DELIVERED"].includes(data.status);
+
+  const canCancel = !isFinalPaymentState && !isFinalOrderState;
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-sm font-medium">Order Status</h2>
+    <div className="space-y-4">
+      {/* HEADER */}
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Order</p>
+          <p className="font-semibold text-base">{data.orderCode}</p>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-medium">{data.orderCode}</p>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-1">
             <PaymentStatusBadge status={data.paymentStatus} />
             <OrderStatusBadge status={data.status} />
           </div>
@@ -69,9 +73,7 @@ export default function OrderStatus({ data, refetch }: Props) {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Cancel this order?</DialogTitle>
-                  <DialogDescription>
-                    This will cancel your order and cannot be undone. You will need to create a new order if you wish to proceed.
-                  </DialogDescription>
+                  <DialogDescription>Are you sure you want to cancel this order? This action cannot be undone.</DialogDescription>
                 </DialogHeader>
 
                 <DialogFooter>
@@ -96,14 +98,16 @@ export default function OrderStatus({ data, refetch }: Props) {
         </div>
       </div>
 
-      {/* Countdown */}
+      <div className="border-t" />
+
+      {/* COUNTDOWN */}
       {data.paymentStatus === "UNPAID" && !isExpired && (
         <p className="text-xs text-muted-foreground">
-          Expires in <span className="font-medium">{formatted}</span>
+          Complete your payment within <span className="font-medium text-foreground">{formatted}</span>
         </p>
       )}
 
-      {isExpired && data.paymentStatus === "UNPAID" && <p className="text-xs text-destructive">Payment expired</p>}
+      {isExpired && data.paymentStatus === "UNPAID" && <p className="text-xs text-destructive font-medium">Payment has expired</p>}
     </div>
   );
 }

@@ -2,6 +2,8 @@ export type OptionSnapshot = { dimension: string; value: string };
 
 export type CheckoutBlockReason = "INVALID_ITEMS" | "NO_ADDRESS" | "NO_SHIPPING" | "SHIPPING_NOT_CALCULATED";
 
+export type ItemWarning = "UNAVAILABLE" | "INSUFFICIENT_STOCK";
+
 export interface CheckoutSession {
   sessionId: number;
   expiresAt: Date;

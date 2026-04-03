@@ -7,6 +7,7 @@ import { COURIERS } from "../constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSetShipping } from "../hooks/use-set-shipping";
 import { cn } from "@/lib/utils";
+import { formatRupiah } from "@/shared/utils/formatter";
 
 type Props = {
   sessionId: number;
@@ -37,9 +38,15 @@ export function ShippingSection({ sessionId, disabled }: Props) {
     });
   }
 
+  const services = data?.services ?? [];
+
   return (
     <div className="space-y-3">
       <h2 className="text-sm font-medium">Shipping Method</h2>
+
+      {/* DISABLED MESSAGE */}
+      {disabled && <div className="text-xs text-muted-foreground border border-dashed rounded-md p-3">Please select a shipping address first.</div>}
+
       {/* COURIER SELECT */}
       <div className="flex gap-2 flex-wrap">
         {COURIERS.map((c) => (
@@ -55,7 +62,13 @@ export function ShippingSection({ sessionId, disabled }: Props) {
         ))}
       </div>
 
-      {loading ? (
+      {/* EMPTY STATE (belum pilih courier) */}
+      {!loading && courier === null && !disabled && (
+        <div className="text-xs text-muted-foreground border border-dashed rounded-md p-3">Choose a courier to see available shipping options.</div>
+      )}
+
+      {/* LOADING */}
+      {loading && (
         <div className="space-y-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="border rounded-md p-3">
@@ -70,10 +83,14 @@ export function ShippingSection({ sessionId, disabled }: Props) {
             </div>
           ))}
         </div>
-      ) : data?.services?.length ? (
+      )}
+
+      {/* SERVICES */}
+      {!loading && services.length > 0 && (
         <div className="space-y-2">
-          {data.services.map((opt) => {
+          {services.map((opt) => {
             const isValid = isValidService(opt);
+            const isSelected = selectedService === opt.service;
 
             return (
               <div
@@ -98,12 +115,12 @@ export function ShippingSection({ sessionId, disabled }: Props) {
                 className={cn(
                   "border rounded-md p-3 transition",
                   isValid ? "cursor-pointer hover:border-primary" : "opacity-50 cursor-not-allowed",
-                  selectedService === opt.service && isValid && "border-primary bg-primary/5",
+                  isSelected && isValid && "border-primary bg-primary/5",
                   setShippingMutation.isPending && "opacity-60 pointer-events-none"
                 )}
               >
-                <div className="flex justify-between text-sm">
-                  <div>
+                <div className="flex justify-between text-sm gap-3">
+                  <div className="space-y-1">
                     <p className="font-medium">
                       {opt.name} - {opt.service}
                     </p>
@@ -112,16 +129,21 @@ export function ShippingSection({ sessionId, disabled }: Props) {
                       {opt.description} • {opt.etd || "No estimation"}
                     </p>
 
-                    {!isValid && <p className="text-[11px] text-destructive mt-1">This shipping option is currently unavailable</p>}
+                    {!isValid && <p className="text-[11px] text-destructive">This shipping option is currently unavailable</p>}
                   </div>
 
-                  <p className="font-medium">Rp {opt.cost.toLocaleString("id-ID")}</p>
+                  <p className="font-medium shrink-0">{formatRupiah(opt.cost)}</p>
                 </div>
               </div>
             );
           })}
         </div>
-      ) : null}
+      )}
+
+      {/* NO RESULT */}
+      {!loading && courier && data?.services?.length === 0 && (
+        <div className="text-xs text-muted-foreground border border-dashed rounded-md p-3">No shipping options available for this courier.</div>
+      )}
     </div>
   );
 }

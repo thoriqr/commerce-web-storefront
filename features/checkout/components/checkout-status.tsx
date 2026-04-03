@@ -10,8 +10,9 @@ export function CheckoutStatus({ canPlaceOrder, reason }: Props) {
   if (canPlaceOrder) return null;
 
   return (
-    <div className="border border-destructive/30 bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-      {reason ? reasonMap[reason] : "Something went wrong."}
+    <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+      <p className="font-medium">Action required</p>
+      <p className="text-xs mt-1">{reason ? reasonMap[reason] : "Something went wrong."}</p>
     </div>
   );
 }

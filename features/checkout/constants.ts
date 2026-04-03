@@ -8,10 +8,10 @@ export const COURIERS = [
 ];
 
 export const reasonMap: Record<CheckoutBlockReason, string> = {
-  INVALID_ITEMS: "Some items are unavailable or out of stock.",
-  NO_ADDRESS: "Please select a shipping address.",
+  INVALID_ITEMS: "Some items are no longer available. Please review your cart.",
+  NO_ADDRESS: "Please select a shipping address to continue.",
   NO_SHIPPING: "Please choose a shipping method.",
-  SHIPPING_NOT_CALCULATED: "Please calculate shipping cost first."
+  SHIPPING_NOT_CALCULATED: "Please calculate shipping cost before placing order."
 };
 
 export const QUERY_KEYS = {

@@ -22,3 +22,14 @@ export function handleCheckoutError(error: unknown, router?: AppRouterInstance) 
     duration: 5000
   });
 }
+
+export function getItemWarningLabel(warning: string | null) {
+  switch (warning) {
+    case "UNAVAILABLE":
+      return "Item is no longer available";
+    case "INSUFFICIENT_STOCK":
+      return "Not enough stock available";
+    default:
+      return null;
+  }
+}

@@ -1,25 +1,40 @@
 import { OrderDetail } from "../types";
 
 export default function ShippingAddress({ data }: { data: OrderDetail }) {
+  const { shipping, address } = data;
+
   return (
     <div className="space-y-4 text-sm">
       <h2 className="text-sm font-medium">Shipping</h2>
 
-      <div>
+      {/* COURIER */}
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">Courier</p>
+
         <p className="font-medium">
-          {data.shipping.courierName} ({data.shipping.courierService})
+          {shipping.courierName} ({shipping.courierService})
         </p>
-        <p className="text-xs text-muted-foreground">Estimation: {data.shipping.etd}</p>
+
+        <p className="text-xs text-muted-foreground">Estimation: {shipping.etd}</p>
+
+        {shipping.trackingNumber && (
+          <p className="text-xs text-muted-foreground">
+            Tracking: <span className="font-medium text-foreground">{shipping.trackingNumber}</span>
+          </p>
+        )}
       </div>
 
-      <div>
-        <p className="font-medium">{data.address.recipientName}</p>
-        <p className="text-xs text-muted-foreground">{data.address.phone}</p>
+      <div className="border-t" />
+
+      {/* ADDRESS */}
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">Delivery Address</p>
+
+        <p className="font-medium">{address.recipientName}</p>
+        <p className="text-xs text-muted-foreground">{address.phone}</p>
 
         <p className="text-xs text-muted-foreground leading-relaxed">
-          {[data.address.addressLine, data.address.districtName, data.address.cityName, data.address.provinceName, data.address.postalCode]
-            .filter(Boolean)
-            .join(", ")}
+          {[address.addressLine, address.districtName, address.cityName, address.provinceName, address.postalCode].filter(Boolean).join(", ")}
         </p>
       </div>
     </div>

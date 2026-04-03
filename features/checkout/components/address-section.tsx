@@ -29,6 +29,7 @@ export function AddressSection({ sessionId, address }: Props) {
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+
   const { data, isLoading, error, refetch } = useAddresses(open);
   const setAddressMutation = useSetAddress();
 
@@ -38,42 +39,51 @@ export function AddressSection({ sessionId, address }: Props) {
         <h2 className="text-sm font-medium">Shipping Address</h2>
 
         {!address ? (
-          <div className="flex gap-2">
-            <Button size="sm" onClick={() => setOpen(true)}>
-              Select Address
-            </Button>
+          <div className="space-y-3">
+            {/* EMPTY STATE */}
+            <div className="border border-dashed rounded-md p-4 text-sm text-center space-y-2">
+              <p className="font-medium">No address selected</p>
+              <p className="text-xs text-muted-foreground">Please select or create a shipping address to continue.</p>
 
-            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  Create New Address
+              <div className="flex justify-center gap-2 pt-2">
+                <Button size="sm" onClick={() => setOpen(true)}>
+                  Select Address
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
-                <DialogHeader>
-                  <DialogTitle>Add New Address</DialogTitle>
-                  <DialogDescription>Enter your shipping details below. This address will be used for delivery.</DialogDescription>
-                </DialogHeader>
 
-                <div className="max-h-[70vh] overflow-y-auto pr-2">
-                  <AddressForm
-                    key="create"
-                    onCancel={() => {
-                      setCreateOpen(false);
-                    }}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+                <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline">
+                      Create New
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogContent className="sm:max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
+                    <DialogHeader>
+                      <DialogTitle>Add New Address</DialogTitle>
+                      <DialogDescription>Enter your shipping details below. This address will be used for delivery.</DialogDescription>
+                    </DialogHeader>
+
+                    <div className="max-h-[70vh] overflow-y-auto pr-2">
+                      <AddressForm key="create" onCancel={() => setCreateOpen(false)} />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="border rounded-md p-3 text-sm space-y-1">
-            <p className="font-medium">{address.recipientName}</p>
-            <p>{address.phone}</p>
-            <p>
-              {address.addressLine}, {address.districtName}, {address.cityName}, {address.provinceName} {address.postalCode}
-            </p>
+          <div className="border rounded-md p-3 text-sm space-y-2">
+            {/* ADDRESS INFO */}
+            <div className="space-y-1">
+              <p className="font-medium">{address.recipientName}</p>
+              <p className="text-xs text-muted-foreground">{address.phone}</p>
 
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {[address.addressLine, address.districtName, address.cityName, address.provinceName, address.postalCode].filter(Boolean).join(", ")}
+              </p>
+            </div>
+
+            {/* ACTION */}
             <div className="pt-2">
               <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
                 Change Address
@@ -83,31 +93,32 @@ export function AddressSection({ sessionId, address }: Props) {
         )}
       </div>
 
+      {/* SELECT ADDRESS DIALOG */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Select shipping address</DialogTitle>
             <DialogDescription>Choose the address where you want your order to be delivered.</DialogDescription>
           </DialogHeader>
+
           <div className="max-h-[70vh] overflow-y-auto space-y-3">
             {isLoading ? (
-              <div className="flex items-center justify-center min-h-75">
+              <div className="flex items-center justify-center min-h-[200px]">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : error ? (
-              <div className="flex flex-col items-center justify-center gap-2 min-h-75 text-center">
-                <p className="text-sm font-medium">Failed to load address</p>
-                <p className="text-xs text-muted-foreground">Please try again or reopen the dialog.</p>
+              <div className="flex flex-col items-center justify-center gap-2 min-h-[200px] text-center">
+                <p className="text-sm font-medium">Failed to load addresses</p>
+                <p className="text-xs text-muted-foreground">Please try again.</p>
 
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    refetch();
-                  }}
-                >
+                <Button size="sm" variant="outline" onClick={() => refetch()}>
                   Retry
                 </Button>
+              </div>
+            ) : data?.addresses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 min-h-[200px] text-center">
+                <p className="text-sm font-medium">No addresses found</p>
+                <p className="text-xs text-muted-foreground">Please create a new address first.</p>
               </div>
             ) : (
               data?.addresses.map((a) => (
@@ -119,24 +130,20 @@ export function AddressSection({ sessionId, address }: Props) {
                     selectedId === a.id ? "border-primary bg-primary/5" : "hover:border-muted-foreground/40"
                   )}
                 >
-                  {/* Top row */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium">{a.recipientName}</p>
+                  {/* HEADER */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-medium">{a.recipientName}</p>
 
-                      {/* Label (Home, Office, etc) */}
-                      {a.label?.trim() && <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground">{a.label}</span>}
+                    {a.label?.trim() && <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground">{a.label}</span>}
 
-                      {/* Default badge */}
-                      {a.isDefault && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Default
-                        </Badge>
-                      )}
-                    </div>
+                    {a.isDefault && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        Default
+                      </Badge>
+                    )}
                   </div>
 
-                  {/* Address */}
+                  {/* ADDRESS */}
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     {a.addressLine}, {a.cityName}
                   </p>
@@ -145,10 +152,11 @@ export function AddressSection({ sessionId, address }: Props) {
             )}
           </div>
 
-          <DialogFooter className="flex justify-end">
+          <DialogFooter>
             <DialogClose asChild>
-              <Button type="button">Close</Button>
+              <Button variant="ghost">Close</Button>
             </DialogClose>
+
             <Button
               disabled={!selectedId || setAddressMutation.isPending}
               onClick={async () => {

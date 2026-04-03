@@ -7,6 +7,8 @@ import OrderStatus from "./order-status";
 import OrderItems from "./order-items";
 import ShippingAddress from "./shipping-address";
 import OrderSummary from "./order-summary";
+import OrderTimeline from "./order-timeline";
+import OrderMainSkeleton from "./skeletons/order-main-skeleton";
 
 type Props = {
   orderCode: string;
@@ -16,7 +18,7 @@ export default function OrderMain({ orderCode }: Props) {
   const { data, isLoading, error, refetch } = useOrder(orderCode);
 
   if (isLoading) {
-    return <div>loading...</div>;
+    return <OrderMainSkeleton />;
   }
 
   if (error || !data) {
@@ -24,11 +26,15 @@ export default function OrderMain({ orderCode }: Props) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_320px]">
       {/* LEFT */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <SectionCard>
           <OrderStatus data={data} refetch={refetch} />
+        </SectionCard>
+
+        <SectionCard>
+          <OrderTimeline timeline={data.timeline} />
         </SectionCard>
 
         <SectionCard>
@@ -41,7 +47,7 @@ export default function OrderMain({ orderCode }: Props) {
       </div>
 
       {/* RIGHT */}
-      <div className="space-y-6 lg:sticky lg:top-6 h-fit">
+      <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-6 h-fit">
         <SectionCard>
           <OrderSummary data={data} />
         </SectionCard>
