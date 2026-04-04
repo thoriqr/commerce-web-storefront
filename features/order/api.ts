@@ -26,6 +26,12 @@ export async function cancelOrder(orderCode: string) {
   });
 }
 
+export async function confirmDelivered(orderCode: string) {
+  return await fetchAuth<void>(`${BASE_URL}/${orderCode}/deliver`, {
+    method: "POST"
+  });
+}
+
 export async function createSnapToken(orderCode: string) {
   return await fetchAuth<{ token: string; redirect_url: string }>(`${BASE_URL}/${orderCode}/snap-token`, {
     method: "POST"

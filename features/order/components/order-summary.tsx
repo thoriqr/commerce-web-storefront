@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/shared/utils/formatter";
 
 export default function OrderSummary({ data }: { data: OrderDetail }) {
-  const isFinalState =
-    data.status === "CANCELLED" || data.status === "COMPLETED" || data.paymentStatus === "FAILED" || data.paymentStatus === "EXPIRED";
+  const showHistoryButton = data.status !== "WAITING_PAYMENT";
 
   return (
     <div className="space-y-4 text-sm">
@@ -31,10 +30,10 @@ export default function OrderSummary({ data }: { data: OrderDetail }) {
       </div>
 
       {/* ACTION */}
-      {isFinalState && (
+      {showHistoryButton && (
         <Link href="/user/orders">
           <Button variant="outline" className="w-full">
-            View Order History
+            Back to Orders
           </Button>
         </Link>
       )}

@@ -1,4 +1,5 @@
 import { CheckoutMain } from "@/features/checkout/components/checkout-main";
+import { Metadata } from "next";
 
 type Props = {
   params: Promise<{
@@ -6,6 +7,12 @@ type Props = {
   }>;
 };
 
+export function generateMetadata(): Metadata {
+  return {
+    title: "Checkout",
+    description: "Complete your purchase"
+  };
+}
 export default async function CheckoutPage({ params }: Props) {
   const { sessionId } = await params;
 

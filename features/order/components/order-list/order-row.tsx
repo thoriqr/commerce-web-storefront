@@ -1,3 +1,5 @@
+"use client";
+
 import { OrderListing } from "../../types";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { getImageUrl } from "@/lib/media";
@@ -5,8 +7,22 @@ import Image from "next/image";
 import { OrderStatusBadge } from "../badge/order-status-badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useConfirmDeliver } from "../../hooks/use-confirm-deliver";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
+  const [open, setOpen] = useState(false);
+  const confirmDeliverMutation = useConfirmDeliver();
   const imageUrl = order.previewItem.imageKey ? getImageUrl(order.previewItem.imageKey) : null;
 
   return (
@@ -52,16 +68,37 @@ export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
 
         {/* CONFIRM */}
         {order.canConfirm && (
-          <Button
-            size="sm"
-            className="flex-1"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log("confirm delivered:", order.id); // placeholder
-            }}
-          >
-            Confirm
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">Mark as Received</Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Mark this order as received?</DialogTitle>
+                <DialogDescription>Make sure you have received the package before confirming.</DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter>
+                {/* CLOSE */}
+                <DialogClose asChild>
+                  <Button variant="ghost">Not yet</Button>
+                </DialogClose>
+
+                {/* CONFIRM */}
+                <Button
+                  size="sm"
+                  disabled={confirmDeliverMutation.isPending}
+                  onClick={async () => {
+                    await confirmDeliverMutation.mutateAsync(order.orderCode);
+                    setOpen(false);
+                  }}
+                >
+                  {confirmDeliverMutation.isPending ? "Processing..." : "Yes, I've received it"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>

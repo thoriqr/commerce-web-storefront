@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderRow } from "@/features/order/components/order-list/order-row";
+import OrderRowSkeleton from "@/features/order/components/order-list/order-row-skeleton";
 import { OrdersEmpty } from "@/features/order/components/order-list/orders-empty";
 import { OrdersError } from "@/features/order/components/order-list/orders-error";
 import { useOrders } from "@/features/order/hooks/use-orders";
@@ -21,7 +22,7 @@ export default function OrdersTab() {
 
   const { data, isLoading, isError } = useOrders({
     page,
-    limit: 2,
+    limit: 10,
     status: status as OrderListingQueryParams["status"]
   });
 
@@ -60,7 +61,7 @@ export default function OrdersTab() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {isLoading && <>loading</>}
+        {isLoading && <OrderRowSkeleton />}
 
         {isError && <OrdersError />}
 

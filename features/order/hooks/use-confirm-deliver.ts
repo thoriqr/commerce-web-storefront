@@ -1,18 +1,16 @@
-import { cancelOrder } from "../api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { confirmDelivered } from "../api";
+import { QUERY_KEYS } from "../constants";
 import { FetchError } from "@/shared/types/api-error";
 import { toast } from "sonner";
-import { QUERY_KEYS } from "../constants";
 
-export function useCancelOrder() {
+export function useConfirmDeliver() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: cancelOrder,
+    mutationFn: confirmDelivered,
 
     onSuccess: (_, orderCode) => {
-      toast.success("Order cancelled");
-
       // refetch order
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ORDER, orderCode]
