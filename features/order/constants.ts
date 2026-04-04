@@ -1,3 +1,4 @@
 export const QUERY_KEYS = {
-  ORDER: "order"
+  ORDER: "order",
+  ORDERS: "orders"
 };

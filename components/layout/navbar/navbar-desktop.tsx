@@ -10,7 +10,7 @@ import { NavbarSearch } from "./navbar-search";
 import { CategoryTree } from "@/features/category/types";
 import { CategoryMegaMenu } from "@/features/category/components/category-mega-menu";
 import { AuthStatus } from "@/features/auth/components/auth-status";
-import CartButton from "@/features/cart/components/cart-button";
+import CartDrawer from "@/features/cart/components/drawer/cart-drawer";
 
 type Props = {
   categories: CategoryTree[];
@@ -46,7 +46,7 @@ export default function NavbarDesktop({ categories }: Props) {
 
       {/* Right actions */}
       <div className="flex justify-end gap-2">
-        <CartButton />
+        <CartDrawer />
 
         <AuthStatus variant="desktop" />
       </div>

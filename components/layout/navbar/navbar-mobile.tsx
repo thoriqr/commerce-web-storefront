@@ -9,7 +9,7 @@ import { CategoryTree } from "@/features/category/types";
 import { MobileCategoryMenu } from "@/features/category/components/mobile-category-menu";
 import { AuthStatus } from "@/features/auth/components/auth-status";
 import { useState } from "react";
-import CartButton from "@/features/cart/components/cart-button";
+import CartDrawer from "@/features/cart/components/drawer/cart-drawer";
 
 type Props = {
   categories: CategoryTree[];
@@ -28,7 +28,7 @@ export default function NavbarMobile({ categories }: Props) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-1">
-          <CartButton />
+          <CartDrawer />
 
           <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setOpen(true)}>
             <Menu className="h-5 w-5" />

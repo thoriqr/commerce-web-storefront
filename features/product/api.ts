@@ -1,5 +1,5 @@
 import { DimensionFilter, ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
-import { appendQueryParams } from "./utils/append-query-params";
+import { appendQueryParams } from "../../shared/utils/append-query-params";
 import { fetchStore } from "@/shared/lib/fetch-store";
 import { fetchServer } from "@/shared/lib/fetch-server";
 import { FetchError } from "@/shared/types/api-error";

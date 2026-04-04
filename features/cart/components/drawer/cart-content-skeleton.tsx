@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function CartSkeleton() {
+export default function CartContentSkeleton() {
   return (
     <div className="flex h-full flex-col">
       {/* Items */}

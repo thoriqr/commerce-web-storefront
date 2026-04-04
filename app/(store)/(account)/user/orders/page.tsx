@@ -1,3 +1,5 @@
+import OrdersTab from "@/features/user/components/orders-tab";
+
 export default function OrdersPage() {
-  return <div>OrdersPage</div>;
+  return <OrdersTab />;
 }

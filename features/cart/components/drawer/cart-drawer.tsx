@@ -5,9 +5,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import CartContent from "./cart-content";
-import { useCart } from "../hooks/use-cart";
+import { useCart } from "../../hooks/use-cart";
 
-export default function CartButton() {
+export default function CartDrawer() {
   const [open, setOpen] = useState(false);
   const { data, isLoading } = useCart();
 

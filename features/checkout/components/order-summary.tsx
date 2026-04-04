@@ -3,6 +3,7 @@ import { CheckoutSession } from "../types";
 import { reasonMap } from "../constants";
 import { useConfirmCheckout } from "../hooks/use-confirm-chekout";
 import { formatRupiah } from "@/shared/utils/formatter";
+import Link from "next/link";
 
 type Props = {
   data: CheckoutSession;
@@ -61,7 +62,19 @@ export function OrderSummary({ data, sessionId }: Props) {
       </Button>
 
       {/* BLOCK REASON */}
-      {!data.canPlaceOrder && data.reason && <p className="text-xs text-destructive text-center leading-snug">{reasonMap[data.reason]}</p>}
+      {!data.canPlaceOrder && data.reason && (
+        <div className="space-y-2 text-center">
+          <p className="text-xs text-destructive leading-snug">{reasonMap[data.reason]}</p>
+
+          {data.reason === "INVALID_ITEMS" && (
+            <Link href="/cart">
+              <Button size="sm" variant="outline" className="w-full">
+                Review Cart
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }

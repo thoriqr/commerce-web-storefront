@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CartSummary as Summary } from "../types";
-import { formatCurrency } from "@/features/product/utils/format-currency";
+
 import { useCreateCheckoutSession } from "@/features/checkout/hooks/use-create-checkout-session";
+import { CartSummary as Summary } from "../types";
+import { formatRupiah } from "@/shared/utils/formatter";
 
 type Props = {
   summary: Summary;
@@ -32,7 +33,7 @@ export default function CartSummary({ summary, isMutating, hasUnavailableItem, h
     <div className="sticky bottom-0 border-t bg-background px-5 py-4">
       <div className="flex justify-between text-sm">
         <span>Subtotal</span>
-        <span className="font-medium">Rp {formatCurrency(summary.subtotal)}</span>
+        <span className="font-medium">{formatRupiah(summary.subtotal)}</span>
       </div>
 
       <Button className="mt-4 w-full" disabled={disableCheckout || createCheckout.isPending} onClick={() => createCheckout.mutate()}>

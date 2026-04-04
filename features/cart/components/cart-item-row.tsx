@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { CartItem } from "../types";
 import { getImageUrl } from "@/lib/media";
 import { formatCurrency } from "@/features/product/utils/format-currency";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -7,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUpdateItem } from "../hooks/use-update-item";
 import { useDeleteItem } from "../hooks/use-delete-item";
+import { CartItem } from "../types";
+import { formatRupiah } from "@/shared/utils/formatter";
 
 type Props = {
   item: CartItem;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 const MAX_CART_ITEM_QTY = 99;
@@ -83,7 +84,7 @@ export default function CartItemRow({ item, onClose }: Props) {
 
           {/* Price + quantity */}
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-sm font-medium">Rp {formatCurrency(item.price)}</span>
+            <span className="text-sm font-medium">{formatRupiah(item.price)}</span>
 
             <div className="flex items-center gap-1">
               <Button size="icon" variant="outline" className="h-7 w-7" disabled={disableDecrease} onClick={handleDecrease}>

@@ -57,3 +57,26 @@ export type OrderDetail = {
   }[];
   timeline: TimelineItem[];
 };
+
+export type OrderListing = {
+  items: {
+    id: number;
+    orderCode: string;
+    status: OrderStatus;
+    total: number;
+    createdAt: Date;
+    itemCount: number;
+    previewItem: {
+      name: string;
+      imageKey: string | null;
+    };
+    canConfirm: boolean;
+  }[];
+  meta: { page: number; limit: number; total: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+};
+
+export type OrderListingQueryParams = {
+  page: number;
+  limit: number;
+  status?: "ongoing" | "completed" | "cancelled";
+};

@@ -1,8 +1,8 @@
-import CartSkeleton from "./cart-skeleton";
-import { Cart } from "../types";
-import CartItemRow from "./cart-item-row";
-import CartSummary from "./cart-summary";
-import { useIsMutating } from "@tanstack/react-query";
+import { useCartMutations } from "../../hooks/use-cart-mutations";
+import { Cart } from "../../types";
+import CartItemRow from "../cart-item-row";
+import CartSummary from "../cart-summary";
+import CartSkeleton from "./cart-content-skeleton";
 
 type Props = {
   isLoading: boolean;
@@ -11,11 +11,7 @@ type Props = {
 };
 
 export default function CartContent({ data, isLoading, onClose }: Props) {
-  const isUpdating = useIsMutating({ mutationKey: ["cart-update"] }) > 0;
-  const isDeleting = useIsMutating({ mutationKey: ["cart-delete"] }) > 0;
-  const isAdding = useIsMutating({ mutationKey: ["cart-add"] }) > 0;
-
-  const isMutating = isUpdating || isDeleting || isAdding;
+  const { isMutating } = useCartMutations();
 
   if (isLoading) {
     return <CartSkeleton />;
@@ -44,7 +40,7 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
   return (
     <div className="flex h-full flex-col">
       {/* Scrollable items */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 pb-28">
         {cart.items.map((item) => (
           <CartItemRow key={item.variantId} item={item} onClose={onClose} />
         ))}
