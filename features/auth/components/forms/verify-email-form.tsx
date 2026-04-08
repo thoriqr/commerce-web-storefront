@@ -19,8 +19,6 @@ type Props = {
 
 export default function VerifyEmailForm({ token }: Props) {
   const router = useRouter();
-  const verifyMutation = useVerifyEmail();
-  const mutationIsPending = verifyMutation.isPending;
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
 
@@ -33,13 +31,19 @@ export default function VerifyEmailForm({ token }: Props) {
     }
   });
 
-  async function onSubmit(values: VerifyEmailFormSchema) {
-    try {
-      await verifyMutation.mutateAsync({ displayName: values.displayName, password: values.password, token });
-      router.replace("/");
-    } catch (err) {
+  const verifyMutation = useVerifyEmail({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      router.replace("/");
     }
+  });
+
+  const mutationIsPending = verifyMutation.isPending;
+
+  function onSubmit(values: VerifyEmailFormSchema) {
+    verifyMutation.mutateAsync({ displayName: values.displayName, password: values.password, token });
   }
 
   return (

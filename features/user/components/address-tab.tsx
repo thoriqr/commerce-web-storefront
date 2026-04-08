@@ -125,12 +125,7 @@ export default function AddressTab() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-                          <AlertDialogAction
-                            onClick={async () => {
-                              await deleteMutation.mutateAsync(addr.id);
-                            }}
-                            className="bg-destructive text-destructive-foreground"
-                          >
+                          <AlertDialogAction onClick={() => deleteMutation.mutate(addr.id)} className="bg-destructive text-destructive-foreground">
                             {deleteMutation.isPending ? "Deleting..." : "Delete"}
                           </AlertDialogAction>
                         </AlertDialogFooter>

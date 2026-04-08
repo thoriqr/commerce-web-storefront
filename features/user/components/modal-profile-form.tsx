@@ -19,15 +19,16 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { handleFormError } from "@/shared/utils/form";
 import { UserProfileFormSchema, userProfileSchema } from "../schema";
 import { Controller, useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 
 type Props = {
   initialValue: string;
 };
 
 export default function ModalProfileForm({ initialValue }: Props) {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const updateMutation = useUpdateProfile();
-  const mutationIsPending = updateMutation.isPending;
 
   const form = useForm<UserProfileFormSchema>({
     resolver: standardSchemaResolver(userProfileSchema),
@@ -36,13 +37,27 @@ export default function ModalProfileForm({ initialValue }: Props) {
     }
   });
 
-  async function onSubmit(values: UserProfileFormSchema) {
-    try {
-      await updateMutation.mutateAsync(values.displayName);
-      setOpen(false);
-    } catch (err) {
+  const updateMutation = useUpdateProfile({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.USER_PROFILE
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.ME
+      });
+
+      setOpen(false);
     }
+  });
+
+  const mutationIsPending = updateMutation.isPending;
+
+  function onSubmit(values: UserProfileFormSchema) {
+    updateMutation.mutate(values.displayName);
   }
 
   return (

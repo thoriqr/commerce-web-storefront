@@ -18,8 +18,6 @@ type Props = {
 };
 
 export default function ChangePasswordForm({ onClose }: Props) {
-  const changeMutation = useChangePassword();
-  const mutationIsPending = changeMutation.isPending;
   const currentPasswordToggle = usePasswordToggle();
   const newPasswordToggle = usePasswordToggle();
   const confirmNewPasswordToggle = usePasswordToggle();
@@ -34,13 +32,19 @@ export default function ChangePasswordForm({ onClose }: Props) {
     }
   });
 
-  async function onSubmit(values: ChangePasswordFormSchema) {
-    try {
-      await changeMutation.mutateAsync({ currentPassword: values.currentPassword, newPassword: values.newPassword });
-      setSuccess(true);
-    } catch (err) {
+  const changeMutation = useChangePassword({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      setSuccess(true);
     }
+  });
+
+  const mutationIsPending = changeMutation.isPending;
+
+  function onSubmit(values: ChangePasswordFormSchema) {
+    changeMutation.mutate({ currentPassword: values.currentPassword, newPassword: values.newPassword });
   }
 
   if (success) {

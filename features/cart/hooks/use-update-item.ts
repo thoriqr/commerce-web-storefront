@@ -10,8 +10,8 @@ export function useUpdateItem() {
     mutationKey: ["cart-update"],
     mutationFn: updateItem,
 
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 
     onError: () => {

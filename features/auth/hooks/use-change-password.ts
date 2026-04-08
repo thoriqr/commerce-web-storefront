@@ -1,14 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { changePasswordRequest } from "../api";
-import { invalidateUserScope } from "@/shared/utils/invalidate";
+import { ChangePasswordInput } from "../types";
 
-export function useChangePassword() {
-  const queryClient = useQueryClient();
-
+export function useChangePassword(options?: UseMutationOptions<void, unknown, ChangePasswordInput>) {
   return useMutation({
     mutationFn: changePasswordRequest,
-    onSuccess: async () => {
-      await invalidateUserScope(queryClient);
-    }
+    ...options
   });
 }

@@ -14,8 +14,6 @@ import { handleFormError } from "@/shared/utils/form";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();
-  const resetMutation = usePasswordResetRequest();
-  const mutationIsPending = resetMutation.isPending;
   const form = useForm<EmailFormSchema>({
     resolver: standardSchemaResolver(emailSchema),
     defaultValues: {
@@ -23,13 +21,19 @@ export default function ForgotPasswordForm() {
     }
   });
 
-  async function onSubmit(values: EmailFormSchema) {
-    try {
-      await resetMutation.mutateAsync(values);
-      router.replace("/forgot-password/success");
-    } catch (err) {
+  const resetMutation = usePasswordResetRequest({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      router.replace("/forgot-password/success");
     }
+  });
+
+  const mutationIsPending = resetMutation.isPending;
+
+  function onSubmit(values: EmailFormSchema) {
+    resetMutation.mutate(values);
   }
 
   return (

@@ -12,14 +12,15 @@ import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { ResetPasswordFormSchema, resetPasswordSchema } from "../schema";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function SetPasswordForm({ onClose }: Props) {
-  const setMutation = useSetPassword();
-  const mutationIsPending = setMutation.isPending;
+  const queryClient = useQueryClient();
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
   const [success, setSuccess] = useState(false);
@@ -32,13 +33,20 @@ export default function SetPasswordForm({ onClose }: Props) {
     }
   });
 
-  async function onSubmit(values: ResetPasswordFormSchema) {
-    try {
-      await setMutation.mutateAsync({ password: values.password });
-      setSuccess(true);
-    } catch (err) {
+  const setMutation = useSetPassword({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [USER_QUERY_KEYS.USER_PROFILE] });
+      setSuccess(true);
     }
+  });
+
+  const mutationIsPending = setMutation.isPending;
+
+  function onSubmit(values: ResetPasswordFormSchema) {
+    setMutation.mutate({ password: values.password });
   }
 
   if (success) {

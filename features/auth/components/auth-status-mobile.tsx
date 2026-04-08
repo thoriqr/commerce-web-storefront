@@ -9,7 +9,7 @@ import { ChevronDownIcon, LogOutIcon, Package, UserIcon } from "lucide-react";
 type Props = {
   user: MeResponse;
   onClose?: () => void;
-  onLogout(): Promise<void>;
+  onLogout: () => void;
 };
 
 export function AuthStatusMobile({ user, onClose, onLogout }: Props) {

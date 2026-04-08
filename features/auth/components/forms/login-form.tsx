@@ -14,11 +14,13 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { handleFormError } from "@/shared/utils/form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
+import { useQueryClient } from "@tanstack/react-query";
+import { invalidateUserScope } from "@/shared/utils/invalidate";
 
 export default function LoginForm() {
   const router = useRouter();
-  const loginMutation = useLogin();
-  const mutationIsPending = loginMutation.isPending;
+  const queryClient = useQueryClient();
+
   const passwordToggle = usePasswordToggle();
 
   const form = useForm<LoginFormSchema>({
@@ -29,13 +31,20 @@ export default function LoginForm() {
     }
   });
 
-  async function onSubmit(values: LoginFormSchema) {
-    try {
-      await loginMutation.mutateAsync(values);
-      router.replace("/");
-    } catch (err) {
+  const loginMutation = useLogin({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      invalidateUserScope(queryClient);
+      router.replace("/");
     }
+  });
+
+  const mutationIsPending = loginMutation.isPending;
+
+  function onSubmit(values: LoginFormSchema) {
+    loginMutation.mutate(values);
   }
 
   return (

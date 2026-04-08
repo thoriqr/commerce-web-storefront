@@ -9,20 +9,18 @@ export function useSetDefaultAddress() {
   return useMutation({
     mutationFn: setDefaultAddress,
 
-    onSuccess: async (_, addressId) => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.ADDRESS, addressId]
-        }),
+    onSuccess: (_, addressId) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ADDRESS, addressId]
+      });
 
-        queryClient.invalidateQueries({
-          queryKey: USER_QUERY_KEYS.USER_PROFILE
-        }),
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.USER_PROFILE
+      });
 
-        queryClient.invalidateQueries({
-          queryKey: USER_QUERY_KEYS.ADDRESSES
-        })
-      ]);
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.ADDRESSES
+      });
     }
   });
 }

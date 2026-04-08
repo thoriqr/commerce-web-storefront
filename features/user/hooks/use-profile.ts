@@ -5,7 +5,6 @@ import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 export function useProfile() {
   return useQuery({
     queryKey: USER_QUERY_KEYS.USER_PROFILE,
-    queryFn: getUserProfile,
-    staleTime: 0
+    queryFn: getUserProfile
   });
 }

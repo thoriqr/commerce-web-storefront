@@ -19,8 +19,6 @@ type Props = {
 
 export default function ResetPasswordForm({ token }: Props) {
   const router = useRouter();
-  const resetMutation = useResetPassword();
-  const mutationIsPending = resetMutation.isPending;
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
 
@@ -32,13 +30,19 @@ export default function ResetPasswordForm({ token }: Props) {
     }
   });
 
-  async function onSubmit(values: ResetPasswordFormSchema) {
-    try {
-      await resetMutation.mutateAsync({ password: values.password, token });
-      router.replace("/");
-    } catch (err) {
+  const resetMutation = useResetPassword({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      router.replace("/");
     }
+  });
+
+  const mutationIsPending = resetMutation.isPending;
+
+  function onSubmit(values: ResetPasswordFormSchema) {
+    resetMutation.mutate({ password: values.password, token });
   }
 
   return (

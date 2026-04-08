@@ -9,6 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useLogout } from "../hooks/use-logout";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthStatusMobile } from "./auth-status-mobile";
+import { useQueryClient } from "@tanstack/react-query";
+import { clearUserScope } from "@/shared/utils/invalidate";
 
 type Props = {
   variant: "desktop" | "mobile";
@@ -17,21 +19,29 @@ type Props = {
 
 export function AuthStatus({ variant, onClose }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: user, isLoading } = useMe();
-  const logoutMutation = useLogout();
-
   const pathname = usePathname();
 
-  async function handleLogout() {
-    await logoutMutation.mutateAsync();
-
+  function handleAfterLogout() {
     const isProtectedRoute = pathname.startsWith("/user");
+
+    clearUserScope(queryClient);
 
     if (isProtectedRoute) {
       router.replace("/login");
     } else {
-      router.refresh(); // optional: refresh navbar state
+      router.refresh();
     }
+  }
+
+  const logoutMutation = useLogout({
+    onSuccess: handleAfterLogout,
+    onError: handleAfterLogout
+  });
+
+  function handleLogout() {
+    logoutMutation.mutate();
   }
 
   if (isLoading) {

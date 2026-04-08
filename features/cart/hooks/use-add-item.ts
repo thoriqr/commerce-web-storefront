@@ -10,8 +10,8 @@ export function useAddItem() {
     mutationKey: ["cart-add"],
     mutationFn: addItem,
 
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 
     onError: () => {

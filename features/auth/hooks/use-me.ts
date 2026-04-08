@@ -6,8 +6,6 @@ export function useMe() {
   return useQuery({
     queryKey: USER_QUERY_KEYS.ME,
     queryFn: fetchMe,
-    staleTime: 0,
-    retry: false,
-    refetchOnWindowFocus: true
+    retry: false
   });
 }

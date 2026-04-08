@@ -1,14 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { loginRequest } from "../api";
-import { invalidateUserScope } from "@/shared/utils/invalidate";
+import { LoginFormSchema } from "../components/schema";
 
-export function useLogin() {
-  const queryClient = useQueryClient();
-
+export function useLogin(options?: UseMutationOptions<void, unknown, LoginFormSchema>) {
   return useMutation({
     mutationFn: loginRequest,
-    onSuccess: async () => {
-      await invalidateUserScope(queryClient);
-    }
+    ...options
   });
 }

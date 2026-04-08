@@ -14,9 +14,6 @@ import { handleFormError } from "@/shared/utils/form";
 
 export default function RegisterForm() {
   const router = useRouter();
-  const registerMutation = useRegister();
-  const mutationIsPending = registerMutation.isPending;
-
   const form = useForm<EmailFormSchema>({
     resolver: standardSchemaResolver(emailSchema),
     defaultValues: {
@@ -24,13 +21,19 @@ export default function RegisterForm() {
     }
   });
 
-  async function onSubmit(values: EmailFormSchema) {
-    try {
-      await registerMutation.mutateAsync(values);
-      router.replace("/register/success");
-    } catch (err) {
+  const registerMutation = useRegister({
+    onError: (err) => {
       handleFormError(err, form);
+    },
+    onSuccess: () => {
+      router.replace("/register/success");
     }
+  });
+
+  const mutationIsPending = registerMutation.isPending;
+
+  function onSubmit(values: EmailFormSchema) {
+    registerMutation.mutate(values);
   }
 
   return (

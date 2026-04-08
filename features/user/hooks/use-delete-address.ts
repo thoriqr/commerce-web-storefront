@@ -10,20 +10,16 @@ export function useDeleteAddress() {
   return useMutation({
     mutationFn: deleteAddress,
 
-    onSuccess: async (_, addressId) => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.ADDRESS, addressId]
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: USER_QUERY_KEYS.USER_PROFILE
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: USER_QUERY_KEYS.ADDRESSES
-        })
-      ]);
+    onSuccess: (_, addressId) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ADDRESS, addressId]
+      });
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.USER_PROFILE
+      });
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.ADDRESSES
+      });
     },
     onError: () => {
       toast.error("Cannot delete address");

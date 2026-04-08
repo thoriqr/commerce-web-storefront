@@ -1,41 +1,49 @@
-import { fetchAuth } from "@/shared/lib/fetch-auth";
 import { CheckoutSession, SetShippingPayload, ShippingCost } from "./types";
+import { authRequest } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user/checkout-sessions";
 
-export async function getCheckoutSession(sessionId: number) {
-  return await fetchAuth<CheckoutSession>(`${BASE_URL}/${sessionId}`);
-}
-
-export async function getShippingCost(sessionId: number, courier: string) {
-  return await fetchAuth<ShippingCost>(`${BASE_URL}/${sessionId}/shipping-cost`, {
-    method: "POST",
-    body: JSON.stringify({ courier })
+export function getCheckoutSession(sessionId: number) {
+  return authRequest<CheckoutSession>({
+    url: `${BASE_URL}/${sessionId}`,
+    method: "GET"
   });
 }
 
-export async function createCheckoutSession() {
-  return await fetchAuth<{ sessionId: number }>(`${BASE_URL}`, {
+export function getShippingCost(sessionId: number, courier: string) {
+  return authRequest<ShippingCost>({
+    url: `${BASE_URL}/${sessionId}/shipping-cost`,
+    method: "POST",
+    data: { courier }
+  });
+}
+
+export function createCheckoutSession() {
+  return authRequest<{ sessionId: number }>({
+    url: `${BASE_URL}`,
     method: "POST"
   });
 }
 
-export async function setAddressCheckoutSession(sessionId: number, addressId: number) {
-  return await fetchAuth<void>(`${BASE_URL}/${sessionId}/address`, {
+export function setAddressCheckoutSession(sessionId: number, addressId: number) {
+  return authRequest<void>({
+    url: `${BASE_URL}/${sessionId}/address`,
     method: "PATCH",
-    body: JSON.stringify({ addressId })
+    data: { addressId }
   });
 }
 
-export async function setShippingCheckoutSession(sessionId: number, payload: SetShippingPayload) {
-  return await fetchAuth<void>(`${BASE_URL}/${sessionId}/shipping-method`, {
+export function setShippingCheckoutSession(sessionId: number, payload: SetShippingPayload) {
+  return authRequest<void>({
+    url: `${BASE_URL}/${sessionId}/shipping-method`,
     method: "PATCH",
-    body: JSON.stringify(payload)
+    data: payload
   });
 }
 
-export async function confirmCheckout(sessionId: number) {
-  return await fetchAuth<{ orderCode: string }>(`${BASE_URL}/${sessionId}/confirm`, {
+export function confirmCheckout(sessionId: number) {
+  return authRequest<{ orderCode: string }>({
+    url: `${BASE_URL}/${sessionId}/confirm`,
     method: "POST"
   });
 }

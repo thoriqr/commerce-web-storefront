@@ -1,14 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { googleLoginRequest } from "../api";
-import { invalidateUserScope } from "@/shared/utils/invalidate";
 
-export function useGoogleLogin() {
-  const queryClient = useQueryClient();
-
+export function useGoogleLogin(options?: UseMutationOptions<void, unknown, string>) {
   return useMutation({
     mutationFn: googleLoginRequest,
-    onSuccess: async () => {
-      await invalidateUserScope(queryClient);
-    }
+    ...options
   });
 }

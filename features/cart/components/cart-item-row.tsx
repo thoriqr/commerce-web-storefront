@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { getImageUrl } from "@/lib/media";
-import { formatCurrency } from "@/features/product/utils/format-currency";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

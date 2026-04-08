@@ -1,39 +1,47 @@
-import { fetchAuth } from "@/shared/lib/fetch-auth";
 import { OrderDetail, OrderListing, OrderListingQueryParams } from "./types";
 import { appendQueryParams } from "@/shared/utils/append-query-params";
+import { authRequest } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user/orders";
 
-export async function getOrders(params?: OrderListingQueryParams) {
+export function getOrders(params?: OrderListingQueryParams) {
   const search = new URLSearchParams();
 
   appendQueryParams(search, params);
 
   const queryString = search.toString();
-
   const url = queryString ? `${BASE_URL}?${queryString}` : BASE_URL;
 
-  return await fetchAuth<OrderListing>(url);
+  return authRequest<OrderListing>({
+    url,
+    method: "GET"
+  });
 }
 
-export async function getOrder(orderCode: string) {
-  return await fetchAuth<OrderDetail>(`${BASE_URL}/${orderCode}`);
+export function getOrder(orderCode: string) {
+  return authRequest<OrderDetail>({
+    url: `${BASE_URL}/${orderCode}`,
+    method: "GET"
+  });
 }
 
-export async function cancelOrder(orderCode: string) {
-  return await fetchAuth<void>(`${BASE_URL}/${orderCode}/cancel`, {
+export function cancelOrder(orderCode: string) {
+  return authRequest<void>({
+    url: `${BASE_URL}/${orderCode}/cancel`,
     method: "POST"
   });
 }
 
-export async function confirmDelivered(orderCode: string) {
-  return await fetchAuth<void>(`${BASE_URL}/${orderCode}/deliver`, {
+export function confirmDelivered(orderCode: string) {
+  return authRequest<void>({
+    url: `${BASE_URL}/${orderCode}/deliver`,
     method: "POST"
   });
 }
 
-export async function createSnapToken(orderCode: string) {
-  return await fetchAuth<{ token: string; redirect_url: string }>(`${BASE_URL}/${orderCode}/snap-token`, {
+export function createSnapToken(orderCode: string) {
+  return authRequest<{ token: string; redirect_url: string }>({
+    url: `${BASE_URL}/${orderCode}/snap-token`,
     method: "POST"
   });
 }

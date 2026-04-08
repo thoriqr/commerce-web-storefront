@@ -1,14 +1,23 @@
-import { fetchAuth } from "@/shared/lib/fetch-auth";
 import { City, District, Province } from "./types";
+import { authRequest } from "@/shared/lib/auth-request";
 
-export async function getProvinces() {
-  return await fetchAuth<Province[]>(`/shipping/provinces`);
+export function getProvinces() {
+  return authRequest<Province[]>({
+    url: `/shipping/provinces`,
+    method: "GET"
+  });
 }
 
-export async function getCities(provinceId: number) {
-  return await fetchAuth<City[]>(`/shipping/cities/${provinceId}`);
+export function getCities(provinceId: number) {
+  return authRequest<City[]>({
+    url: `/shipping/cities/${provinceId}`,
+    method: "GET"
+  });
 }
 
-export async function getDistricts(cityId: number) {
-  return await fetchAuth<District[]>(`/shipping/districts/${cityId}`);
+export function getDistricts(cityId: number) {
+  return authRequest<District[]>({
+    url: `/shipping/districts/${cityId}`,
+    method: "GET"
+  });
 }

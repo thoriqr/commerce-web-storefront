@@ -11,6 +11,9 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { handleFormError } from "@/shared/utils/form";
 import { AddressFormSchema, addressSchema } from "../schema";
 import AddressSelectForm from "./address-select-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
+import { QUERY_KEYS } from "@/features/user/constants";
 
 type Props = {
   onCancel?: () => void;
@@ -19,10 +22,8 @@ type Props = {
 };
 
 export default function AddressForm({ onCancel, initialData, addressId }: Props) {
+  const queryClient = useQueryClient();
   const isEdit = !!addressId;
-  const updateMutation = useUpdateAddress();
-  const createMutation = useCreateAddress();
-  const mutationIsPending = updateMutation.isPending || createMutation.isPending;
 
   const form = useForm<AddressFormSchema>({
     resolver: standardSchemaResolver(addressSchema),
@@ -38,7 +39,39 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
     }
   });
 
-  async function onSubmit(values: AddressFormSchema) {
+  const createMutation = useCreateAddress({
+    onError: (err) => {
+      handleFormError(err, form);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.ADDRESSES });
+      onCancel?.();
+    }
+  });
+
+  const updateMutation = useUpdateAddress({
+    onError: (err) => {
+      handleFormError(err, form);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ADDRESS, addressId]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.USER_PROFILE
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: USER_QUERY_KEYS.ADDRESSES
+      });
+      onCancel?.();
+    }
+  });
+
+  const mutationIsPending = updateMutation.isPending || createMutation.isPending;
+
+  function onSubmit(values: AddressFormSchema) {
     const payload = {
       ...values,
       shippingProvinceId: Number(values.shippingProvinceId),
@@ -46,16 +79,10 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
       shippingDistrictId: Number(values.shippingDistrictId)
     };
 
-    try {
-      if (isEdit) {
-        await updateMutation.mutateAsync({ addressId, payload });
-      } else {
-        await createMutation.mutateAsync(payload);
-      }
-
-      onCancel?.();
-    } catch (err) {
-      handleFormError(err, form);
+    if (isEdit) {
+      updateMutation.mutate({ addressId, payload });
+    } else {
+      createMutation.mutate(payload);
     }
   }
 

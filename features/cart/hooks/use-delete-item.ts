@@ -10,8 +10,8 @@ export function useDeleteItem() {
     mutationKey: ["cart-delete"],
     mutationFn: deleteItem,
 
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.CART });
     },
 
     onError: () => {

@@ -1,37 +1,63 @@
-import { fetchAction } from "@/shared/lib/fetch-action";
 import { UserAddresses, User, UpsertAddressPayload, AddressDetail } from "./types";
-import { fetchAuth } from "@/shared/lib/fetch-auth";
+import { authRequest } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user";
 
-export async function getUserProfile() {
-  return await fetchAuth<User>(`${BASE_URL}/profile`);
+export function getUserProfile() {
+  return authRequest<User>({
+    url: `${BASE_URL}/profile`,
+    method: "GET"
+  });
 }
 
-export async function updateProfile(displayName: string) {
-  return await fetchAction<void>(`${BASE_URL}/profile`, { method: "PUT", body: JSON.stringify({ displayName }), withAuth: true });
+export function updateProfile(displayName: string) {
+  return authRequest<void>({
+    url: `${BASE_URL}/profile`,
+    method: "PUT",
+    data: { displayName }
+  });
 }
 
-export async function getUserAddresses() {
-  return await fetchAuth<UserAddresses>(`${BASE_URL}/addresses`);
+export function getUserAddresses() {
+  return authRequest<UserAddresses>({
+    url: `${BASE_URL}/addresses`,
+    method: "GET"
+  });
 }
 
-export async function getAddress(addressId: number) {
-  return await fetchAuth<AddressDetail>(`${BASE_URL}/addresses/${addressId}`);
+export function getAddress(addressId: number) {
+  return authRequest<AddressDetail>({
+    url: `${BASE_URL}/addresses/${addressId}`,
+    method: "GET"
+  });
 }
 
-export async function createAddress(payload: UpsertAddressPayload) {
-  return await fetchAction<void>(`${BASE_URL}/addresses`, { method: "POST", body: JSON.stringify(payload), withAuth: true });
+export function createAddress(payload: UpsertAddressPayload) {
+  return authRequest<void>({
+    url: `${BASE_URL}/addresses`,
+    method: "POST",
+    data: payload
+  });
 }
 
-export async function updateAddress(addressId: number, payload: UpsertAddressPayload) {
-  return await fetchAction<void>(`${BASE_URL}/addresses/${addressId}`, { method: "PUT", body: JSON.stringify(payload), withAuth: true });
+export function updateAddress(addressId: number, payload: UpsertAddressPayload) {
+  return authRequest<void>({
+    url: `${BASE_URL}/addresses/${addressId}`,
+    method: "PUT",
+    data: payload
+  });
 }
 
-export async function deleteAddress(addressId: number) {
-  return await fetchAction<void>(`${BASE_URL}/addresses/${addressId}`, { method: "DELETE", withAuth: true });
+export function deleteAddress(addressId: number) {
+  return authRequest<void>({
+    url: `${BASE_URL}/addresses/${addressId}`,
+    method: "DELETE"
+  });
 }
 
-export async function setDefaultAddress(addressId: number) {
-  return await fetchAction<void>(`${BASE_URL}/addresses/${addressId}/default`, { method: "PATCH", withAuth: true });
+export function setDefaultAddress(addressId: number) {
+  return authRequest<void>({
+    url: `${BASE_URL}/addresses/${addressId}/default`,
+    method: "PATCH"
+  });
 }

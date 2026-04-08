@@ -1,8 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { resetPasswordRequest } from "../api";
+import { RegisterInput } from "../types";
 
-export function usePasswordResetRequest() {
+export function usePasswordResetRequest(options?: UseMutationOptions<void, unknown, RegisterInput>) {
   return useMutation({
-    mutationFn: resetPasswordRequest
+    mutationFn: resetPasswordRequest,
+    ...options
   });
 }
