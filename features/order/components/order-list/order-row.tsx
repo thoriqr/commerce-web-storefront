@@ -19,11 +19,48 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "../../constants";
+import { FetchError } from "@/shared/types/api-error";
+import { toast } from "sonner";
 
 export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const confirmDeliverMutation = useConfirmDeliver();
   const imageUrl = order.previewItem.imageKey ? getImageUrl(order.previewItem.imageKey) : null;
+
+  const confirmDeliverMutation = useConfirmDeliver({
+    onSuccess: () => {
+      toast.success("Thanks! Order marked as received 📦");
+      // refetch order
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDER, order.orderCode]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDERS]
+      });
+
+      setOpen(false);
+    },
+
+    onError: (error) => {
+      if (error instanceof FetchError) {
+        // generic API error
+        toast.error("Request failed", {
+          description: error.message,
+          duration: 5000
+        });
+
+        return;
+      }
+
+      // fallback
+      toast.error("Something went wrong", {
+        duration: 5000
+      });
+    }
+  });
 
   return (
     <div className="rounded-md border p-3 hover:bg-muted/50 transition space-y-3">
@@ -86,14 +123,7 @@ export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
                 </DialogClose>
 
                 {/* CONFIRM */}
-                <Button
-                  size="sm"
-                  disabled={confirmDeliverMutation.isPending}
-                  onClick={async () => {
-                    await confirmDeliverMutation.mutateAsync(order.orderCode);
-                    setOpen(false);
-                  }}
-                >
+                <Button size="sm" disabled={confirmDeliverMutation.isPending} onClick={() => confirmDeliverMutation.mutate(order.orderCode)}>
                   {confirmDeliverMutation.isPending ? "Processing..." : "Yes, I've received it"}
                 </Button>
               </DialogFooter>

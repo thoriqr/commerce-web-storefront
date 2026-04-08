@@ -18,23 +18,60 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { QUERY_KEYS } from "../constants";
+import { FetchError } from "@/shared/types/api-error";
 
 type Props = {
   data: OrderDetail;
+  orderCode: string;
   refetch: () => void;
 };
 
-export default function OrderStatus({ data, refetch }: Props) {
+export default function OrderStatus({ data, orderCode, refetch }: Props) {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
   const expiresAt = new Date(data.expiresAt);
   const { formatted, isExpired } = useCountdown(expiresAt);
 
-  const { handlePay, isLoading: isPaying } = usePayOrder(data.orderCode, refetch);
-  const cancelMutation = useCancelOrder();
+  const { handlePay, isLoading: isPaying } = usePayOrder(orderCode, refetch);
+
+  const cancelMutation = useCancelOrder({
+    onSuccess: () => {
+      toast.success("Order cancelled");
+
+      // refetch order
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDER, orderCode]
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDERS]
+      });
+
+      setOpen(false);
+    },
+
+    onError: (error) => {
+      if (error instanceof FetchError) {
+        toast.error("Request failed", {
+          description: error.message,
+          duration: 5000
+        });
+
+        return;
+      }
+
+      // fallback
+      toast.error("Something went wrong", {
+        duration: 5000
+      });
+    }
+  });
 
   const isFinalPaymentState = ["PAID", "EXPIRED", "FAILED"].includes(data.paymentStatus);
-
   const isFinalOrderState = ["CANCELLED", "COMPLETED", "SHIPPED", "DELIVERED"].includes(data.status);
 
   const canCancel = !isFinalPaymentState && !isFinalOrderState;
@@ -84,9 +121,8 @@ export default function OrderStatus({ data, refetch }: Props) {
                   <Button
                     variant="destructive"
                     disabled={cancelMutation.isPending}
-                    onClick={async () => {
-                      await cancelMutation.mutateAsync(data.orderCode);
-                      setOpen(false);
+                    onClick={() => {
+                      cancelMutation.mutate(orderCode);
                     }}
                   >
                     {cancelMutation.isPending ? "Cancelling..." : "Yes, Cancel"}

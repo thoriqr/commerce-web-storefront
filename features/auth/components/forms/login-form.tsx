@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLogin } from "../../hooks/use-login";
 import GoogleLoginButton from "../google-login-button";
 import { Controller, useForm } from "react-hook-form";
@@ -16,11 +16,13 @@ import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { useQueryClient } from "@tanstack/react-query";
 import { invalidateUserScope } from "@/shared/utils/invalidate";
+import { toast } from "sonner";
+import { getSafeRedirect } from "@/lib/get-safe-redirect";
 
 export default function LoginForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-
+  const searchParams = useSearchParams();
   const passwordToggle = usePasswordToggle();
 
   const form = useForm<LoginFormSchema>({
@@ -37,7 +39,15 @@ export default function LoginForm() {
     },
     onSuccess: () => {
       invalidateUserScope(queryClient);
-      router.replace("/");
+
+      const redirect = searchParams.get("redirect");
+      const safeRedirect = getSafeRedirect(redirect);
+
+      if (redirect?.startsWith("/cart")) {
+        toast.success("You're back! Continue your checkout");
+      }
+
+      router.replace(safeRedirect);
     }
   });
 

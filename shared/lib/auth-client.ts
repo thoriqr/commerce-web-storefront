@@ -23,29 +23,29 @@ authClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomConfig;
 
-    // ❌ No response means network error (do not handle here)
+    //  No response means network error (do not handle here)
     if (!error.response) {
       return Promise.reject(error);
     }
 
-    // ❌ Only handle 401 (Unauthorized)
+    // Only handle 401 (Unauthorized)
     if (error.response.status !== 401) {
       return Promise.reject(error);
     }
 
     const url = originalRequest?.url || "";
 
-    // ❌ Skip refresh logic if explicitly disabled
+    // Skip refresh logic if explicitly disabled
     if (originalRequest?.skipAuthRefresh) {
       return Promise.reject(error);
     }
 
-    // ❌ Do not intercept auth-refresh
+    //  Do not intercept auth-refresh
     if (url.includes("/auth/refresh")) {
       return Promise.reject(error);
     }
 
-    // ❌ Prevent infinite retry loop
+    // Prevent infinite retry loop
     if (originalRequest._retry) {
       return Promise.reject(error);
     }
@@ -53,7 +53,7 @@ authClient.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      // 🔥 Ensure a single refresh request (avoid race condition)
+      // Ensure a single refresh request (avoid race condition)
       if (!refreshPromise) {
         const p = refreshToken();
         refreshPromise = p.finally(() => {
@@ -61,13 +61,13 @@ authClient.interceptors.response.use(
         });
       }
 
-      // ⏳ Wait for refresh to complete
+      // Wait for refresh to complete
       await refreshPromise;
 
-      // 🔁 Retry the original request with updated credentials
+      // Retry the original request with updated credentials
       return authClient(originalRequest);
     } catch (err) {
-      // ❌ Refresh failed → let the caller handle it
+      //  Refresh failed → let the caller handle it
       return Promise.reject(err);
     }
   }

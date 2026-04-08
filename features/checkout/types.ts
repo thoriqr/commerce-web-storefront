@@ -52,3 +52,8 @@ export type SetShippingPayload = {
   courierCode: string;
   courierService: string;
 };
+
+export type SetAddressCheckout = {
+  sessionId: number;
+  addressId: number;
+};

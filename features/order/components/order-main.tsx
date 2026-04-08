@@ -30,7 +30,7 @@ export default function OrderMain({ orderCode }: Props) {
       {/* LEFT */}
       <div className="space-y-4 sm:space-y-6">
         <SectionCard>
-          <OrderStatus data={data} refetch={refetch} />
+          <OrderStatus data={data} refetch={refetch} orderCode={orderCode} />
         </SectionCard>
 
         <SectionCard>

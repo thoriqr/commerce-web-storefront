@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useShippingCost } from "../hooks/use-shipping-cost";
-import { COURIERS } from "../constants";
+import { COURIERS, QUERY_KEYS } from "../constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSetShipping } from "../hooks/use-set-shipping";
 import { cn } from "@/lib/utils";
 import { formatRupiah } from "@/shared/utils/formatter";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { handleCheckoutError } from "../util";
 
 type Props = {
   sessionId: number;
@@ -19,20 +22,30 @@ function isValidService(opt: { service: string; cost: number; etd: string }) {
 }
 
 export function ShippingSection({ sessionId, disabled }: Props) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [courier, setCourier] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const shippingMutation = useShippingCost();
-  const setShippingMutation = useSetShipping();
+  const shippingMutation = useShippingCost({ onError: (error) => handleCheckoutError(error, router) });
+
+  const setShippingMutation = useSetShipping({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.CHECKOUT_SESSION, sessionId]
+      });
+    },
+    onError: (error) => handleCheckoutError(error, router)
+  });
 
   const data = shippingMutation.data;
   const loading = shippingMutation.isPending;
 
-  async function handleSelectCourier(code: string) {
+  function handleSelectCourier(code: string) {
     setCourier(code);
     setSelectedService(null);
 
-    await shippingMutation.mutateAsync({
+    shippingMutation.mutate({
       sessionId,
       courier: code
     });

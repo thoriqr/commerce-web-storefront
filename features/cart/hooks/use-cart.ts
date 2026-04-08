@@ -6,6 +6,10 @@ export function useCart() {
   return useQuery({
     queryKey: USER_QUERY_KEYS.CART,
     queryFn: getCart,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
     retry: false
   });
 }

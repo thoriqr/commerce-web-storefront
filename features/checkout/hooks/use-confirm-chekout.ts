@@ -1,18 +1,9 @@
-import { useRouter } from "next/navigation";
 import { confirmCheckout } from "../api";
-import { useMutation } from "@tanstack/react-query";
-import { handleCheckoutError } from "../util";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
-export function useConfirmCheckout() {
-  const router = useRouter();
-
+export function useConfirmCheckout(options?: UseMutationOptions<{ orderCode: string }, unknown, number>) {
   return useMutation({
-    mutationFn: confirmCheckout,
-
-    onSuccess: (data) => {
-      router.replace(`/order/${data.orderCode}`);
-    },
-
-    onError: (error) => handleCheckoutError(error, router)
+    mutationFn: (sessionId) => confirmCheckout(sessionId),
+    ...options
   });
 }

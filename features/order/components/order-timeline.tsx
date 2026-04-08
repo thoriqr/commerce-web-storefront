@@ -33,7 +33,7 @@ export default function OrderTimeline({ timeline }: Props) {
                 {item.label}
               </p>
 
-              {item.date && <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleString()}</p>}
+              {item.date && <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString("id-ID")}</p>}
             </div>
           </div>
         );

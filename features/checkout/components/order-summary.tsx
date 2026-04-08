@@ -4,6 +4,8 @@ import { reasonMap } from "../constants";
 import { useConfirmCheckout } from "../hooks/use-confirm-chekout";
 import { formatRupiah } from "@/shared/utils/formatter";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { handleCheckoutError } from "../util";
 
 type Props = {
   data: CheckoutSession;
@@ -11,8 +13,14 @@ type Props = {
 };
 
 export function OrderSummary({ data, sessionId }: Props) {
+  const router = useRouter();
   const hasShipping = !!data.courierCode;
-  const confirmMutation = useConfirmCheckout();
+  const confirmMutation = useConfirmCheckout({
+    onSuccess: (data) => {
+      router.replace(`/order/${data.orderCode}`);
+    },
+    onError: (error) => handleCheckoutError(error, router)
+  });
 
   const isDisabled = !data.canPlaceOrder || confirmMutation.isPending;
 

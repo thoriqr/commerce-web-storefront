@@ -13,9 +13,9 @@ export function ProductCarousel({ products }: Props) {
 
   return (
     <Carousel opts={{ align: "start" }}>
-      <CarouselContent className="pl-1">
+      <CarouselContent className="pl-1 pr-4 md:pr-0">
         {products.map((product) => (
-          <CarouselItem key={product.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5 pb-1">
+          <CarouselItem key={product.id} className="basis-[45%] md:basis-1/3 lg:basis-1/5 pb-1">
             <ProductCard product={product} />
           </CarouselItem>
         ))}

@@ -1,43 +1,9 @@
 import { cancelOrder } from "../api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FetchError } from "@/shared/types/api-error";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "../constants";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
-export function useCancelOrder() {
-  const queryClient = useQueryClient();
-
+export function useCancelOrder(options?: UseMutationOptions<void, unknown, string>) {
   return useMutation({
     mutationFn: cancelOrder,
-
-    onSuccess: (_, orderCode) => {
-      toast.success("Order cancelled");
-
-      // refetch order
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ORDER, orderCode]
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ORDERS]
-      });
-    },
-
-    onError: (error) => {
-      if (error instanceof FetchError) {
-        // generic API error
-        toast.error("Request failed", {
-          description: error.message,
-          duration: 5000
-        });
-
-        return;
-      }
-
-      // fallback
-      toast.error("Something went wrong", {
-        duration: 5000
-      });
-    }
+    ...options
   });
 }

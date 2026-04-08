@@ -19,6 +19,10 @@ import { cn } from "@/lib/utils";
 import { useSetAddress } from "../hooks/use-set-address";
 import { Badge } from "@/components/ui/badge";
 import AddressForm from "@/features/shipping/components/address-form";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "../constants";
+import { handleCheckoutError } from "../util";
 
 type Props = {
   sessionId: number;
@@ -26,12 +30,21 @@ type Props = {
 };
 
 export function AddressSection({ sessionId, address }: Props) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
   const { data, isLoading, error, refetch } = useAddresses(open);
-  const setAddressMutation = useSetAddress();
+
+  const setAddressMutation = useSetAddress({
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.CHECKOUT_SESSION, variables.sessionId]
+      });
+    },
+    onError: (error) => handleCheckoutError(error, router)
+  });
 
   return (
     <>
@@ -103,11 +116,11 @@ export function AddressSection({ sessionId, address }: Props) {
 
           <div className="max-h-[70vh] overflow-y-auto space-y-3">
             {isLoading ? (
-              <div className="flex items-center justify-center min-h-[200px]">
+              <div className="flex items-center justify-center min-h-50">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : error ? (
-              <div className="flex flex-col items-center justify-center gap-2 min-h-[200px] text-center">
+              <div className="flex flex-col items-center justify-center gap-2 min-h-50 text-center">
                 <p className="text-sm font-medium">Failed to load addresses</p>
                 <p className="text-xs text-muted-foreground">Please try again.</p>
 
@@ -116,7 +129,7 @@ export function AddressSection({ sessionId, address }: Props) {
                 </Button>
               </div>
             ) : data?.addresses.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-2 min-h-[200px] text-center">
+              <div className="flex flex-col items-center justify-center gap-2 min-h-50 text-center">
                 <p className="text-sm font-medium">No addresses found</p>
                 <p className="text-xs text-muted-foreground">Please create a new address first.</p>
               </div>
@@ -159,8 +172,8 @@ export function AddressSection({ sessionId, address }: Props) {
 
             <Button
               disabled={!selectedId || setAddressMutation.isPending}
-              onClick={async () => {
-                await setAddressMutation.mutateAsync({
+              onClick={() => {
+                setAddressMutation.mutate({
                   sessionId,
                   addressId: selectedId!
                 });

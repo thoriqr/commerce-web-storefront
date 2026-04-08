@@ -1,20 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { setAddressCheckoutSession } from "../api";
-import { handleCheckoutError } from "../util";
-import { QUERY_KEYS } from "../constants";
+import { SetAddressCheckout } from "../types";
 
-export function useSetAddress() {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
+export function useSetAddress(options?: UseMutationOptions<void, unknown, SetAddressCheckout>) {
   return useMutation({
-    mutationFn: ({ sessionId, addressId }: { sessionId: number; addressId: number }) => setAddressCheckoutSession(sessionId, addressId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.CHECKOUT_SESSION, variables.sessionId]
-      });
-    },
-    onError: (error) => handleCheckoutError(error, router)
+    mutationFn: ({ sessionId, addressId }: SetAddressCheckout) => setAddressCheckoutSession(sessionId, addressId),
+    ...options
   });
 }

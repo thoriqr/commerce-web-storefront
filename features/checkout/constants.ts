@@ -16,4 +16,4 @@ export const reasonMap: Record<CheckoutBlockReason, string> = {
 
 export const QUERY_KEYS = {
   CHECKOUT_SESSION: "checkout-session"
-};
+} as const;
