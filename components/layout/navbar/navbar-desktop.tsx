@@ -25,12 +25,12 @@ export default function NavbarDesktop({ categories }: Props) {
       </Link>
 
       {/* Navigation */}
-      <NavigationMenu viewport={false}>
+      <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
 
-            <NavigationMenuContent>
+            <NavigationMenuContent className="overflow-visible">
               <CategoryMegaMenu categories={categories} />
             </NavigationMenuContent>
           </NavigationMenuItem>

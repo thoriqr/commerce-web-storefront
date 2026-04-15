@@ -8,8 +8,8 @@ type Props = {
 
 export function CategoryMegaMenu({ categories }: Props) {
   return (
-    <div className="w-200 p-4">
-      <div className="grid grid-cols-4 gap-10">
+    <div className="w-[800px] max-h-[500px] overflow-y-auto px-6 py-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {categories.map((root) => {
           const lvl2Children = root.children ?? [];
 
