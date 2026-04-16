@@ -5,32 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { formatCurrency } from "../utils/format-currency";
 import { useAddItem } from "@/features/cart/hooks/use-add-item";
+import { getVariantStatusText } from "./get-variant-status-text";
+import { ProductVariantDetail } from "../types";
+import { formatRupiah } from "@/shared/utils/formatter";
 
 type Props = {
   variantId: number;
-  price: number;
-  stock: number;
+  variant?: ProductVariantDetail;
   mobile?: boolean;
   isVariantLoading: boolean;
-  productUnavailable: boolean;
-  variantUnavailable: boolean;
-  outOfStock: boolean;
-  disablePurchase: boolean;
 };
 
-export function ProductPurchaseSection({
-  variantId,
-  price,
-  stock,
-  isVariantLoading,
-  productUnavailable,
-  variantUnavailable,
-  outOfStock,
-  disablePurchase,
-  mobile
-}: Props) {
+export function ProductPurchaseSection({ variantId, variant, isVariantLoading, mobile }: Props) {
+  const price = variant?.price ?? 0;
+  const stock = variant?.stock ?? 0;
+  const outOfStock = stock === 0;
+  const disablePurchase = isVariantLoading || variant?.isAvailable === false;
+
   const [qty, setQty] = useState<string>(stock > 0 ? "1" : "0");
   const addItem = useAddItem();
   const isMutating = addItem.isPending;
@@ -82,14 +74,6 @@ export function ProductPurchaseSection({
     }
   };
 
-  const statusText = isVariantLoading
-    ? "Loading..."
-    : productUnavailable || variantUnavailable
-      ? "Unavailable"
-      : outOfStock
-        ? "Out of Stock"
-        : "Add to Cart";
-
   // ================= MOBILE =================
   if (mobile) {
     return (
@@ -102,15 +86,9 @@ export function ProductPurchaseSection({
             </>
           ) : (
             <>
-              <p className="text-base font-semibold">Rp {formatCurrency(price)}</p>
+              <p className="text-base font-semibold">{formatRupiah(price)}</p>
 
-              {productUnavailable || variantUnavailable ? (
-                <p className="text-xs text-destructive font-medium">Unavailable</p>
-              ) : outOfStock ? (
-                <p className="text-xs text-destructive font-medium">Out of stock</p>
-              ) : (
-                <p className="text-xs text-muted-foreground">{stock} available</p>
-              )}
+              {getVariantStatusText(variant?.warning ?? null, stock)}
             </>
           )}
         </div>
@@ -136,7 +114,7 @@ export function ProductPurchaseSection({
           </div>
 
           <Button onClick={handleAddToCart} className="flex-1" disabled={buttonDisabled}>
-            {statusText}
+            Add to Cart
           </Button>
         </div>
       </div>
@@ -153,15 +131,9 @@ export function ProductPurchaseSection({
         </div>
       ) : (
         <div className="space-y-1">
-          <p className="text-base font-semibold">Rp {formatCurrency(price)}</p>
+          <p className="text-base font-semibold">{formatRupiah(price)}</p>
 
-          {productUnavailable || variantUnavailable ? (
-            <p className="text-xs text-destructive font-medium">Unavailable</p>
-          ) : outOfStock ? (
-            <p className="text-xs text-destructive font-medium">Out of stock</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">{stock} available</p>
-          )}
+          {getVariantStatusText(variant?.warning ?? null, stock)}
         </div>
       )}
 
@@ -185,7 +157,7 @@ export function ProductPurchaseSection({
       </div>
 
       <Button onClick={handleAddToCart} className="w-full" disabled={buttonDisabled}>
-        {statusText}
+        Add to Cart
       </Button>
     </div>
   );

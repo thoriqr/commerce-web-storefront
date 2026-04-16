@@ -17,7 +17,7 @@ import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { useQueryClient } from "@tanstack/react-query";
 import { invalidateUserScope } from "@/shared/utils/invalidate";
 import { toast } from "sonner";
-import { getSafeRedirect } from "@/lib/get-safe-redirect";
+import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
 
 export default function LoginForm() {
   const router = useRouter();

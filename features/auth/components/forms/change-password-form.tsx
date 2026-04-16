@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useChangePassword } from "../../hooks/use-change-password";
-import { ChangePasswordFormSchema, changePasswordSchema } from "../schema";
 import { handleFormError } from "@/shared/utils/form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
+import { ChangePasswordFormSchema, changePasswordSchema } from "../../schema";
 
 type Props = {
   onClose: () => void;

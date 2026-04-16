@@ -2,7 +2,7 @@
 
 import { OrderListing } from "../../types";
 import { formatRupiah } from "@/shared/utils/formatter";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 import Image from "next/image";
 import { OrderStatusBadge } from "../badge/order-status-badge";
 import { Button } from "@/components/ui/button";

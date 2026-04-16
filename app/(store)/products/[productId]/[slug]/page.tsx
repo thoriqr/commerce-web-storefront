@@ -1,17 +1,18 @@
 import { ProductDetail } from "@/features/product/components/product-detail";
-import { getProductOrFail, getVariantByProductSlugAndVariantId } from "@/features/product/api";
-import { truncate } from "@/lib/truncate";
+import { getProductByIdOrFail, getVariantByProductIdAndVariantId } from "@/features/product/api";
+import { truncate } from "@/shared/utils/truncate";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ productId: string; slug: string }>;
   searchParams: Promise<{ variant?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getProductOrFail(slug);
+  const { productId } = await params;
+  const product = await getProductByIdOrFail(Number(productId));
 
   const title = product.name;
   const description = truncate(product.description, 160);
@@ -29,14 +30,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params, searchParams }: Props) {
   const queryClient = new QueryClient();
 
-  const { slug } = await params;
+  const { productId, slug } = await params;
   const { variant } = await searchParams;
 
   // prefetch product
   const product = await queryClient.fetchQuery({
-    queryKey: ["product", slug],
-    queryFn: () => getProductOrFail(slug)
+    queryKey: ["product", productId],
+    queryFn: () => getProductByIdOrFail(Number(productId))
   });
+
+  // redirect if slug mismatch
+  if (slug !== product.slug) {
+    redirect(`/products/${product.id}/${product.slug}`);
+  }
 
   // resolve active variant
   const activeVariantId = variant ?? String(product.initialVariantId);
@@ -47,14 +53,14 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
   // prefetch variant
   await queryClient.prefetchQuery({
-    queryKey: ["variant", slug, activeVariantId],
-    queryFn: () => getVariantByProductSlugAndVariantId(slug, Number(finalVariantId))
+    queryKey: ["variant", productId, activeVariantId],
+    queryFn: () => getVariantByProductIdAndVariantId(Number(productId), Number(finalVariantId))
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-8">
-        <ProductDetail slug={slug} activeVariantId={finalVariantId} />
+        <ProductDetail activeVariantId={finalVariantId} productId={Number(productId)} />
       </div>
     </HydrationBoundary>
   );

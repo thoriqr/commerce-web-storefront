@@ -64,6 +64,7 @@ export type ProductDetail = {
   slug: string;
   description: string;
   isAvailable: boolean;
+  warning: ProductDetailWarning | null;
   isVariant: boolean;
   initialVariantId: number;
   category: {
@@ -84,4 +85,9 @@ export type ProductVariantDetail = {
   weight: number;
   weightUnit: string;
   isAvailable: boolean;
+  warning: VariantDetailWarning | null;
 };
+
+export type ProductDetailWarning = "UNAVAILABLE";
+
+export type VariantDetailWarning = "UNAVAILABLE" | "OUT_OF_STOCK" | "LOW_STOCK";

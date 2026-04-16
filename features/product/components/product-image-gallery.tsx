@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import { ProductDetail } from "@/features/product/types";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 
 type Props = {
   product: ProductDetail;

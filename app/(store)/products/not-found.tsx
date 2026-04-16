@@ -3,7 +3,6 @@
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { SearchIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const SUGGESTIONS = ["shoes", "hoodie", "jacket", "t-shirt"];

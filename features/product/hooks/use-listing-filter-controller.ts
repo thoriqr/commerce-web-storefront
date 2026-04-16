@@ -181,11 +181,6 @@ export function useListingFilterController({ dimensions, mode = "instant" }: Opt
     router.replace(`?${params.toString()}`, {
       scroll: false
     });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
   };
 
   // RESET

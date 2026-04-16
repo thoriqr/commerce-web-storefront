@@ -11,9 +11,9 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
-import { ResetPasswordFormSchema, resetPasswordSchema } from "../schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
+import { ResetPasswordFormSchema, resetPasswordSchema } from "../../schema";
 
 type Props = {
   onClose: () => void;

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { AUTH_SCHEMA } from "../constants";
 import { userProfileSchema } from "@/features/user/schema";
+import { AUTH_SCHEMA } from "./constants";
 
 export const baseSchema = z.object({
   email: z.email("Please enter a valid email address"),

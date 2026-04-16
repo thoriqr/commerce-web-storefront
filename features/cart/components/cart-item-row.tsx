@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { useUpdateItem } from "../hooks/use-update-item";
 import { useDeleteItem } from "../hooks/use-delete-item";
 import { CartItem } from "../types";
 import { formatRupiah } from "@/shared/utils/formatter";
+import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
 type Props = {
   item: CartItem;
@@ -62,7 +63,7 @@ export default function CartItemRow({ item, onClose }: Props) {
         {/* Content */}
         <div className="flex flex-1 flex-col">
           {/* Product name */}
-          <Link href={`/products/${item.slug}`} onClick={onClose}>
+          <Link href={navigateProductPage(item.productId, item.slug)} onClick={onClose}>
             <p className="text-sm font-medium leading-snug line-clamp-2 hover:underline">{item.name}</p>
           </Link>
 

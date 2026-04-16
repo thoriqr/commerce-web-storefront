@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Banner } from "@/features/marketing/types";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 
 type Props = {
   banners: Banner[];

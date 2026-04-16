@@ -1,4 +1,4 @@
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 import { CheckoutSession } from "../types";
 import { getItemWarningLabel } from "../util";
 import Image from "next/image";

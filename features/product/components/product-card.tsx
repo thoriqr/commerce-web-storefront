@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard as ProductCardType } from "@/features/product/types";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
+import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
 type Props = {
   product: ProductCardType;
@@ -10,7 +11,7 @@ type Props = {
 
 export function ProductCard({ product }: Props) {
   return (
-    <Link href={`/products/${product.slug}`}>
+    <Link href={navigateProductPage(Number(product.id), product.slug)}>
       <Card className="p-0 gap-0">
         <div className="relative aspect-square w-full">
           <Image

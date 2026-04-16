@@ -37,13 +37,13 @@ export async function getProductsByCollection(slug: string, params?: ProductList
   return fetchStore<ProductListing>(`${BASE_URL}/by-collection?${search.toString()}`);
 }
 
-export async function getProductBySlug(slug: string) {
-  return fetchStore<ProductDetail>(`${BASE_URL}/${slug}`);
+export async function getProductById(productId: number) {
+  return fetchStore<ProductDetail>(`${BASE_URL}/${productId}`);
 }
 
-export async function getProductOrFail(slug: string) {
+export async function getProductByIdOrFail(productId: number) {
   try {
-    return await getProductBySlug(slug);
+    return await getProductById(productId);
   } catch (err) {
     if (err instanceof FetchError && err.status === 404) {
       notFound();
@@ -52,8 +52,8 @@ export async function getProductOrFail(slug: string) {
   }
 }
 
-export async function getVariantByProductSlugAndVariantId(productSlug: string, variantId: number) {
-  return fetchStore<ProductVariantDetail>(`${BASE_URL}/${productSlug}/variants/${variantId}`);
+export async function getVariantByProductIdAndVariantId(productId: number, variantId: number) {
+  return fetchStore<ProductVariantDetail>(`${BASE_URL}/${productId}/variants/${variantId}`);
 }
 
 export async function getSearchProductDimensionFilter(query: string) {

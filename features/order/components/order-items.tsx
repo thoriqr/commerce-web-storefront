@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { OrderDetail } from "../types";
-import { getImageUrl } from "@/lib/media";
+import { getImageUrl } from "@/shared/utils/media";
 import Link from "next/link";
 import { formatRupiah } from "@/shared/utils/formatter";
+import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
 export default function OrderItems({ items }: { items: OrderDetail["items"] }) {
   return (
@@ -15,7 +16,12 @@ export default function OrderItems({ items }: { items: OrderDetail["items"] }) {
         return (
           <div key={item.variantId} className="flex gap-3 rounded-md border bg-muted/40 p-3 transition hover:bg-muted/60">
             {/* IMAGE */}
-            <Link href={`/products/${item.slug}`} target="_blank" rel="noopener noreferrer" className="flex gap-3 flex-1 min-w-0">
+            <Link
+              href={navigateProductPage(item.productId, item.slug)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-3 flex-1 min-w-0"
+            >
               {/* IMAGE */}
               <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted shrink-0">
                 {imageUrl ? (
