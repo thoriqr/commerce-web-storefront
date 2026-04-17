@@ -5,21 +5,18 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Menu } from "lucide-react";
 import { NavbarSearch } from "./navbar-search";
 import Link from "next/link";
-import { CategoryTree } from "@/features/category/types";
-import { MobileCategoryMenu } from "@/features/category/components/mobile-category-menu";
 import { AuthStatus } from "@/features/auth/components/auth-status";
 import { useState } from "react";
 import CartDrawer from "@/features/cart/components/drawer/cart-drawer";
+import CategoryMenuModal from "@/features/category/components/category-menu-dialog";
 
-type Props = {
-  categories: CategoryTree[];
-};
-
-export default function NavbarMobile({ categories }: Props) {
+export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   return (
     <>
+      {open && <CategoryMenuModal open={openDialog} onClose={() => setOpenDialog(false)} closeDrawer={() => setOpen(false)} />}
       <div className="flex h-16 items-center justify-between md:hidden">
         {/* Logo */}
         <Link href="/" className="text-lg font-semibold">
@@ -42,8 +39,10 @@ export default function NavbarMobile({ categories }: Props) {
                   <SheetDescription className="sr-only">Browse categories and navigate your account</SheetDescription>
                 </SheetHeader>
 
-                <div className="mt-3 space-y-6 px-5">
-                  <MobileCategoryMenu categories={categories} onClose={() => setOpen(false)} />
+                <div className="mt-3 space-y-3 px-5">
+                  <Button onClick={() => setOpenDialog(true)} variant="outline" className="w-full justify-start">
+                    Categories
+                  </Button>
 
                   <div className="border-t pt-4 space-y-2">
                     <AuthStatus variant="mobile" onClose={() => setOpen(false)} />

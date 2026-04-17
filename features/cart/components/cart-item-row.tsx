@@ -22,8 +22,10 @@ export default function CartItemRow({ item, onClose }: Props) {
 
   const isMutating = updateItem.isPending || deleteItem.isPending;
 
-  const isUnavailable = !item.isAvailable;
-  const isOutOfStock = item.stockWarning === "OUT_OF_STOCK";
+  const isUnavailable = item.warning === "UNAVAILABLE";
+  const isOutOfStock = item.warning === "OUT_OF_STOCK";
+  const isInsufficient = item.warning === "INSUFFICIENT_STOCK";
+  const isLowStock = item.warning === "LOW_STOCK";
 
   const disableIncrease = item.quantity >= item.stock || item.quantity >= MAX_CART_ITEM_QTY || isUnavailable || isOutOfStock || isMutating;
 
@@ -53,18 +55,16 @@ export default function CartItemRow({ item, onClose }: Props) {
 
   return (
     <div className="flex gap-3 border-b pb-4">
-      {/* Blur container */}
       <div className={`flex flex-1 gap-3 ${blurRow ? "opacity-50" : ""}`}>
         {/* Image */}
         <div className="h-16 w-16 overflow-hidden rounded-md border bg-muted">
           <Image src={getImageUrl(item.imageKey)} alt={item.name} width={64} height={64} className="h-full w-full object-cover" />
         </div>
 
-        {/* Content */}
         <div className="flex flex-1 flex-col">
-          {/* Product name */}
+          {/* Name */}
           <Link href={navigateProductPage(item.productId, item.slug)} onClick={onClose}>
-            <p className="text-sm font-medium leading-snug line-clamp-2 hover:underline">{item.name}</p>
+            <p className="text-sm font-medium line-clamp-2 hover:underline">{item.name}</p>
           </Link>
 
           {/* Options */}
@@ -72,17 +72,19 @@ export default function CartItemRow({ item, onClose }: Props) {
             <p className="text-xs text-muted-foreground">{item.options.map((o) => `${o.dimension}: ${o.value}`).join(" • ")}</p>
           )}
 
-          {/* Status messages */}
+          {/* Unified Warning */}
           {isUnavailable && <p className="text-xs text-destructive mt-1">Item no longer available</p>}
 
-          {item.stockWarning === "OUT_OF_STOCK" && <p className="text-xs text-destructive mt-1">Out of stock</p>}
+          {isOutOfStock && <p className="text-xs text-destructive mt-1">Out of stock</p>}
 
-          {item.stockWarning === "INSUFFICIENT_STOCK" && <p className="text-xs text-orange-500 mt-1">Only {item.stock} left in stock</p>}
+          {isInsufficient && <p className="text-xs text-orange-500 mt-1">Only {item.stock} left in stock</p>}
 
-          {/* Stock */}
+          {isLowStock && !isInsufficient && <p className="text-xs text-orange-500 mt-1">Low stock ({item.stock} left)</p>}
+
+          {/* Stock info */}
           {item.stock > 0 && <p className="text-xs text-muted-foreground mt-1">Stock: {item.stock}</p>}
 
-          {/* Price + quantity */}
+          {/* Price + Qty */}
           <div className="mt-2 flex items-center justify-between">
             <span className="text-sm font-medium">{formatRupiah(item.price)}</span>
 
@@ -101,7 +103,7 @@ export default function CartItemRow({ item, onClose }: Props) {
         </div>
       </div>
 
-      {/* Delete button (not blurred) */}
+      {/* Delete */}
       <div className="flex items-start pt-1">
         <Button
           size="icon"

@@ -31,12 +31,6 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
     );
   }
 
-  const hasUnavailableItem = cart.items.some((i) => !i.isAvailable);
-
-  const hasOutOfStock = cart.items.some((i) => i.stockWarning === "OUT_OF_STOCK");
-
-  const hasInsufficientStock = cart.items.some((i) => i.stockWarning === "INSUFFICIENT_STOCK");
-
   return (
     <div className="flex h-full flex-col">
       {/* Scrollable items */}
@@ -47,13 +41,7 @@ export default function CartContent({ data, isLoading, onClose }: Props) {
       </div>
 
       {/* Sticky summary */}
-      <CartSummary
-        summary={cart.summary}
-        isMutating={isMutating}
-        hasUnavailableItem={hasUnavailableItem}
-        hasOutOfStock={hasOutOfStock}
-        hasInsufficientStock={hasInsufficientStock}
-      />
+      <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} />
     </div>
   );
 }

@@ -41,13 +41,7 @@ export default function CartView() {
         {/* RIGHT */}
         <div className="lg:sticky lg:top-20 h-fit">
           <SectionCard>
-            <CartSummary
-              summary={data.summary}
-              isMutating={isMutating}
-              hasUnavailableItem={data.items.some((i) => !i.isAvailable)}
-              hasOutOfStock={data.items.some((i) => i.stockWarning === "OUT_OF_STOCK")}
-              hasInsufficientStock={data.items.some((i) => i.stockWarning === "INSUFFICIENT_STOCK")}
-            />
+            <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} />
           </SectionCard>
         </div>
       </div>

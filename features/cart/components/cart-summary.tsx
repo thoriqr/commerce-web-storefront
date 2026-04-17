@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useCreateCheckoutSession } from "@/features/checkout/hooks/use-create-checkout-session";
-import { CartSummary as Summary } from "../types";
+import { CartItem, CartSummary as Summary } from "../types";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { useRouter } from "next/navigation";
 import { FetchError } from "@/shared/types/api-error";
@@ -12,12 +12,9 @@ import { useMe } from "@/features/auth/hooks/use-me";
 type Props = {
   summary: Summary;
   isMutating: boolean;
-  hasUnavailableItem: boolean;
-  hasOutOfStock: boolean;
-  hasInsufficientStock: boolean;
+  items: CartItem[];
 };
-
-export default function CartSummary({ summary, isMutating, hasUnavailableItem, hasOutOfStock, hasInsufficientStock }: Props) {
+export default function CartSummary({ summary, isMutating, items }: Props) {
   const router = useRouter();
 
   const { data: user } = useMe();
@@ -40,15 +37,19 @@ export default function CartSummary({ summary, isMutating, hasUnavailableItem, h
     }
   });
 
-  const disableCheckout = isMutating || hasUnavailableItem || hasOutOfStock || hasInsufficientStock;
+  const hasUnavailable = items.some((i) => i.warning === "UNAVAILABLE");
+  const hasOutOfStock = items.some((i) => i.warning === "OUT_OF_STOCK");
+  const hasInsufficient = items.some((i) => i.warning === "INSUFFICIENT_STOCK");
+
+  const disableCheckout = isMutating || hasUnavailable || hasOutOfStock || hasInsufficient;
 
   let message: string | null = null;
 
-  if (hasUnavailableItem) {
+  if (hasUnavailable) {
     message = "Remove unavailable items before checkout.";
   } else if (hasOutOfStock) {
     message = "Some items are out of stock.";
-  } else if (hasInsufficientStock) {
+  } else if (hasInsufficient) {
     message = "Adjust item quantities before checkout.";
   }
 

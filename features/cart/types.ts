@@ -14,7 +14,7 @@ export type CartItem = {
   imageKey: string;
   options: DimOption[];
   isAvailable: boolean;
-  stockWarning: "OUT_OF_STOCK" | "INSUFFICIENT_STOCK" | null;
+  warning: "UNAVAILABLE" | "OUT_OF_STOCK" | "INSUFFICIENT_STOCK" | "LOW_STOCK" | null;
 };
 
 export type CartSummary = {
