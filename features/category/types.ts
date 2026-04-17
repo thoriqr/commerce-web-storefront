@@ -13,10 +13,12 @@ export type Category = {
   slugPath: string;
 };
 
-export type CategoryTopLevel = {
+export type PopularCategory = {
   id: number;
   name: string;
   slug: string;
+  slugPath: string;
+  totalSold: number;
 };
 
 export type CategoryDetail = {

@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 import { usePasswordResetRequest } from "../../hooks/use-password-reset-request";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
-import { EmailFormSchema, emailSchema } from "../schema";
 import { handleFormError } from "@/shared/utils/form";
+import { EmailFormSchema, emailSchema } from "../../schema";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();

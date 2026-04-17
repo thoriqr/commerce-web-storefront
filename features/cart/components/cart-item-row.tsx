@@ -57,30 +57,24 @@ export default function CartItemRow({ item, onClose }: Props) {
     <div className="flex gap-3 border-b pb-4">
       <div className={`flex flex-1 gap-3 ${blurRow ? "opacity-50" : ""}`}>
         {/* Image */}
-        <div className="h-16 w-16 overflow-hidden rounded-md border bg-muted">
+        <Link href={navigateProductPage(item.productId, item.slug)} className="h-16 w-16 overflow-hidden rounded-md border bg-muted">
           <Image src={getImageUrl(item.imageKey)} alt={item.name} width={64} height={64} className="h-full w-full object-cover" />
-        </div>
+        </Link>
 
         <div className="flex flex-1 flex-col">
           {/* Name */}
-          <Link href={navigateProductPage(item.productId, item.slug)} onClick={onClose}>
-            <p className="text-sm font-medium line-clamp-2 hover:underline">{item.name}</p>
+          <Link href={navigateProductPage(item.productId, item.slug)} onClick={onClose} className="text-sm font-medium line-clamp-2 w-fit">
+            {item.name}
           </Link>
-
           {/* Options */}
           {item.options.length > 0 && (
             <p className="text-xs text-muted-foreground">{item.options.map((o) => `${o.dimension}: ${o.value}`).join(" • ")}</p>
           )}
-
           {/* Unified Warning */}
           {isUnavailable && <p className="text-xs text-destructive mt-1">Item no longer available</p>}
-
           {isOutOfStock && <p className="text-xs text-destructive mt-1">Out of stock</p>}
-
           {isInsufficient && <p className="text-xs text-orange-500 mt-1">Only {item.stock} left in stock</p>}
-
           {isLowStock && !isInsufficient && <p className="text-xs text-orange-500 mt-1">Low stock ({item.stock} left)</p>}
-
           {/* Stock info */}
           {item.stock > 0 && <p className="text-xs text-muted-foreground mt-1">Stock: {item.stock}</p>}
 

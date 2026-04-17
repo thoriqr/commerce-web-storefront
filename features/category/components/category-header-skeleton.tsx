@@ -13,9 +13,9 @@ export function CategoryHeaderSkeleton() {
       </div>
 
       {/* Subcategories */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 rounded-lg" />
+      <div className="flex flex-wrap gap-2 sm:gap-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-9 w-24 sm:w-28 rounded-md" />
         ))}
       </div>
     </div>

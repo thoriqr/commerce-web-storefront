@@ -1,20 +1,22 @@
-import { CategoryTopLevel } from "@/features/category/types";
+import { buttonVariants } from "@/components/ui/button";
+import { PopularCategory } from "@/features/category/types";
+import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
-  category: CategoryTopLevel;
+  category: PopularCategory;
 };
 
 export default function PopularCategoriesItem({ category }: Props) {
   return (
-    <Link href={`/category/${category.slug}`} className="group rounded-lg border bg-background">
-      <div className="flex items-start p-4 gap-4 min-w-0">
-        <div className="space-y-1 min-w-0 flex-1">
-          <h3 className="text-base sm:text-lg font-semibold leading-snug line-clamp-2">{category.name}</h3>
+    <Link
+      href={`/category/${category.slugPath}`}
+      className={cn(buttonVariants({ variant: "outline", size: "sm" }), "justify-between py-3 px-4 group")}
+    >
+      <span className="truncate">{category.name}</span>
 
-          <span className="text-sm text-muted-foreground">Explore →</span>
-        </div>
-      </div>
+      <ArrowRight className="size-4 text-muted-foreground transition-all duration-200 group-hover:translate-x-1 group-hover:text-foreground ease-out" />
     </Link>
   );
 }

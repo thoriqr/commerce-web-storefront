@@ -23,6 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../../constants";
 import { FetchError } from "@/shared/types/api-error";
 import { toast } from "sonner";
+import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
 export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
   const queryClient = useQueryClient();
@@ -65,19 +66,20 @@ export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
   return (
     <div className="rounded-md border p-3 hover:bg-muted/50 transition space-y-3">
       {/* TOP */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 w-fit">
         {/* IMAGE */}
-        <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted shrink-0">
+        <Link href={navigateProductPage(order.productId, order.slug)} className="relative w-16 h-16 rounded-md overflow-hidden bg-muted shrink-0">
           {imageUrl ? (
             <Image src={imageUrl} alt={order.previewItem.name} fill sizes="64px" className="object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No Image</div>
           )}
-        </div>
-
+        </Link>
         {/* INFO */}
         <div className="flex-1 min-w-0 space-y-1">
-          <p className="text-sm font-medium line-clamp-2">{order.previewItem.name}</p>
+          <Link href={navigateProductPage(order.productId, order.slug)} className="text-sm font-medium line-clamp-2">
+            {order.previewItem.name}
+          </Link>
 
           <p className="text-[11px] text-muted-foreground">#{order.orderCode}</p>
 
@@ -86,6 +88,7 @@ export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
           </p>
         </div>
       </div>
+      <div className="flex gap-3"></div>
 
       {/* STATUS + PRICE */}
       <div className="flex items-center justify-between">

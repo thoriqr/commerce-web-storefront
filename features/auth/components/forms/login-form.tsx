@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLogin } from "../../hooks/use-login";
 import GoogleLoginButton from "../google-login-button";
 import { Controller, useForm } from "react-hook-form";
-import { LoginFormSchema, loginSchema } from "../schema";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { handleFormError } from "@/shared/utils/form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
@@ -18,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { invalidateUserScope } from "@/shared/utils/invalidate";
 import { toast } from "sonner";
 import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
+import { LoginFormSchema, loginSchema } from "../../schema";
 
 export default function LoginForm() {
   const router = useRouter();

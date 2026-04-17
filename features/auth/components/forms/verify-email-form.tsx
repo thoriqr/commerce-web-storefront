@@ -11,7 +11,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
-import { VerifyEmailFormSchema, verifyEmailSchema } from "../schema";
+import { VerifyEmailFormSchema, verifyEmailSchema } from "../../schema";
 
 type Props = {
   token: string;

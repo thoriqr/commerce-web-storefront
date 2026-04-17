@@ -62,6 +62,8 @@ export type OrderListing = {
   items: {
     id: number;
     orderCode: string;
+    productId: number;
+    slug: string;
     status: OrderStatus;
     total: number;
     createdAt: Date;

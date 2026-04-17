@@ -15,7 +15,7 @@ export async function PopularCategoriesContent() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Popular Categories</h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         {categories.map((category) => (
           <PopularCategoriesItem key={category.id} category={category} />
         ))}

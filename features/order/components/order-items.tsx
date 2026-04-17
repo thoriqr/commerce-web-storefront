@@ -14,14 +14,9 @@ export default function OrderItems({ items }: { items: OrderDetail["items"] }) {
         const imageUrl = item.imageKey ? getImageUrl(item.imageKey) : null;
 
         return (
-          <div key={item.variantId} className="flex gap-3 rounded-md border bg-muted/40 p-3 transition hover:bg-muted/60">
+          <div key={item.variantId} className="flex gap-3 justify-between rounded-md border bg-muted/40 p-3 transition hover:bg-muted/60">
             {/* IMAGE */}
-            <Link
-              href={navigateProductPage(item.productId, item.slug)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex gap-3 flex-1 min-w-0"
-            >
+            <Link href={navigateProductPage(item.productId, item.slug)} target="_blank" rel="noopener noreferrer" className="flex gap-3 w-fit">
               {/* IMAGE */}
               <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted shrink-0">
                 {imageUrl ? (
@@ -33,7 +28,7 @@ export default function OrderItems({ items }: { items: OrderDetail["items"] }) {
 
               {/* INFO */}
               <div className="flex-1 space-y-1 text-sm">
-                <p className="font-medium leading-snug hover:underline">{item.name}</p>
+                <p className="font-medium leading-snug">{item.name}</p>
 
                 {item.options.length > 0 && (
                   <p className="text-xs text-muted-foreground">{item.options.map((opt) => `${opt.dimension}: ${opt.value}`).join(", ")}</p>
@@ -46,7 +41,7 @@ export default function OrderItems({ items }: { items: OrderDetail["items"] }) {
             </Link>
 
             {/* SUBTOTAL */}
-            <div className="text-right min-w-[90px]">
+            <div className="text-right min-w-22.5">
               <p className="font-medium text-sm">{formatRupiah(item.price * item.quantity)}</p>
             </div>
           </div>

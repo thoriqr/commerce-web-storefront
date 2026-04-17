@@ -5,6 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { MeResponse } from "../types";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon, LogOutIcon, Package, UserIcon } from "lucide-react";
+import { getInitials } from "@/shared/utils/formatter";
 
 type Props = {
   user: MeResponse;
@@ -16,15 +17,14 @@ export function AuthStatusMobile({ user, onClose, onLogout }: Props) {
   const router = useRouter();
 
   const name = user.displayName?.trim() || user.email || "User";
-  const initial = name.charAt(0).toUpperCase();
 
   return (
     <Collapsible defaultOpen>
       {/* TRIGGER */}
       <CollapsibleTrigger asChild>
         <Button variant="ghost" className="group w-full justify-start gap-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
-            {initial}
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground text-sm font-medium">
+            {getInitials(name)}
           </div>
 
           <span className="truncate text-sm font-medium">{name}</span>

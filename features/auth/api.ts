@@ -1,5 +1,4 @@
 import { authRequest } from "@/shared/lib/auth-request";
-import { EmailFormSchema, LoginFormSchema } from "./components/schema";
 import type {
   RegisterInput,
   VerifyEmailInput,
@@ -10,6 +9,7 @@ import type {
   VerificationToken
 } from "./types";
 import { fetchAction } from "@/shared/lib/fetch-action";
+import { EmailFormSchema, LoginFormSchema } from "./schema";
 
 const AUTH_URL = "/auth";
 

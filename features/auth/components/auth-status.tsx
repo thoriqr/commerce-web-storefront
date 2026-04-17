@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AuthStatusMobile } from "./auth-status-mobile";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearUserScope } from "@/shared/utils/invalidate";
+import { getInitials } from "@/shared/utils/formatter";
 
 type Props = {
   variant: "desktop" | "mobile";
@@ -66,7 +67,6 @@ export function AuthStatus({ variant, onClose }: Props) {
   }
 
   const name = user.displayName?.trim() || user.email || "User";
-  const initial = name.charAt(0).toUpperCase();
 
   return (
     <>
@@ -74,8 +74,8 @@ export function AuthStatus({ variant, onClose }: Props) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                {initial}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground text-sm font-medium">
+                {getInitials(name)}
               </div>
             </Button>
           </DropdownMenuTrigger>

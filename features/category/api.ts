@@ -1,4 +1,4 @@
-import { CategoryDetail, CategoryTopLevel, CategoryTree } from "./types";
+import { CategoryDetail, CategoryTree, PopularCategory } from "./types";
 import { DimensionFilter } from "../product/types";
 import { fetchServer } from "@/shared/lib/fetch-server";
 import { fetchStore } from "@/shared/lib/fetch-store";
@@ -10,7 +10,7 @@ export async function getCategoryTree() {
 }
 
 export async function getPopularCategories() {
-  return fetchServer<CategoryTopLevel[]>(`${BASE_URL}/popular`);
+  return fetchServer<PopularCategory[]>(`${BASE_URL}/popular`);
 }
 
 export async function getCategoryDetail(slugPath: string) {
