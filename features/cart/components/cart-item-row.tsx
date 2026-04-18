@@ -57,7 +57,11 @@ export default function CartItemRow({ item, onClose }: Props) {
     <div className="flex gap-3 border-b pb-4">
       <div className={`flex flex-1 gap-3 ${blurRow ? "opacity-50" : ""}`}>
         {/* Image */}
-        <Link href={navigateProductPage(item.productId, item.slug)} className="h-16 w-16 overflow-hidden rounded-md border bg-muted">
+        <Link
+          href={navigateProductPage(item.productId, item.slug)}
+          onClick={onClose}
+          className="h-16 w-16 overflow-hidden rounded-md border bg-muted"
+        >
           <Image src={getImageUrl(item.imageKey)} alt={item.name} width={64} height={64} className="h-full w-full object-cover" />
         </Link>
 
