@@ -9,6 +9,7 @@ import { OrderSummary } from "./order-summary";
 import { SectionCard } from "../../../components/section-card";
 import { ShippingSection } from "./shipping-section";
 import CheckoutMainSkeleton from "./skeletons/checkout-main-skeleton";
+import CheckoutOrigin from "./checkout-origin";
 
 type Props = {
   sessionId: number;
@@ -37,6 +38,10 @@ export function CheckoutMain({ sessionId }: Props) {
 
         <SectionCard>
           <AddressSection sessionId={data.sessionId} address={data.address} />
+        </SectionCard>
+
+        <SectionCard>
+          <CheckoutOrigin />
         </SectionCard>
 
         <SectionCard>

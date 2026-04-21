@@ -37,6 +37,24 @@ export default function ShippingAddress({ data }: { data: OrderDetail }) {
           {[address.addressLine, address.districtName, address.cityName, address.provinceName, address.postalCode].filter(Boolean).join(", ")}
         </p>
       </div>
+
+      {data.warehouseOrigin && (
+        <>
+          <div className="border-t" />
+
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">From</p>
+
+            <p className="font-medium">{data.warehouseOrigin.name}</p>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {[data.warehouseOrigin.district, data.warehouseOrigin.city, data.warehouseOrigin.province, data.warehouseOrigin.postalCode]
+                .filter(Boolean)
+                .join(", ")}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

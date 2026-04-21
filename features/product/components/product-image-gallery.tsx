@@ -19,12 +19,12 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const hasMountedRef = useRef(false);
 
-  // 🔥 Cari active variant
+  // Cari active variant
   const activeVariant = useMemo(() => {
     return product.variants.find((v) => String(v.id) === activeVariantId);
   }, [product.variants, activeVariantId]);
 
-  // 🔥 Cari image index berdasarkan signature
+  // Cari image index berdasarkan signature
   const variantImageIndex = useMemo(() => {
     if (!activeVariant) return -1;
 
@@ -81,7 +81,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
       <Carousel setApi={setApi} opts={{ align: "start" }} className="w-full">
         <CarouselContent>
           {product.images.map((img, idx) => (
-            <CarouselItem key={img.id}>
+            <CarouselItem key={img.imageKey}>
               <div className="relative aspect-square w-full overflow-hidden rounded-xl border bg-muted">
                 <Image
                   src={getImageUrl(img.imageKey)}
@@ -108,7 +108,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
               ref={(el) => {
                 thumbRefs.current[index] = el;
               }}
-              key={img.id}
+              key={img.imageKey}
               onClick={() => api?.scrollTo(index)}
               className={` relative h-16 w-16 shrink-0 rounded-md border transition ${current === index ? "ring-2 ring-primary" : "hover:ring-1 hover:ring-muted-foreground"}`}
             >

@@ -2,9 +2,11 @@ import { CheckoutBlockReason } from "./types";
 
 export const COURIERS = [
   { label: "JNE", value: "jne" },
-  { label: "J&T", value: "jnt" },
+  { label: "SICEPAT", value: "sicepat" },
   { label: "POS", value: "pos" },
-  { label: "TIKI", value: "tiki" }
+  { label: "ANTERAJA", value: "anteraja" },
+  { label: "NINJA", value: "ninja" },
+  { label: "WAHANA", value: "wahana" }
 ];
 
 export const reasonMap: Record<CheckoutBlockReason, string> = {

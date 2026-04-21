@@ -1,4 +1,4 @@
-import { CheckoutSession, SetShippingPayload, ShippingCost } from "./types";
+import { CheckoutSession, CheckoutWarehouseOrigin, SetShippingPayload, ShippingCost } from "./types";
 import { authRequest } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user/checkout-sessions";
@@ -45,5 +45,12 @@ export function confirmCheckout(sessionId: number) {
   return authRequest<{ orderCode: string }>({
     url: `${BASE_URL}/${sessionId}/confirm`,
     method: "POST"
+  });
+}
+
+export function getWarehouseOrigin() {
+  return authRequest<CheckoutWarehouseOrigin>({
+    url: `${BASE_URL}/origin`,
+    method: "GET"
   });
 }

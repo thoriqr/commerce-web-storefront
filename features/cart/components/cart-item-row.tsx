@@ -77,7 +77,7 @@ export default function CartItemRow({ item, onClose }: Props) {
           {/* Unified Warning */}
           {isUnavailable && <p className="text-xs text-destructive mt-1">Item no longer available</p>}
           {isOutOfStock && <p className="text-xs text-destructive mt-1">Out of stock</p>}
-          {isInsufficient && <p className="text-xs text-orange-500 mt-1">Only {item.stock} left in stock</p>}
+          {isInsufficient && item.stock > 0 && <p className="text-xs text-orange-500 mt-1">Only {item.stock} left in stock</p>}
           {isLowStock && !isInsufficient && <p className="text-xs text-orange-500 mt-1">Low stock ({item.stock} left)</p>}
           {/* Stock info */}
           {item.stock > 0 && <p className="text-xs text-muted-foreground mt-1">Stock: {item.stock}</p>}

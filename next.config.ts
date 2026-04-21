@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "img.commerce.web.id"
+      },
+
+      {
+        protocol: "https",
+        hostname: "img-dev.commerce.web.id"
       }
     ]
   }

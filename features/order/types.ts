@@ -16,6 +16,14 @@ export type TimelineItem = {
   isCurrent: boolean;
 };
 
+export type OrderWarehouseOrigin = {
+  name: string;
+  province: string;
+  city: string;
+  district: string;
+  postalCode: string;
+};
+
 export type OrderDetail = {
   orderCode: string;
   subtotal: number;
@@ -55,6 +63,7 @@ export type OrderDetail = {
     imageKey: string;
     options: OptionSnapshot[];
   }[];
+  warehouseOrigin: OrderWarehouseOrigin | null;
   timeline: TimelineItem[];
 };
 

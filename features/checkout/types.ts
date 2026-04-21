@@ -57,3 +57,10 @@ export type SetAddressCheckout = {
   sessionId: number;
   addressId: number;
 };
+
+export type CheckoutWarehouseOrigin = {
+  name: string;
+  province: string;
+  city: string;
+  district: string;
+};
