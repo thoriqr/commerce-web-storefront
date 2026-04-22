@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: "Commerce",
     template: "%s | Commerce"
   },
-  description: "Commerce"
+  icons: "/favicon.ico"
 };
 
 export default function RootLayout({
