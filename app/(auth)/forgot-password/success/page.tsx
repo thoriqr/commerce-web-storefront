@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Check your email",
+  description: "We’ve sent a password reset link if the email exists"
+};
 
 export default function ForgotPasswordSuccessPage() {
   return (

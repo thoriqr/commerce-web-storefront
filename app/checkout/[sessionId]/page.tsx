@@ -13,6 +13,7 @@ export function generateMetadata(): Metadata {
     description: "Complete your purchase"
   };
 }
+
 export default async function CheckoutPage({ params }: Props) {
   const { sessionId } = await params;
 
