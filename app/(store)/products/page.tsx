@@ -3,6 +3,8 @@ import SearchProducts from "@/features/product/components/search-products";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   searchParams: Promise<{ q?: string }>;
 };

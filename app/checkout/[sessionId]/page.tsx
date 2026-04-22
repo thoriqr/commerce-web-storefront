@@ -1,6 +1,8 @@
 import { CheckoutMain } from "@/features/checkout/components/checkout-main";
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{
     sessionId: string;

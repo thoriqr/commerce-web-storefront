@@ -1,6 +1,8 @@
 import OrderMain from "@/features/order/components/order-main";
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{
     orderCode: string;
