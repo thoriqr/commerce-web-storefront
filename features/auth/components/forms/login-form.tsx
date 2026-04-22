@@ -28,8 +28,8 @@ export default function LoginForm() {
   const form = useForm<LoginFormSchema>({
     resolver: standardSchemaResolver(loginSchema),
     defaultValues: {
-      email: "testuser1@example.com",
-      password: "asdfasdf"
+      email: "",
+      password: ""
     }
   });
 
