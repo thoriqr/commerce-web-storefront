@@ -3,6 +3,8 @@ import VerifyEmailForm from "@/features/auth/components/forms/verify-email-form"
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };

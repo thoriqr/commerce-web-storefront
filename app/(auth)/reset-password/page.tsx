@@ -3,6 +3,8 @@ import ResetPasswordForm from "@/features/auth/components/forms/reset-password-f
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };
