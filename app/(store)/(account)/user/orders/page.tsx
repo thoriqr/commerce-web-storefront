@@ -1,6 +1,8 @@
 import OrdersTab from "@/features/user/components/orders-tab";
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export function generateMetadata(): Metadata {
   return {
     title: "My Orders",
