@@ -6,9 +6,10 @@ import { Menu } from "lucide-react";
 import { NavbarSearch } from "./navbar-search";
 import Link from "next/link";
 import { AuthStatus } from "@/features/auth/components/auth-status";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import CartDrawer from "@/features/cart/components/drawer/cart-drawer";
 import CategoryMenuModal from "@/features/category/components/category-menu-dialog";
+import { NavbarSearchSkeleton } from "./navbar-skeleton";
 
 export default function NavbarMobile() {
   const [open, setOpen] = useState(false);
@@ -55,7 +56,9 @@ export default function NavbarMobile() {
       </div>
       {/* MOBILE SEARCH (outside sheet) */}
       <div className="pb-3 md:hidden">
-        <NavbarSearch />
+        <Suspense fallback={<NavbarSearchSkeleton />}>
+          <NavbarSearch />
+        </Suspense>
       </div>
     </>
   );

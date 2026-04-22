@@ -4,9 +4,10 @@ import Link from "next/link";
 import { NavbarSearch } from "./navbar-search";
 import { AuthStatus } from "@/features/auth/components/auth-status";
 import CartDrawer from "@/features/cart/components/drawer/cart-drawer";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CategoryMenuModal from "@/features/category/components/category-menu-dialog";
+import { NavbarSearchSkeleton } from "./navbar-skeleton";
 
 export default function NavbarDesktop() {
   const [open, setOpen] = useState(false);
@@ -29,7 +30,9 @@ export default function NavbarDesktop() {
         {/* Search */}
         <div className="flex justify-center">
           <div className="w-full max-w-xl">
-            <NavbarSearch />
+            <Suspense fallback={<NavbarSearchSkeleton />}>
+              <NavbarSearch />
+            </Suspense>
           </div>
         </div>
 

@@ -7,7 +7,7 @@ export default async function CategoryFilterBoundary({ slugPath }: { slugPath: s
 
   return (
     <ProductFilterSidebarLayout>
-      <ProductFilterController dimensions={dimensions} />
+      <ProductFilterController dimensions={dimensions ?? undefined} />
     </ProductFilterSidebarLayout>
   );
 }

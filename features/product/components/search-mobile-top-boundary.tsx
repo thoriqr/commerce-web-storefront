@@ -6,5 +6,10 @@ import SearchProductSortControl from "./search-product-sort-control";
 export default async function SearchMobileTopBoundary({ query }: { query: string }) {
   const dimensions = await getSearchProductDimensionFilter(query);
 
-  return <ProductMobileTopBar filterContent={<ProductFilterDrawerController dimensions={dimensions} />} sortControl={<SearchProductSortControl />} />;
+  return (
+    <ProductMobileTopBar
+      filterContent={<ProductFilterDrawerController dimensions={dimensions ?? undefined} />}
+      sortControl={<SearchProductSortControl />}
+    />
+  );
 }

@@ -14,6 +14,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryDetail(slug.join("/"));
 
+  if (!category) notFound();
+
   const title = category.category.name;
   const description = category.category.description;
 

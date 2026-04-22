@@ -2,6 +2,7 @@ import { CategoryDetail, CategoryTree, PopularCategory } from "./types";
 import { DimensionFilter } from "../product/types";
 import { fetchServer } from "@/shared/lib/fetch-server";
 import { fetchStore } from "@/shared/lib/fetch-store";
+import { notFound } from "next/navigation";
 
 const BASE_URL = "/categories";
 
@@ -13,8 +14,14 @@ export async function getPopularCategories() {
   return fetchServer<PopularCategory[]>(`${BASE_URL}/popular`);
 }
 
-export async function getCategoryDetail(slugPath: string) {
-  return fetchServer<CategoryDetail>(`${BASE_URL}/detail?slugPath=${slugPath}`);
+export async function getCategoryDetail(slugPath: string): Promise<CategoryDetail> {
+  const data = await fetchServer<CategoryDetail>(`${BASE_URL}/detail?slugPath=${slugPath}`);
+
+  if (!data) {
+    notFound();
+  }
+
+  return data;
 }
 
 export async function getCategoryDimensionFilter(slugPath: string) {

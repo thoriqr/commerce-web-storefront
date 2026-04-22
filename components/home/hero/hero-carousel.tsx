@@ -21,7 +21,7 @@ export function HeroCarousel({ banners }: Props) {
         {/* FRAME */}
         <div className="overflow-hidden rounded-lg">
           <CarouselContent>
-            {banners.map((banner, idx) => (
+            {banners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <Link href={banner.url ?? "#"}>
                   <div className="relative aspect-3/1 w-full">

@@ -6,5 +6,10 @@ import { ProductFilterDrawerController } from "@/features/product/components/fil
 export default async function CategoryMobileTopBarBoundary({ slugPath }: { slugPath: string }) {
   const dimensions = await getCategoryDimensionFilter(slugPath);
 
-  return <ProductMobileTopBar filterContent={<ProductFilterDrawerController dimensions={dimensions} />} sortControl={<CategorySortControl />} />;
+  return (
+    <ProductMobileTopBar
+      filterContent={dimensions ? <ProductFilterDrawerController dimensions={dimensions} /> : null}
+      sortControl={<CategorySortControl />}
+    />
+  );
 }

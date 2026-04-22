@@ -6,7 +6,7 @@ export default async function SearchFilterBoundary({ query }: { query: string })
   const dimensions = await getSearchProductDimensionFilter(query);
   return (
     <ProductFilterSidebarLayout>
-      <ProductFilterController dimensions={dimensions} />
+      <ProductFilterController dimensions={dimensions ?? undefined} />
     </ProductFilterSidebarLayout>
   );
 }

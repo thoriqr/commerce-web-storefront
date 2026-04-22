@@ -1,5 +1,3 @@
-"use client";
-
 import NavbarDesktop from "./navbar-desktop";
 import NavbarMobile from "./navbar-mobile";
 
