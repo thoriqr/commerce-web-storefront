@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "@/features/product/types";
-import { startTransition, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
   product: ProductDetail;
@@ -23,18 +23,44 @@ export function ProductDimensionSelector({ product, activeVariantId, onSwitchSta
     setSelectedVariantId(activeVariantId);
   }, [activeVariantId]);
 
-  const activeVariant = product.variants.find((v) => String(v.id) === selectedVariantId);
+  const variantById = useMemo(() => {
+    const map = new Map<string, (typeof product.variants)[number]>();
+
+    for (const variant of product.variants) {
+      map.set(String(variant.id), variant);
+    }
+
+    return map;
+  }, [product]);
+
+  const variantMap = useMemo(() => {
+    const map = new Map<string, (typeof product.variants)[number]>();
+
+    for (const variant of product.variants) {
+      const key = variant.options
+        .map((opt) => `${opt.dimensionKey}:${opt.valueKey}`)
+        .sort()
+        .join("|");
+
+      map.set(key, variant);
+    }
+
+    return map;
+  }, [product]);
+
+  const activeVariant = variantById.get(selectedVariantId);
 
   if (!activeVariant) return null;
 
   const handleSelect = (dimensionKey: string, valueKey: string) => {
     const nextSelection = activeVariant.options.map((opt) => (opt.dimensionKey === dimensionKey ? { ...opt, valueKey } : opt));
 
-    const matchingVariant = product.variants.find((variant) =>
-      nextSelection.every((selected) =>
-        variant.options.some((opt) => opt.dimensionKey === selected.dimensionKey && opt.valueKey === selected.valueKey)
-      )
-    );
+    const nextKey = nextSelection
+      .map((opt) => `${opt.dimensionKey}:${opt.valueKey}`)
+      .sort()
+      .join("|");
+
+    const matchingVariant = variantMap.get(nextKey);
 
     if (!matchingVariant) return;
 
@@ -49,9 +75,7 @@ export function ProductDimensionSelector({ product, activeVariantId, onSwitchSta
     const params = new URLSearchParams(searchParams.toString());
     params.set("variant", nextId);
 
-    startTransition(() => {
-      router.replace(`?${params.toString()}`, { scroll: false });
-    });
+    router.replace(`?${params.toString()}`, { scroll: false });
   };
 
   return (

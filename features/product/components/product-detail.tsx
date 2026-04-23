@@ -11,7 +11,7 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { getVariantStatusText } from "./get-variant-status-text";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { ExpandableText } from "@/components/expandable-text";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   productId: number;
@@ -20,6 +20,7 @@ type Props = {
 
 export function ProductDetail({ productId, activeVariantId }: Props) {
   const [isSwitching, setIsSwitching] = useState(false);
+  const prevVariantRef = useRef(activeVariantId);
 
   const {
     data: product,
@@ -36,8 +37,11 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
   });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsSwitching(false);
+    if (prevVariantRef.current !== activeVariantId) {
+      prevVariantRef.current = activeVariantId;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsSwitching(false);
+    }
   }, [activeVariantId]);
 
   if (isProductLoading) return <ProductDetailSkeleton />;
