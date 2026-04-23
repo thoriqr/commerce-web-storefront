@@ -21,11 +21,17 @@ export function HeroCarousel({ banners }: Props) {
         {/* FRAME */}
         <div className="overflow-hidden rounded-lg">
           <CarouselContent>
-            {banners.map((banner) => (
+            {banners.map((banner, idx) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <Link href={banner.url ?? "#"}>
                   <div className="relative aspect-3/1 w-full">
-                    <Image src={getImageUrl(banner.imageKey)} alt={banner.title} fill loading="eager" className="object-cover" />
+                    <Image
+                      src={getImageUrl(banner.imageKey)}
+                      alt={banner.title}
+                      fill
+                      loading={idx === 0 ? "eager" : "lazy"}
+                      className="object-cover"
+                    />
                   </div>
                 </Link>
               </CarouselItem>

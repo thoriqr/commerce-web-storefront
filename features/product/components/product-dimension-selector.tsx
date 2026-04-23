@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "@/features/product/types";
+import { startTransition } from "react";
 
 type Props = {
   product: ProductDetail;
@@ -33,7 +34,9 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("variant", String(matchingVariant.id));
 
-    router.push(`?${params.toString()}`, { scroll: false });
+    startTransition(() => {
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
   };
 
   return (

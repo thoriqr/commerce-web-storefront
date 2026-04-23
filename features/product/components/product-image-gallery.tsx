@@ -19,21 +19,37 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const hasMountedRef = useRef(false);
 
+  const imageMap = useMemo(() => {
+    const map = new Map<string, number>();
+
+    product.images.forEach((img, index) => {
+      if (img.type === "variant" && img.signature) {
+        const key = `${img.signature.dimensionKey}:${img.signature.valueKey}`;
+        map.set(key, index);
+      }
+    });
+
+    return map;
+  }, [product.images]);
+
   // Cari active variant
   const activeVariant = useMemo(() => {
     return product.variants.find((v) => String(v.id) === activeVariantId);
   }, [product.variants, activeVariantId]);
 
   // Cari image index berdasarkan signature
-  const variantImageIndex = useMemo(() => {
+  const variantImageIndex = (() => {
     if (!activeVariant) return -1;
 
-    return product.images.findIndex((img) => {
-      if (img.type !== "variant" || !img.signature) return false;
+    for (const opt of activeVariant.options) {
+      const key = `${opt.dimensionKey}:${opt.valueKey}`;
+      if (imageMap.has(key)) {
+        return imageMap.get(key)!;
+      }
+    }
 
-      return activeVariant.options.some((opt) => opt.dimensionKey === img.signature?.dimensionKey && opt.valueKey === img.signature?.valueKey);
-    });
-  }, [product.images, activeVariant]);
+    return -1;
+  })();
 
   useEffect(() => {
     if (!api) return;
@@ -52,15 +68,19 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
 
   useEffect(() => {
     if (!api) return;
+    if (variantImageIndex < 0) return;
 
+    //  skip first render
     if (!hasMountedRef.current) {
       hasMountedRef.current = true;
-      return; // skip only first mount
+      return;
     }
 
-    if (variantImageIndex >= 0) {
+    const id = setTimeout(() => {
       api.scrollTo(variantImageIndex);
-    }
+    }, 50);
+
+    return () => clearTimeout(id);
   }, [api, variantImageIndex]);
 
   useEffect(() => {
@@ -80,7 +100,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
       {/* MAIN CAROUSEL */}
       <Carousel setApi={setApi} opts={{ align: "start" }} className="w-full">
         <CarouselContent>
-          {product.images.map((img, idx) => (
+          {product.images.map((img) => (
             <CarouselItem key={img.imageKey}>
               <div className="relative aspect-square w-full overflow-hidden rounded-xl border bg-muted">
                 <Image
@@ -88,7 +108,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  loading="eager"
+                  loading="lazy"
                   className="object-cover"
                 />
               </div>
@@ -118,7 +138,7 @@ export function ProductImageGallery({ product, activeVariantId }: Props) {
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 25vw, 10vw"
-                  loading="eager"
+                  loading="lazy"
                   className="object-cover"
                 />
               </div>
