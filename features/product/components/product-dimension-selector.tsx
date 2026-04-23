@@ -3,26 +3,32 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "@/features/product/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
   product: ProductDetail;
   activeVariantId: string;
-  onSwitchStart: () => void;
+  onSwitchStart: (nextId: string) => void;
 };
 
 export function ProductDimensionSelector({ product, activeVariantId, onSwitchStart }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // local state sebagai source of truth
   const [selectedVariantId, setSelectedVariantId] = useState(activeVariantId);
 
-  // sync kalau URL berubah (misalnya user back/forward)
+  // track intent (biar ga loncat)
+  const latestIntentRef = useRef<string | null>(null);
+
+  // sync dari URL tapi filter stale update
   useEffect(() => {
-    setSelectedVariantId(activeVariantId);
+    if (latestIntentRef.current === activeVariantId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedVariantId(activeVariantId);
+    }
   }, [activeVariantId]);
 
+  // map by id
   const variantById = useMemo(() => {
     const map = new Map<string, (typeof product.variants)[number]>();
 
@@ -31,8 +37,9 @@ export function ProductDimensionSelector({ product, activeVariantId, onSwitchSta
     }
 
     return map;
-  }, [product]);
+  }, [product.variants]);
 
+  // map by option combination
   const variantMap = useMemo(() => {
     const map = new Map<string, (typeof product.variants)[number]>();
 
@@ -46,7 +53,7 @@ export function ProductDimensionSelector({ product, activeVariantId, onSwitchSta
     }
 
     return map;
-  }, [product]);
+  }, [product.variants]);
 
   const activeVariant = variantById.get(selectedVariantId);
 
@@ -68,8 +75,13 @@ export function ProductDimensionSelector({ product, activeVariantId, onSwitchSta
 
     if (nextId === selectedVariantId) return;
 
-    onSwitchStart();
+    // 🔥 set intent
+    latestIntentRef.current = nextId;
 
+    // inform parent (control switching)
+    onSwitchStart(nextId);
+
+    // instant UI
     setSelectedVariantId(nextId);
 
     const params = new URLSearchParams(searchParams.toString());

@@ -11,7 +11,7 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { getVariantStatusText } from "./get-variant-status-text";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { ExpandableText } from "@/components/expandable-text";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   productId: number;
@@ -20,7 +20,7 @@ type Props = {
 
 export function ProductDetail({ productId, activeVariantId }: Props) {
   const [isSwitching, setIsSwitching] = useState(false);
-  const prevVariantRef = useRef(activeVariantId);
+  const [targetVariantId, setTargetVariantId] = useState<string | null>(null);
 
   const {
     data: product,
@@ -36,13 +36,14 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
     queryFn: () => getVariantByProductIdAndVariantId(productId, Number(activeVariantId))
   });
 
+  // reset switching hanya kalau variant yang dituju sudah tercapai
   useEffect(() => {
-    if (prevVariantRef.current !== activeVariantId) {
-      prevVariantRef.current = activeVariantId;
+    if (targetVariantId === activeVariantId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsSwitching(false);
+      setTargetVariantId(null);
     }
-  }, [activeVariantId]);
+  }, [activeVariantId, targetVariantId]);
 
   if (isProductLoading) return <ProductDetailSkeleton />;
 
@@ -51,6 +52,11 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
   if (!product) return null;
 
   const isActionLocked = isSwitching || isVariantFetching;
+
+  const handleSwitchStart = (nextId: string) => {
+    setIsSwitching(true);
+    setTargetVariantId(nextId);
+  };
 
   return (
     <div className="space-y-8 pb-24 md:pb-0">
@@ -77,7 +83,7 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
 
           <ExpandableText text={product.description} />
 
-          <ProductDimensionSelector product={product} activeVariantId={activeVariantId} onSwitchStart={() => setIsSwitching(true)} />
+          <ProductDimensionSelector product={product} activeVariantId={activeVariantId} onSwitchStart={handleSwitchStart} />
 
           <div className="hidden md:block">
             <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isActionLocked} />
