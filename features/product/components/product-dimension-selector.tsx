@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "@/features/product/types";
-import { startTransition } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 type Props = {
   product: ProductDetail;
@@ -14,15 +14,21 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const activeVariant = product.variants.find((v) => String(v.id) === activeVariantId);
+  // local state sebagai source of truth
+  const [selectedVariantId, setSelectedVariantId] = useState(activeVariantId);
+
+  // sync kalau URL berubah (misalnya user back/forward)
+  useEffect(() => {
+    setSelectedVariantId(activeVariantId);
+  }, [activeVariantId]);
+
+  const activeVariant = product.variants.find((v) => String(v.id) === selectedVariantId);
 
   if (!activeVariant) return null;
 
   const handleSelect = (dimensionKey: string, valueKey: string) => {
-    // build new selection based on active variant
     const nextSelection = activeVariant.options.map((opt) => (opt.dimensionKey === dimensionKey ? { ...opt, valueKey } : opt));
 
-    // find match variant whole selection
     const matchingVariant = product.variants.find((variant) =>
       nextSelection.every((selected) =>
         variant.options.some((opt) => opt.dimensionKey === selected.dimensionKey && opt.valueKey === selected.valueKey)
@@ -31,11 +37,17 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
 
     if (!matchingVariant) return;
 
+    const nextId = String(matchingVariant.id);
+
+    // INSTANT UI UPDATE
+    setSelectedVariantId(nextId);
+
+    // sync ke URL (non-blocking)
     const params = new URLSearchParams(searchParams.toString());
-    params.set("variant", String(matchingVariant.id));
+    params.set("variant", nextId);
 
     startTransition(() => {
-      router.push(`?${params.toString()}`, { scroll: false });
+      router.replace(`?${params.toString()}`, { scroll: false });
     });
   };
 
