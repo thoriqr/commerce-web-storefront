@@ -39,10 +39,10 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
 
     const nextId = String(matchingVariant.id);
 
-    // INSTANT UI UPDATE
+    if (nextId === selectedVariantId) return;
+
     setSelectedVariantId(nextId);
 
-    // sync ke URL (non-blocking)
     const params = new URLSearchParams(searchParams.toString());
     params.set("variant", nextId);
 

@@ -27,7 +27,7 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
     queryFn: () => getProductByIdOrFail(productId)
   });
 
-  const { data: variant, isLoading: isVariantLoading } = useQuery({
+  const { data: variant, isFetching: isVariantFetching } = useQuery({
     queryKey: ["variant", productId, activeVariantId],
     queryFn: () => getVariantByProductIdAndVariantId(productId, Number(activeVariantId))
   });
@@ -37,6 +37,8 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
   if (productError) throw productError;
 
   if (!product) return null;
+
+  const isActionLocked = isVariantFetching;
 
   return (
     <div className="space-y-8 pb-24 md:pb-0">
@@ -53,11 +55,11 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
           {/* PRICE + STOCK TEXT */}
           <div className="space-y-1 min-h-14">
             <div className="text-xl sm:text-2xl font-bold">
-              {isVariantLoading ? <Skeleton className="h-6 w-32" /> : <>{formatRupiah(variant!.price)}</>}
+              {isVariantFetching ? <Skeleton className="h-6 w-32" /> : <>{formatRupiah(variant!.price)}</>}
             </div>
 
             <div className="text-xs sm:text-sm">
-              {isVariantLoading ? <Skeleton className="h-3 w-20" /> : getVariantStatusText(variant?.warning ?? null, variant?.stock ?? 0)}
+              {isVariantFetching ? <Skeleton className="h-3 w-20" /> : getVariantStatusText(variant?.warning ?? null, variant?.stock ?? 0)}
             </div>
           </div>
 
@@ -66,14 +68,14 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
           <ProductDimensionSelector product={product} activeVariantId={activeVariantId} />
 
           <div className="hidden md:block">
-            <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isVariantLoading} />
+            <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isActionLocked} />
           </div>
         </div>
       </div>
 
       {/* Mobile Sticky Purchase */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background p-4 md:hidden">
-        <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isVariantLoading} mobile />
+        <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isActionLocked} mobile />
       </div>
     </div>
   );
