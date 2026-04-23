@@ -8,9 +8,10 @@ import { startTransition, useEffect, useState } from "react";
 type Props = {
   product: ProductDetail;
   activeVariantId: string;
+  onSwitchStart: () => void;
 };
 
-export function ProductDimensionSelector({ product, activeVariantId }: Props) {
+export function ProductDimensionSelector({ product, activeVariantId, onSwitchStart }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -40,6 +41,8 @@ export function ProductDimensionSelector({ product, activeVariantId }: Props) {
     const nextId = String(matchingVariant.id);
 
     if (nextId === selectedVariantId) return;
+
+    onSwitchStart();
 
     setSelectedVariantId(nextId);
 

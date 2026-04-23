@@ -11,6 +11,7 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { getVariantStatusText } from "./get-variant-status-text";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { ExpandableText } from "@/components/expandable-text";
+import { useEffect, useState } from "react";
 
 type Props = {
   productId: number;
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export function ProductDetail({ productId, activeVariantId }: Props) {
+  const [isSwitching, setIsSwitching] = useState(false);
+
   const {
     data: product,
     isLoading: isProductLoading,
@@ -32,13 +35,18 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
     queryFn: () => getVariantByProductIdAndVariantId(productId, Number(activeVariantId))
   });
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSwitching(false);
+  }, [activeVariantId]);
+
   if (isProductLoading) return <ProductDetailSkeleton />;
 
   if (productError) throw productError;
 
   if (!product) return null;
 
-  const isActionLocked = isVariantFetching;
+  const isActionLocked = isSwitching || isVariantFetching;
 
   return (
     <div className="space-y-8 pb-24 md:pb-0">
@@ -65,7 +73,7 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
 
           <ExpandableText text={product.description} />
 
-          <ProductDimensionSelector product={product} activeVariantId={activeVariantId} />
+          <ProductDimensionSelector product={product} activeVariantId={activeVariantId} onSwitchStart={() => setIsSwitching(true)} />
 
           <div className="hidden md:block">
             <ProductPurchaseSection variantId={Number(activeVariantId)} variant={variant} isVariantLoading={isActionLocked} />
