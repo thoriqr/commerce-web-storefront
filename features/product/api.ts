@@ -57,5 +57,7 @@ export async function getVariantByProductIdAndVariantId(productId: number, varia
 }
 
 export async function getSearchProductDimensionFilter(query: string) {
-  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`);
+  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`, {
+    revalidate: 60
+  });
 }
