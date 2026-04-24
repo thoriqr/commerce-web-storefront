@@ -1,22 +1,19 @@
 const STORE_URL = `${process.env.NEXT_PUBLIC_API_URL!}/store`;
 
-type FetchServerOptions = {
-  cache?: RequestCache; // "no-store" | "force-cache"
-  revalidate?: number; // ISR
+type FetchOptions = {
+  revalidate?: number;
+  noStore?: boolean;
 };
 
-export async function fetchServer<T>(path: string, options?: FetchServerOptions): Promise<T | null> {
+export async function fetchServer<T>(path: string, options?: FetchOptions): Promise<T | null> {
   const fetchOptions: RequestInit & {
     next?: { revalidate?: number };
+    cache?: RequestCache;
   } = {};
 
-  // handle cache
-  if (options?.cache) {
-    fetchOptions.cache = options.cache;
-  }
-
-  // handle revalidate (Next.js specific)
-  if (options?.revalidate !== undefined) {
+  if (options?.noStore) {
+    fetchOptions.cache = "no-store";
+  } else if (options?.revalidate) {
     fetchOptions.next = { revalidate: options.revalidate };
   }
 
@@ -24,9 +21,7 @@ export async function fetchServer<T>(path: string, options?: FetchServerOptions)
 
   const json = await res.json().catch(() => null);
 
-  if (!res.ok) {
-    return null;
-  }
+  if (!res.ok) return null;
 
-  return json?.data as T;
+  return json.data as T;
 }

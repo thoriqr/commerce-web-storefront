@@ -12,13 +12,13 @@ export async function getCategoryTree() {
 
 export async function getPopularCategories() {
   return fetchServer<PopularCategory[]>(`${BASE_URL}/popular`, {
-    revalidate: 60
+    noStore: true
   });
 }
 
 export async function getCategoryDetail(slugPath: string): Promise<CategoryDetail> {
   const data = await fetchServer<CategoryDetail>(`${BASE_URL}/detail?slugPath=${slugPath}`, {
-    revalidate: 60
+    noStore: true
   });
 
   if (!data) {
@@ -30,6 +30,6 @@ export async function getCategoryDetail(slugPath: string): Promise<CategoryDetai
 
 export async function getCategoryDimensionFilter(slugPath: string) {
   return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?slugPath=${slugPath}`, {
-    revalidate: 60
+    noStore: true
   });
 }

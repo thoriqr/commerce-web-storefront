@@ -3,6 +3,6 @@ import { fetchServer } from "@/shared/lib/fetch-server";
 
 export async function getBannerPlacement(placement: BannerPlacement) {
   return fetchServer<Banner[]>(`/marketing/banners?placement=${placement}`, {
-    revalidate: 60
+    noStore: true
   });
 }
