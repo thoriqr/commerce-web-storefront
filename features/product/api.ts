@@ -38,7 +38,7 @@ export async function getProductsByCollection(slug: string, params?: ProductList
 }
 
 export async function getProductById(productId: number) {
-  return fetchStore<ProductDetail>(`${BASE_URL}/${productId}`);
+  return fetchStore<ProductDetail>(`${BASE_URL}/${productId}`, { next: { revalidate: 60 } });
 }
 
 export async function getProductByIdOrFail(productId: number) {
@@ -57,5 +57,7 @@ export async function getVariantByProductIdAndVariantId(productId: number, varia
 }
 
 export async function getSearchProductDimensionFilter(query: string) {
-  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`);
+  return fetchServer<DimensionFilter[]>(`${BASE_URL}/filters?q=${query}`, {
+    noStore: true
+  });
 }

@@ -5,11 +5,15 @@ import { notFound } from "next/navigation";
 const BASE_URL = "/collections";
 
 export async function getCollectionPreview() {
-  return fetchServer<CollectionPreview[]>(`${BASE_URL}/preview`);
+  return fetchServer<CollectionPreview[]>(`${BASE_URL}/preview`, {
+    noStore: true
+  });
 }
 
 export async function getCollectionDetail(slug: string): Promise<CollectionDetail> {
-  const data = await fetchServer<CollectionDetail>(`${BASE_URL}/${slug}`);
+  const data = await fetchServer<CollectionDetail>(`${BASE_URL}/${slug}`, {
+    noStore: true
+  });
 
   if (!data) notFound();
 
