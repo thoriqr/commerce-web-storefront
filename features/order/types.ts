@@ -11,7 +11,7 @@ export type OrderRawStatus = "PENDING" | "PROCESSING" | "CANCELLED" | "COMPLETED
 export type TimelineItem = {
   key: string;
   label: string;
-  date: Date | null;
+  date: string | null;
   isCompleted: boolean;
   isCurrent: boolean;
 };
@@ -32,8 +32,8 @@ export type OrderDetail = {
   rawStatus: OrderRawStatus;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
-  expiresAt: Date;
-  paidAt: Date | null;
+  expiresAt: string;
+  paidAt: string | null;
   canPay: boolean;
   address: {
     recipientName: string;
@@ -75,7 +75,7 @@ export type OrderListing = {
     slug: string;
     status: OrderStatus;
     total: number;
-    createdAt: Date;
+    createdAt: string;
     itemCount: number;
     previewItem: {
       name: string;

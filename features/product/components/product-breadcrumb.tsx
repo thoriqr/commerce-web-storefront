@@ -1,11 +1,13 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
 type Props = {
+  productId: number;
   name: string;
   slug: string;
 };
 
-export default function ProductBreadcrumb({ name, slug }: Props) {
+export default function ProductBreadcrumb({ productId, name, slug }: Props) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -14,7 +16,7 @@ export default function ProductBreadcrumb({ name, slug }: Props) {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/products/${slug}`}>{name}</BreadcrumbLink>
+          <BreadcrumbLink href={navigateProductPage(productId, slug)}>{name}</BreadcrumbLink>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

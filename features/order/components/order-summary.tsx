@@ -2,9 +2,12 @@ import Link from "next/link";
 import { OrderDetail } from "../types";
 import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/shared/utils/formatter";
+import { useCountdown } from "../hooks/use-count-down";
 
 export default function OrderSummary({ data }: { data: OrderDetail }) {
-  const showHistoryButton = data.status !== "WAITING_PAYMENT";
+  const { isExpired } = useCountdown(data.expiresAt);
+
+  const showHistoryButton = data.status !== "WAITING_PAYMENT" || isExpired;
 
   return (
     <div className="space-y-4 text-sm">

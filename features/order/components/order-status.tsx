@@ -33,8 +33,7 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
-  const expiresAt = new Date(data.expiresAt);
-  const { formatted, isExpired } = useCountdown(expiresAt);
+  const { formatted, isExpired } = useCountdown(data.expiresAt);
 
   const { handlePay, isLoading: isPaying } = usePayOrder(orderCode, refetch);
 
@@ -79,7 +78,7 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
   return (
     <div className="space-y-4">
       {/* HEADER */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Order</p>
           <p className="font-semibold text-base">{data.orderCode}</p>
@@ -90,10 +89,10 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex w-full gap-2 md:w-auto">
           {/* PAY */}
           {data.canPay && !isExpired && (
-            <Button size="sm" onClick={handlePay} disabled={isPaying}>
+            <Button className="flex-1 md:flex-none" size="sm" onClick={handlePay} disabled={isPaying}>
               {isPaying ? "Processing..." : "Pay Now"}
             </Button>
           )}
@@ -102,7 +101,7 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
           {canCancel && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" className="flex-1 md:flex-none">
                   Cancel
                 </Button>
               </DialogTrigger>

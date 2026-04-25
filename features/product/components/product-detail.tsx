@@ -60,7 +60,7 @@ export function ProductDetail({ productId, activeVariantId }: Props) {
 
   return (
     <div className="space-y-8 pb-24 md:pb-0">
-      <ProductBreadcrumb name={product.name} slug={product.slug} />
+      <ProductBreadcrumb productId={product.id} name={product.name} slug={product.slug} />
 
       <div className="grid gap-6 md:gap-10 md:grid-cols-2">
         <div className="min-w-0">
