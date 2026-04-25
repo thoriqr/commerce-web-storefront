@@ -4,29 +4,29 @@
 
 ## Overview
 
-A modern e-commerce storefront with product browsing, variant selection, and a complete checkout experience, integrated with a custom backend API.
+E-commerce storefront built around a variant-centric product system, enabling flexible product browsing and a seamless checkout experience, integrated with a custom backend API.
 
 ---
 
 ## Features
 
 - **Variant-centric product model**  
-  Products are structured around variants, allowing both single and multi-variant products to share a consistent data model.
+  Products are structured around variants, supporting both single and multi-variant configurations with a consistent data model.
 
 - **Hybrid data fetching strategy**  
-  Combines server-side rendering for initial load and React Query for client-side caching and synchronization.
+  Combines server-side rendering for initial load with client-side caching and synchronization.
 
-- **Client-side caching with React Query**  
-  Eliminates unnecessary refetching and avoids manual data handling with useEffect.
+- **Client-side caching with TanStack Query**  
+  Reduces unnecessary refetching and simplifies data management without relying on manual state handling.
 
 - **Authentication handling with Axios interceptors**  
   Implements token-based authentication with automatic refresh handling for protected requests.
 
 - **Route protection and authentication flow**  
-  Ensures protected routes are only accessible to authenticated users and prevents access to auth pages when already logged in.
+  Ensures proper access control for protected routes and prevents access to authentication pages when already logged in.
 
 - **Checkout with shipping calculation**  
-  Calculates shipping costs using RajaOngkir API before confirming the order.
+  Calculates shipping costs using RajaOngkir API before order confirmation.
 
 - **Order and payment integration**  
   Handles order creation and payment processing using Midtrans Snap without full page redirects.
@@ -35,37 +35,10 @@ A modern e-commerce storefront with product browsing, variant selection, and a c
 
 ## Tech Stack
 
-### **Next.js (App Router)**
-
-Used to build a server-rendered storefront with improved initial load performance and SEO.  
-Server-side rendering is applied to public data where authentication is not required.
-
----
-
-### **React Query**
-
-Handles client-side data fetching, caching, and synchronization.  
-Reduces boilerplate by eliminating manual state handling with useEffect.
-
----
-
-### **Axios**
-
-Used for authenticated requests with interceptor support.  
-Automatically handles token refresh when encountering expired sessions.
-
----
-
-### **Zod & React Hook Form**
-
-Used for client-side form validation in authentication flows.  
-Provides immediate feedback while maintaining server-side validation as fallback.
-
----
-
-### **Tailwind CSS**
-
-Utility-first styling approach for rapid UI development and consistent design.
+- **Core:** Next.js (App Router), TypeScript
+- **Data Fetching:** TanStack Query, Axios
+- **Forms & Validation:** Zod, React Hook Form
+- **UI:** Tailwind CSS, shadcn/ui
 
 ---
 
@@ -73,10 +46,10 @@ Utility-first styling approach for rapid UI development and consistent design.
 
 The application uses a hybrid data fetching approach to balance performance and flexibility.
 
-- Public data is fetched on the server using Next.js SSR for faster initial load and better SEO.
-- Authenticated and dynamic data is handled on the client using React Query for caching and synchronization.
+- Public data is fetched on the server using Next.js SSR for faster initial load and improved SEO.
+- Authenticated and dynamic data is handled on the client using TanStack Query for caching and synchronization.
+- Axios is used for HTTP requests with interceptor-based authentication handling, including automatic token refresh.
 - Authentication is managed using cookies, separating access tokens and refresh tokens.
-- Axios interceptors handle token expiration and automatically retry failed requests.
 - Checkout flow calculates shipping costs via RajaOngkir before order confirmation.
 - Order processing integrates with Midtrans Snap for seamless in-app payment handling.
 
