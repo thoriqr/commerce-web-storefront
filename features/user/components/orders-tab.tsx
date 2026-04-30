@@ -43,7 +43,7 @@ export default function OrdersTab() {
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const pages = data ? getPaginationRange(page, data.meta.totalPages) : [];
+  const pages = data ? getPaginationRange(page, data.meta?.totalPages ?? 1) : [];
 
   return (
     <Card>
@@ -65,18 +65,18 @@ export default function OrdersTab() {
 
         {isError && <OrdersError />}
 
-        {!isLoading && !isError && data?.items.length === 0 && <OrdersEmpty />}
+        {!isLoading && !isError && data?.data.length === 0 && <OrdersEmpty />}
 
-        {!isLoading && !isError && data && data.items.length > 0 && data.items.map((order) => <OrderRow key={order.id} order={order} />)}
+        {!isLoading && !isError && data && data.data?.length > 0 && data.data.map((order) => <OrderRow key={order.id} order={order} />)}
 
-        {!isLoading && !isError && data && data.meta.totalPages > 1 && (
+        {!isLoading && !isError && data && data.meta && data.meta.totalPages > 1 && (
           <div className="flex justify-center pt-4">
             <Pagination>
               <PaginationContent>
                 {/* PREV */}
                 <PaginationItem>
                   <PaginationPrevious
-                    onClick={() => data.meta.hasPrev && setPage(page - 1)}
+                    onClick={() => data.meta?.hasPrev && setPage(page - 1)}
                     className={!data.meta.hasPrev ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>
@@ -103,7 +103,7 @@ export default function OrdersTab() {
                 {/* NEXT */}
                 <PaginationItem>
                   <PaginationNext
-                    onClick={() => data.meta.hasNext && setPage(page + 1)}
+                    onClick={() => data.meta?.hasNext && setPage(page + 1)}
                     className={!data.meta.hasNext ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>

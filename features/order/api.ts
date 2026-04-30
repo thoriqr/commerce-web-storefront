@@ -1,6 +1,6 @@
-import { OrderDetail, OrderListing, OrderListingQueryParams } from "./types";
+import { OrderDetail, Order, OrderListingQueryParams, OrderMeta } from "./types";
 import { appendQueryParams } from "@/shared/utils/append-query-params";
-import { authRequest } from "@/shared/lib/auth-request";
+import { authRequest, authRequestWithMeta } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user/orders";
 
@@ -12,7 +12,7 @@ export function getOrders(params?: OrderListingQueryParams) {
   const queryString = search.toString();
   const url = queryString ? `${BASE_URL}?${queryString}` : BASE_URL;
 
-  return authRequest<OrderListing>({
+  return authRequestWithMeta<Order[], OrderMeta>({
     url,
     method: "GET"
   });

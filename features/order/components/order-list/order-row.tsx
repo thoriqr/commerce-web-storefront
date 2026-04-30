@@ -1,6 +1,6 @@
 "use client";
 
-import { OrderListing } from "../../types";
+import { Order } from "../../types";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { getImageUrl } from "@/shared/utils/media";
 import Image from "next/image";
@@ -25,7 +25,7 @@ import { FetchError } from "@/shared/types/api-error";
 import { toast } from "sonner";
 import { navigateProductPage } from "@/shared/utils/navigate-product-page";
 
-export function OrderRow({ order }: { order: OrderListing["items"][number] }) {
+export function OrderRow({ order }: { order: Order }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const imageUrl = order.previewItem.imageKey ? getImageUrl(order.previewItem.imageKey) : null;
