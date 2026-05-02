@@ -8,9 +8,9 @@ export type ProductCard = {
 
 export type ProductListing = {
   items: ProductCard[];
-  nextCursor: string | null;
-  hasMore: boolean;
 };
+
+export type ProductMeta = { nextCursor: string | null; hasMore: boolean };
 
 export type DimensionFilter = {
   name: string;

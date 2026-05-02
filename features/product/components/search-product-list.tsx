@@ -4,7 +4,6 @@ import { useSearchParams } from "next/navigation";
 import { useListingFilterController } from "../hooks/use-listing-filter-controller";
 import { buildListingParams } from "../utils/build-listing-params";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ProductListing } from "../types";
 import { getProductsBySearch } from "../api";
 import { ProductGridSkeleton } from "./skeletons/product-grid-skeleton";
 import { ProductListError } from "./product-list-error";
@@ -20,17 +19,17 @@ export default function SearchProductList({ query }: { query: string }) {
 
   const listingParams = buildListingParams(new URLSearchParams(searchParams.toString()));
 
-  const queryKey = ["search-products", query, JSON.stringify(listingParams)];
+  const queryKey = ["search-products", query, listingParams];
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error, refetch } = useInfiniteQuery<ProductListing>({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error, refetch } = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) =>
       getProductsBySearch(query, {
         ...listingParams,
         cursor: pageParam as string | undefined
       }),
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (data) => data?.meta?.nextCursor ?? undefined
   });
 
   if (isLoading) {
@@ -41,7 +40,7 @@ export default function SearchProductList({ query }: { query: string }) {
     return <ProductListError message={(error as Error)?.message} onRetry={() => refetch()} onResetFilters={resetAll} />;
   }
 
-  const products = data?.pages.flatMap((page) => page.items) ?? [];
+  const products = data?.pages.flatMap((page) => page.data) ?? [];
 
   if (products.length === 0) {
     return <ProductListEmpty onResetFilters={resetAll} />;

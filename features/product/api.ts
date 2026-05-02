@@ -1,6 +1,6 @@
-import { DimensionFilter, ProductDetail, ProductListing, ProductListingQueryParams, ProductVariantDetail } from "./types";
+import { DimensionFilter, ProductCard, ProductDetail, ProductListingQueryParams, ProductMeta, ProductVariantDetail } from "./types";
 import { appendQueryParams } from "../../shared/utils/append-query-params";
-import { fetchStore } from "@/shared/lib/fetch-store";
+import { fetchStore, fetchStoreWithMeta } from "@/shared/lib/fetch-store";
 import { fetchServer } from "@/shared/lib/fetch-server";
 import { FetchError } from "@/shared/types/api-error";
 import { notFound } from "next/navigation";
@@ -14,7 +14,7 @@ export async function getProductsByCategory(slugPath: string, params?: ProductLi
 
   appendQueryParams(search, params);
 
-  return fetchStore<ProductListing>(`/products/by-category?${search.toString()}`);
+  return fetchStoreWithMeta<ProductCard[], ProductMeta>(`/products/by-category?${search.toString()}`);
 }
 
 export async function getProductsBySearch(q: string, params?: ProductListingQueryParams) {
@@ -24,7 +24,7 @@ export async function getProductsBySearch(q: string, params?: ProductListingQuer
 
   appendQueryParams(search, params);
 
-  return fetchStore<ProductListing>(`${BASE_URL}/by-search?${search.toString()}`);
+  return fetchStoreWithMeta<ProductCard[], ProductMeta>(`${BASE_URL}/by-search?${search.toString()}`);
 }
 
 export async function getProductsByCollection(slug: string, params?: ProductListingQueryParams) {
@@ -34,7 +34,7 @@ export async function getProductsByCollection(slug: string, params?: ProductList
 
   appendQueryParams(search, params);
 
-  return fetchStore<ProductListing>(`${BASE_URL}/by-collection?${search.toString()}`);
+  return fetchStoreWithMeta<ProductCard[], ProductMeta>(`${BASE_URL}/by-collection?${search.toString()}`);
 }
 
 export async function getProductById(productId: number) {
