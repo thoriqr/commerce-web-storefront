@@ -4,39 +4,39 @@
 
 ## Overview
 
-E-commerce storefront built around a variant-centric product system, enabling flexible product browsing and a seamless checkout experience, integrated with a custom backend API.
+E-commerce storefront built with Next.js and TypeScript, integrated with a custom backend API for product browsing, checkout, and payment flow.
 
 ---
 
 ## Features
 
-- **Variant-centric product model**  
-  Products are structured around variants, supporting both single and multi-variant configurations with a consistent data model.
+- **Variant-based product model**  
+  Products support both single and multi-variant configurations with a consistent data structure.
 
-- **Hybrid data fetching strategy**  
-  Combines server-side rendering for initial load with client-side caching and synchronization.
+- **Server-side and client-side data fetching**  
+  Uses SSR for initial page load and TanStack Query for client-side caching.
 
 - **Client-side caching with TanStack Query**  
-  Reduces unnecessary refetching and simplifies data management without relying on manual state handling.
+  Handles caching and data updates for dynamic client-side data.
 
-- **Authentication handling with Axios interceptors**  
-  Implements token-based authentication with automatic refresh handling for protected requests.
+- **Authentication with Axios interceptors**  
+  Supports token-based authentication with automatic token refresh for protected requests.
 
-- **Route protection and authentication flow**  
-  Ensures proper access control for protected routes and prevents access to authentication pages when already logged in.
+- **Protected routes and authentication flow**  
+  Restricts access to protected pages and redirects authenticated users from login pages.
 
 - **Checkout with shipping calculation**  
-  Calculates shipping costs using RajaOngkir API before order confirmation.
+  Calculates shipping costs using RajaOngkir before order confirmation.
 
 - **Order and payment integration**  
-  Handles order creation and payment processing using Midtrans Snap without full page redirects.
+  Handles order creation and payment processing using Midtrans Snap.
 
 ---
 
 ## Tech Stack
 
 - **Core:** Next.js (App Router), TypeScript
-- **Data Fetching:** TanStack Query, Axios
+- **Data Fetching:** TanStack Query, Axios, Fetch API
 - **Forms & Validation:** Zod, React Hook Form
 - **UI:** Tailwind CSS, shadcn/ui
 
@@ -44,16 +44,14 @@ E-commerce storefront built around a variant-centric product system, enabling fl
 
 ## Architecture Overview
 
-The application uses a hybrid data fetching approach to balance performance and flexibility.
+The application combines server-side and client-side data fetching.
 
-- Public data is fetched on the server using Next.js SSR for faster initial load and improved SEO.
-- Authenticated and dynamic data is handled on the client using TanStack Query for caching and synchronization.
-- Axios is used for HTTP requests with interceptor-based authentication handling, including automatic token refresh.
-- Authentication is managed using cookies, separating access tokens and refresh tokens.
-- Checkout flow calculates shipping costs via RajaOngkir before order confirmation.
-- Order processing integrates with Midtrans Snap for seamless in-app payment handling.
-
-This separation ensures a responsive user experience while maintaining proper handling of authentication and external integrations.
+- Public data is fetched on the server using Next.js SSR.
+- Authenticated and dynamic data is handled on the client using TanStack Query for caching.
+- Axios is mainly used for authenticated requests with automatic token refresh handling.
+- Authentication uses cookies to separate access tokens and refresh tokens.
+- Checkout flow calculates shipping costs using RajaOngkir before order confirmation.
+- Orders are processed with Midtrans Snap for payment handling.
 
 ---
 
