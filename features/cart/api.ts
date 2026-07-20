@@ -1,40 +1,36 @@
 import { AddItemInput, Cart, DeleteCartItemInput, UpdateCartItemInput } from "./types";
-import { fetchStore } from "@/shared/lib/fetch-store";
-import { fetchAction } from "@/shared/lib/fetch-action";
+import { authRequest } from "@/shared/lib/auth-request";
 
 const CART_URL = "/cart";
 
-export async function getCart() {
-  return fetchStore<Cart>(
-    `/cart`,
-    {
-      credentials: "include"
-    },
-    {
-      useStorePrefix: false
-    }
-  );
+export function getCart() {
+  return authRequest<Cart>({
+    url: CART_URL,
+    method: "GET"
+  });
 }
 
 export function addItem(input: AddItemInput) {
-  return fetchAction<void>(`${CART_URL}/items`, {
+  return authRequest<void>({
+    url: `${CART_URL}/items`,
     method: "POST",
-    body: JSON.stringify(input),
-    withAuth: true
+    data: input
   });
 }
 
 export function updateItem({ variantId, quantity }: UpdateCartItemInput) {
-  return fetchAction<void>(`${CART_URL}/items/${variantId}`, {
+  return authRequest<void>({
+    url: `${CART_URL}/items/${variantId}`,
     method: "PATCH",
-    body: JSON.stringify({ quantity }),
-    withAuth: true
+    data: {
+      quantity
+    }
   });
 }
 
 export function deleteItem({ variantId }: DeleteCartItemInput) {
-  return fetchAction<void>(`${CART_URL}/items/${variantId}`, {
-    method: "DELETE",
-    withAuth: true
+  return authRequest<void>({
+    url: `${CART_URL}/items/${variantId}`,
+    method: "DELETE"
   });
 }

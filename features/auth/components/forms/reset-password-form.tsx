@@ -35,7 +35,7 @@ export default function ResetPasswordForm({ token }: Props) {
       handleFormError(err, form);
     },
     onSuccess: () => {
-      router.replace("/");
+      router.replace("/reset-password/success");
     }
   });
 

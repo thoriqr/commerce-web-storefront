@@ -36,14 +36,14 @@ export default function VerifyEmailForm({ token }: Props) {
       handleFormError(err, form);
     },
     onSuccess: () => {
-      router.replace("/");
+      router.replace("/verify/success");
     }
   });
 
   const mutationIsPending = verifyMutation.isPending;
 
   function onSubmit(values: VerifyEmailFormSchema) {
-    verifyMutation.mutateAsync({ displayName: values.displayName, password: values.password, token });
+    verifyMutation.mutate({ displayName: values.displayName, password: values.password, token });
   }
 
   return (

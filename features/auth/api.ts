@@ -45,8 +45,7 @@ export function registerRequest(input: EmailFormSchema) {
 export function verifyEmailConfirm(input: VerifyEmailInput) {
   return fetchAction<void>(`${AUTH_URL}/verify-email`, {
     method: "POST",
-    body: JSON.stringify(input),
-    withAuth: true
+    body: JSON.stringify(input)
   });
 }
 

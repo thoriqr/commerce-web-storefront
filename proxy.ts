@@ -5,7 +5,7 @@ export default function proxy(request: NextRequest) {
   const hasRefreshToken = request.cookies.has("refresh_token");
   const { pathname } = request.nextUrl;
 
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
 
   const isProtectedPage = pathname.startsWith("/order") || pathname.startsWith("/user") || pathname.startsWith("/checkout");
 
@@ -26,5 +26,5 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/forgot-password", "/reset-password", "/order/:path*", "/user/:path*", "/checkout/:path*"]
+  matcher: ["/login", "/register", "/forgot-password", "/order/:path*", "/user/:path*", "/checkout/:path*"]
 };
