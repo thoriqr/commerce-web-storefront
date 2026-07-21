@@ -2,15 +2,17 @@
 
 import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleLogin } from "../hooks/use-google-login";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FetchError } from "@/shared/types/api-error";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { invalidateUserScope } from "@/shared/utils/invalidate";
+import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
 
 export default function GoogleLoginButton() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const googleLoginMutation = useGoogleLogin({
     onError: (err) => {
@@ -22,7 +24,14 @@ export default function GoogleLoginButton() {
     },
     onSuccess: () => {
       invalidateUserScope(queryClient);
-      router.replace("/");
+      const redirect = searchParams.get("redirect");
+      const safeRedirect = getSafeRedirect(redirect);
+
+      if (redirect?.startsWith("/cart")) {
+        toast.success("You're back! Continue your checkout");
+      }
+
+      router.replace(safeRedirect);
     }
   });
 

@@ -6,10 +6,19 @@ import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import CartContent from "./cart-content";
 import { useCart } from "../../hooks/use-cart";
+import { useMe } from "@/features/auth/hooks/use-me";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CartDrawer() {
+  const { data: user, isLoading: userLoading } = useMe();
+
   const [open, setOpen] = useState(false);
-  const { data, isLoading } = useCart();
+
+  const { data, isLoading } = useCart(!!user);
+
+  if (userLoading) {
+    return <Skeleton className="h-9 w-9 rounded-md" />;
+  }
 
   const totalItems = data ? (data?.summary.totalItems ?? 0) : 0;
 
@@ -35,7 +44,7 @@ export default function CartDrawer() {
               <SheetDescription>Review the items in your cart before checkout.</SheetDescription>
             </SheetHeader>
 
-            <CartContent isLoading={isLoading} data={data} onClose={() => setOpen(false)} />
+            <CartContent isLoading={isLoading} data={data} onClose={() => setOpen(false)} user={user} />
           </SheetContent>
         </Sheet>
       )}

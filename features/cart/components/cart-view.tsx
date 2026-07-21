@@ -7,10 +7,35 @@ import { useCartMutations } from "../hooks/use-cart-mutations";
 import { SectionCard } from "@/components/section-card";
 import CartViewSkeleton from "./cart-view-skeleton";
 import { CartEmpty } from "./cart-empty";
+import { useMe } from "@/features/auth/hooks/use-me";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function CartView() {
-  const { data, isLoading } = useCart();
+  const { data: user, isLoading: userLoading } = useMe();
+
+  const { data, isLoading } = useCart(!!user);
   const { isMutating } = useCartMutations();
+
+  if (userLoading) {
+    return <CartViewSkeleton />;
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-5xl mx-auto px-4">
+        <SectionCard>
+          <div className="flex flex-col items-center py-16 gap-4">
+            <p className="text-sm text-muted-foreground">Sign in to access your cart.</p>
+
+            <Button asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </div>
+        </SectionCard>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <CartViewSkeleton />;

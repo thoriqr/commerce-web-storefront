@@ -62,8 +62,8 @@ export function AuthStatusMobile({ user, onClose, onLogout }: Props) {
         <Button
           variant="destructive"
           className="w-full justify-start gap-3"
-          onClick={async () => {
-            await onLogout();
+          onClick={() => {
+            onLogout();
             onClose?.();
           }}
         >

@@ -1,17 +1,39 @@
+import { MeResponse } from "@/features/auth/types";
 import { useCartMutations } from "../../hooks/use-cart-mutations";
 import { Cart } from "../../types";
 import CartItemRow from "../cart-item-row";
 import CartSummary from "../cart-summary";
 import CartSkeleton from "./cart-content-skeleton";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type Props = {
+  user: MeResponse | undefined;
   isLoading: boolean;
   data: Cart | undefined;
   onClose: () => void;
 };
 
-export default function CartContent({ data, isLoading, onClose }: Props) {
+export default function CartContent({ data, isLoading, onClose, user }: Props) {
+  const router = useRouter();
   const { isMutating } = useCartMutations();
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-4">
+        <p className="text-sm text-muted-foreground">Sign in to view your cart.</p>
+
+        <Button
+          onClick={() => {
+            onClose();
+            router.push("/login");
+          }}
+        >
+          Sign In
+        </Button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <CartSkeleton />;

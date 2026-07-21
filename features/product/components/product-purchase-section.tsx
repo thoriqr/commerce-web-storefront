@@ -9,6 +9,8 @@ import { useAddItem } from "@/features/cart/hooks/use-add-item";
 import { getVariantStatusText } from "./get-variant-status-text";
 import { ProductVariantDetail } from "../types";
 import { formatRupiah } from "@/shared/utils/formatter";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMe } from "@/features/auth/hooks/use-me";
 
 type Props = {
   variantId: number;
@@ -18,6 +20,14 @@ type Props = {
 };
 
 export function ProductPurchaseSection({ variantId, variant, isVariantLoading, mobile }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const { data: user, isLoading: userLoading } = useMe();
+
+  const currentUrl = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
+
   const price = variant?.price ?? 0;
   const stock = variant?.stock ?? 0;
   const outOfStock = stock === 0;
@@ -30,10 +40,19 @@ export function ProductPurchaseSection({ variantId, variant, isVariantLoading, m
   // SAFE QTY
   const numericQty = Number(qty);
   const buttonDisabled = disablePurchase || isMutating;
+  const addToCartDisabled = buttonDisabled || userLoading;
   const safeQty = outOfStock ? 0 : isNaN(numericQty) ? 1 : Math.min(Math.max(numericQty, 1), stock);
 
   const handleAddToCart = () => {
-    if (disablePurchase) return;
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+
+      return;
+    }
+
+    if (disablePurchase) {
+      return;
+    }
 
     addItem.mutate({
       variantId,
@@ -113,8 +132,8 @@ export function ProductPurchaseSection({ variantId, variant, isVariantLoading, m
             </Button>
           </div>
 
-          <Button onClick={handleAddToCart} className="flex-1" disabled={buttonDisabled}>
-            Add to Cart
+          <Button onClick={handleAddToCart} className="flex-1" disabled={addToCartDisabled}>
+            {userLoading ? "Loading..." : "Add to Cart"}
           </Button>
         </div>
       </div>
@@ -156,8 +175,8 @@ export function ProductPurchaseSection({ variantId, variant, isVariantLoading, m
         </Button>
       </div>
 
-      <Button onClick={handleAddToCart} className="w-full" disabled={buttonDisabled}>
-        Add to Cart
+      <Button onClick={handleAddToCart} className="w-full" disabled={addToCartDisabled}>
+        {userLoading ? "Loading..." : "Add to Cart"}
       </Button>
     </div>
   );
