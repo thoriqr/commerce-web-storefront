@@ -4,32 +4,24 @@ import { useState } from "react";
 import { CheckoutSession } from "../types";
 import { Button } from "@/components/ui/button";
 import { useAddresses } from "@/features/user/hooks/use-addresses";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSetAddress } from "../hooks/use-set-address";
 import { Badge } from "@/components/ui/badge";
-import AddressForm from "@/features/shipping/components/address-form";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../constants";
 import { handleCheckoutError } from "../util";
+import { CreateAddressDialog } from "./create-address-dialog";
 
 type Props = {
   sessionId: number;
   address: CheckoutSession["address"];
+  isLocked: boolean;
 };
 
-export function AddressSection({ sessionId, address }: Props) {
+export function AddressSection({ sessionId, address, isLocked }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -48,6 +40,18 @@ export function AddressSection({ sessionId, address }: Props) {
 
   return (
     <>
+      <CreateAddressDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(addressId) => {
+          setSelectedId(addressId);
+
+          setAddressMutation.mutate({
+            sessionId,
+            addressId
+          });
+        }}
+      />
       <div className="space-y-3">
         <h2 className="text-sm font-medium">Shipping Address</h2>
 
@@ -59,28 +63,13 @@ export function AddressSection({ sessionId, address }: Props) {
               <p className="text-xs text-muted-foreground">Please select or create a shipping address to continue.</p>
 
               <div className="flex justify-center gap-2 pt-2">
-                <Button size="sm" onClick={() => setOpen(true)}>
+                <Button size="sm" onClick={() => setOpen(true)} disabled={isLocked}>
                   Select Address
                 </Button>
 
-                <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline">
-                      Create New
-                    </Button>
-                  </DialogTrigger>
-
-                  <DialogContent className="sm:max-w-lg" onOpenAutoFocus={(e) => e.preventDefault()}>
-                    <DialogHeader>
-                      <DialogTitle>Add New Address</DialogTitle>
-                      <DialogDescription>Enter your shipping details below. This address will be used for delivery.</DialogDescription>
-                    </DialogHeader>
-
-                    <div className="max-h-[70vh] overflow-y-auto pr-2">
-                      <AddressForm key="create" onCancel={() => setCreateOpen(false)} />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)} disabled={isLocked}>
+                  Create New
+                </Button>
               </div>
             </div>
           </div>
@@ -97,9 +86,13 @@ export function AddressSection({ sessionId, address }: Props) {
             </div>
 
             {/* ACTION */}
-            <div className="pt-2">
-              <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+            <div className="pt-2 flex gap-2">
+              <Button size="sm" variant="outline" disabled={isLocked} onClick={() => setOpen(true)}>
                 Change Address
+              </Button>
+
+              <Button size="sm" variant="outline" disabled={isLocked} onClick={() => setCreateOpen(true)}>
+                Create New
               </Button>
             </div>
           </div>
@@ -157,9 +150,16 @@ export function AddressSection({ sessionId, address }: Props) {
                   </div>
 
                   {/* ADDRESS */}
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                    {a.addressLine}, {a.cityName}
-                  </p>
+                  <div className="mt-1 space-y-0.5">
+                    <p className="text-xs text-muted-foreground leading-relaxed">{a.addressLine}</p>
+
+                    <p className="text-xs text-muted-foreground">
+                      {[a.districtName, a.cityName, a.provinceName, a.postalCode].filter(Boolean).join(", ")}
+                    </p>
+                  </div>
+
+                  {/* PHONE */}
+                  <p className="text-xs text-muted-foreground mt-1">{a.phone}</p>
                 </div>
               ))
             )}

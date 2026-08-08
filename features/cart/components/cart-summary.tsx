@@ -8,22 +8,35 @@ import { useRouter } from "next/navigation";
 import { FetchError } from "@/shared/types/api-error";
 import { toast } from "sonner";
 import { useMe } from "@/features/auth/hooks/use-me";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/features/checkout/constants";
 
 type Props = {
   summary: Summary;
   isMutating: boolean;
   items: CartItem[];
+  onLockChange: (locked: boolean) => void;
+  isLocked: boolean;
 };
-export default function CartSummary({ summary, isMutating, items }: Props) {
+export default function CartSummary({ summary, isMutating, items, isLocked, onLockChange }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: user } = useMe();
 
   const confirmMutation = useCreateCheckoutSession({
-    onSuccess: (data) => {
+    onMutate() {
+      onLockChange(true);
+    },
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.CHECKOUT_SESSION, data.sessionId]
+      });
+
       router.push(`/checkout/${data.sessionId}`);
     },
     onError: (err) => {
+      onLockChange(false);
       if (err instanceof FetchError) {
         toast.error("Checkout failed", {
           description: err.message
@@ -62,7 +75,7 @@ export default function CartSummary({ summary, isMutating, items }: Props) {
 
       <Button
         className="mt-4 w-full"
-        disabled={disableCheckout || confirmMutation.isPending}
+        disabled={disableCheckout || confirmMutation.isPending || isLocked}
         onClick={() => {
           if (!user) {
             router.push("/login?redirect=/cart");
@@ -72,7 +85,7 @@ export default function CartSummary({ summary, isMutating, items }: Props) {
           confirmMutation.mutate();
         }}
       >
-        {confirmMutation.isPending ? "Processing..." : "Checkout"}
+        {confirmMutation.isPending || isLocked ? "Processing..." : "Checkout"}
       </Button>
 
       {message && <p className="text-xs text-destructive mt-2 text-center">{message}</p>}

@@ -19,9 +19,10 @@ type Props = {
   onCancel?: () => void;
   initialData?: AddressDetail;
   addressId?: number;
+  onCreated?: (addressId: number) => void;
 };
 
-export default function AddressForm({ onCancel, initialData, addressId }: Props) {
+export default function AddressForm({ onCancel, initialData, addressId, onCreated }: Props) {
   const queryClient = useQueryClient();
   const isEdit = !!addressId;
 
@@ -43,8 +44,9 @@ export default function AddressForm({ onCancel, initialData, addressId }: Props)
     onError: (err) => {
       handleFormError(err, form);
     },
-    onSuccess: () => {
+    onSuccess: ({ addressId }) => {
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.ADDRESSES });
+      onCreated?.(addressId);
       onCancel?.();
     }
   });
