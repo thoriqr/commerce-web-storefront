@@ -3,12 +3,14 @@ import { addItem } from "../api";
 import { toast } from "sonner";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 import { FetchError } from "@/shared/types/api-error";
+import { MUTATION_KEYS } from "../constants";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 export function useAddItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["cart-add"],
+    mutationKey: [MUTATION_KEYS.CART_ADD],
     mutationFn: addItem,
 
     onSuccess: () => {
@@ -16,6 +18,10 @@ export function useAddItem() {
     },
 
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       if (err instanceof FetchError) {
         toast.error("Failed to add cart", {
           description: err.message

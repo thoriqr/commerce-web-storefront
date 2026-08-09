@@ -11,6 +11,7 @@ import { formatRupiah } from "@/shared/utils/formatter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { handleCheckoutError } from "../util";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   sessionId: number;
@@ -28,7 +29,15 @@ export function ShippingSection({ sessionId, disabled, isLocked }: Props) {
   const [courier, setCourier] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const shippingMutation = useShippingCost({ onError: (error) => handleCheckoutError(error, router) });
+  const shippingMutation = useShippingCost({
+    onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
+  });
 
   const setShippingMutation = useSetShipping({
     onSuccess: () => {
@@ -36,7 +45,13 @@ export function ShippingSection({ sessionId, disabled, isLocked }: Props) {
         queryKey: [QUERY_KEYS.CHECKOUT_SESSION, sessionId]
       });
     },
-    onError: (error) => handleCheckoutError(error, router)
+    onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
   });
 
   const data = shippingMutation.data;

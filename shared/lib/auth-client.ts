@@ -1,4 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { parseApiError } from "./parse-api-error";
+import { ERROR_CODES } from "@/features/auth/constants";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,32 +22,50 @@ async function refreshToken() {
 
 authClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as CustomConfig;
 
-    //  No response means network error (do not handle here)
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomConfig | undefined;
+
+    // No response means network error.
     if (!error.response) {
       return Promise.reject(error);
     }
 
-    // Only handle 401 (Unauthorized)
+    // Only handle HTTP 401.
     if (error.response.status !== 401) {
       return Promise.reject(error);
     }
 
-    const url = originalRequest?.url || "";
+    // Guard against malformed/unexpected API error responses.
+    const apiError = parseApiError(error.response.data);
 
-    // Skip refresh logic if explicitly disabled
-    if (originalRequest?.skipAuthRefresh) {
+    if (!apiError) {
       return Promise.reject(error);
     }
 
-    //  Do not intercept auth-refresh
+    // Only an expired access token can trigger a refresh.
+    if (apiError.code !== ERROR_CODES.accessTokenExpired) {
+      return Promise.reject(error);
+    }
+
+    // If Axios does not provide the original request, do not retry.
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    const url = originalRequest.url ?? "";
+
+    // Skip refresh logic if explicitly disabled.
+    if (originalRequest.skipAuthRefresh) {
+      return Promise.reject(error);
+    }
+
+    // Never intercept the refresh request itself.
     if (url.includes("/auth/refresh")) {
       return Promise.reject(error);
     }
 
-    // Prevent infinite retry loop
+    // Prevent the same request from being retried more than once.
     if (originalRequest._retry) {
       return Promise.reject(error);
     }
@@ -53,22 +73,24 @@ authClient.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      // Ensure a single refresh request (avoid race condition)
+      // Ensure only one refresh request is running at a time.
       if (!refreshPromise) {
-        const p = refreshToken();
-        refreshPromise = p.finally(() => {
+        const promise = refreshToken();
+
+        refreshPromise = promise.finally(() => {
           refreshPromise = null;
         });
       }
 
-      // Wait for refresh to complete
+      // Wait for the current refresh request.
       await refreshPromise;
 
-      // Retry the original request with updated credentials
+      // Retry the original request with the refreshed session.
       return authClient(originalRequest);
-    } catch (err) {
-      //  Refresh failed → let the caller handle it
-      return Promise.reject(err);
+    } catch (refreshError) {
+      // Refresh failed.
+      // Do not retry the original request again.
+      return Promise.reject(refreshError);
     }
   }
 );

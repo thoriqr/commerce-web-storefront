@@ -3,12 +3,14 @@ import { updateItem } from "../api";
 import { toast } from "sonner";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 import { FetchError } from "@/shared/types/api-error";
+import { MUTATION_KEYS } from "../constants";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 export function useUpdateItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["cart-update"],
+    mutationKey: [MUTATION_KEYS.CART_UPDATE],
     mutationFn: updateItem,
 
     onSuccess: () => {
@@ -16,6 +18,10 @@ export function useUpdateItem() {
     },
 
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       if (err instanceof FetchError) {
         toast.error("Failed to update item", {
           description: err.message

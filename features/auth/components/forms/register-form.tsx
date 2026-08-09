@@ -11,12 +11,16 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { handleFormError } from "@/shared/utils/form";
 import { EmailFormSchema, emailSchema } from "../../schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GoogleLoginButton from "../google-login-button";
+import { useMe } from "../../hooks/use-me";
+import AuthSessionLoading from "../auth-session-loading";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [isLocked, setIsLocked] = useState(false);
+
+  const { data: user, isLoading: isCheckingSession } = useMe();
 
   const form = useForm<EmailFormSchema>({
     resolver: standardSchemaResolver(emailSchema),
@@ -39,6 +43,16 @@ export default function RegisterForm() {
   });
 
   const mutationIsPending = registerMutation.isPending;
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/");
+    }
+  }, [user, router]);
+
+  if (isCheckingSession || user) {
+    return <AuthSessionLoading />;
+  }
 
   function onSubmit(values: EmailFormSchema) {
     registerMutation.mutate(values);

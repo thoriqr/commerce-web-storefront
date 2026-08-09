@@ -14,6 +14,7 @@ import AddressSelectForm from "./address-select-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 import { QUERY_KEYS } from "@/features/user/constants";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   onCancel?: () => void;
@@ -42,6 +43,10 @@ export default function AddressForm({ onCancel, initialData, addressId, onCreate
 
   const createMutation = useCreateAddress({
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       handleFormError(err, form);
     },
     onSuccess: ({ addressId }) => {
@@ -53,6 +58,9 @@ export default function AddressForm({ onCancel, initialData, addressId, onCreate
 
   const updateMutation = useUpdateAddress({
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
       handleFormError(err, form);
     },
     onSuccess: () => {

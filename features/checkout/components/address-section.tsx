@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../constants";
 import { handleCheckoutError } from "../util";
 import { CreateAddressDialog } from "./create-address-dialog";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   sessionId: number;
@@ -35,7 +36,13 @@ export function AddressSection({ sessionId, address, isLocked }: Props) {
         queryKey: [QUERY_KEYS.CHECKOUT_SESSION, variables.sessionId]
       });
     },
-    onError: (error) => handleCheckoutError(error, router)
+    onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
   });
 
   return (

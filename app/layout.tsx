@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import QueryProviders from "@/providers/query-providers";
 import { Toaster } from "@/components/ui/sonner";
+import SessionExpiredDialogProvider from "@/providers/session-expired-dialog-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -24,6 +25,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <QueryProviders>
           <main>{children}</main>
+
+          <SessionExpiredDialogProvider />
           <Toaster
             position="top-center"
             toastOptions={{

@@ -21,6 +21,7 @@ import { UserProfileFormSchema, userProfileSchema } from "../schema";
 import { Controller, useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   initialValue: string;
@@ -39,6 +40,10 @@ export default function ModalProfileForm({ initialValue }: Props) {
 
   const updateMutation = useUpdateProfile({
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       handleFormError(err, form);
     },
     onSuccess: () => {

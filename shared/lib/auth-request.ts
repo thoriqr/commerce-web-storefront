@@ -1,13 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { ApiErrorResponse, FetchError } from "../types/api-error";
+import { FetchError } from "../types/api-error";
 import { authClient } from "./auth-client";
-
-function parseApiError(data: unknown): ApiErrorResponse | undefined {
-  if (typeof data === "object" && data !== null && "error" in data) {
-    return (data as { error?: ApiErrorResponse }).error;
-  }
-  return undefined;
-}
+import { parseApiError } from "./parse-api-error";
 
 export async function authRequest<T>(config: AxiosRequestConfig): Promise<T> {
   try {

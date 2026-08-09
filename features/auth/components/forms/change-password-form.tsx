@@ -12,12 +12,16 @@ import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { ChangePasswordFormSchema, changePasswordSchema } from "../../schema";
+import { useQueryClient } from "@tanstack/react-query";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function ChangePasswordForm({ onClose }: Props) {
+  const queryClient = useQueryClient();
+
   const currentPasswordToggle = usePasswordToggle();
   const newPasswordToggle = usePasswordToggle();
   const confirmNewPasswordToggle = usePasswordToggle();
@@ -34,6 +38,10 @@ export default function ChangePasswordForm({ onClose }: Props) {
 
   const changeMutation = useChangePassword({
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       handleFormError(err, form);
     },
     onSuccess: () => {

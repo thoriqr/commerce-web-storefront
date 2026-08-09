@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useMe } from "@/features/auth/hooks/use-me";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/features/checkout/constants";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   summary: Summary;
@@ -37,6 +38,11 @@ export default function CartSummary({ summary, isMutating, items, isLocked, onLo
     },
     onError: (err) => {
       onLockChange(false);
+
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       if (err instanceof FetchError) {
         toast.error("Checkout failed", {
           description: err.message

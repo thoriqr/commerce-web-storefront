@@ -22,6 +22,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QUERY_KEYS } from "../constants";
 import { FetchError } from "@/shared/types/api-error";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   data: OrderDetail;
@@ -54,6 +55,10 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
     },
 
     onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
       if (error instanceof FetchError) {
         toast.error("Request failed", {
           description: error.message,

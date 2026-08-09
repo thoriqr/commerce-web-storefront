@@ -18,7 +18,9 @@ import { invalidateUserScope } from "@/shared/utils/invalidate";
 import { toast } from "sonner";
 import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
 import { LoginFormSchema, loginSchema } from "../../schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMe } from "../../hooks/use-me";
+import AuthSessionLoading from "../auth-session-loading";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const passwordToggle = usePasswordToggle();
   const [isLocked, setIsLocked] = useState(false);
+
+  const { data: user, isLoading: isCheckingSession } = useMe();
 
   const form = useForm<LoginFormSchema>({
     resolver: standardSchemaResolver(loginSchema),
@@ -58,6 +62,16 @@ export default function LoginForm() {
   });
 
   const mutationIsPending = loginMutation.isPending;
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/");
+    }
+  }, [user, router]);
+
+  if (isCheckingSession || user) {
+    return <AuthSessionLoading />;
+  }
 
   function onSubmit(values: LoginFormSchema) {
     loginMutation.mutate(values);

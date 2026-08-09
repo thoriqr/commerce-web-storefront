@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { CheckoutSession } from "../types";
 import { MUTATION_KEYS, reasonMap } from "../constants";
@@ -6,7 +8,8 @@ import { formatRupiah } from "@/shared/utils/formatter";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleCheckoutError } from "../util";
-import { useIsMutating } from "@tanstack/react-query";
+import { useIsMutating, useQueryClient } from "@tanstack/react-query";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   data: CheckoutSession;
@@ -17,7 +20,9 @@ type Props = {
 
 export function OrderSummary({ data, sessionId, isLocked, onLockChange }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const hasShipping = !!data.courierCode;
+
   const confirmMutation = useConfirmCheckout({
     onMutate() {
       onLockChange(true);
@@ -27,6 +32,10 @@ export function OrderSummary({ data, sessionId, isLocked, onLockChange }: Props)
     },
     onError: (error) => {
       onLockChange(false);
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
       handleCheckoutError(error, router);
     }
   });
