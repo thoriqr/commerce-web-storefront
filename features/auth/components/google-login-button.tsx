@@ -8,22 +8,37 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { invalidateUserScope } from "@/shared/utils/invalidate";
 import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
+import { cn } from "@/lib/utils";
 
-export default function GoogleLoginButton() {
+type Props = {
+  isLocked?: boolean;
+  onLockChange?: (locked: boolean) => void;
+};
+
+export default function GoogleLoginButton({ isLocked, onLockChange }: Props) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const googleLoginMutation = useGoogleLogin({
-    onError: (err) => {
+    onMutate() {
+      onLockChange?.(true);
+    },
+
+    onError(err) {
+      onLockChange?.(false);
+
       if (err instanceof FetchError) {
         toast.error(err.message);
-      } else {
-        toast.error("Something went wrong");
+        return;
       }
+
+      toast.error("Something went wrong");
     },
-    onSuccess: () => {
+
+    onSuccess() {
       invalidateUserScope(queryClient);
+
       const redirect = searchParams.get("redirect");
       const safeRedirect = getSafeRedirect(redirect);
 
@@ -36,20 +51,27 @@ export default function GoogleLoginButton() {
   });
 
   return (
-    <div className="w-full space-y-2 relative">
-      <GoogleLogin
-        theme="outline"
-        size="large"
-        text="continue_with"
-        onSuccess={(credentialResponse) => {
-          const idToken = credentialResponse.credential;
-          if (!idToken) return;
-          googleLoginMutation.mutate(idToken);
-        }}
-        onError={() => {
-          console.error("Google Login Failed");
-        }}
-      />
+    <div className="relative">
+      <div className={cn(isLocked && "opacity-50")}>
+        <GoogleLogin
+          theme="outline"
+          size="large"
+          text="continue_with"
+          onSuccess={(credentialResponse) => {
+            if (isLocked) return;
+
+            const idToken = credentialResponse.credential;
+            if (!idToken) return;
+
+            googleLoginMutation.mutate(idToken);
+          }}
+          onError={() => {
+            console.error("Google Login Failed");
+          }}
+        />
+      </div>
+
+      {isLocked && <div aria-hidden="true" className="absolute inset-0 z-10 cursor-not-allowed" />}
     </div>
   );
 }

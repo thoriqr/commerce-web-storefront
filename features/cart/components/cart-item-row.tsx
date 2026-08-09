@@ -8,28 +8,38 @@ import { useDeleteItem } from "../hooks/use-delete-item";
 import { CartItem } from "../types";
 import { formatRupiah } from "@/shared/utils/formatter";
 import { navigateProductPage } from "@/shared/utils/navigate-product-page";
+import { useIsMutating } from "@tanstack/react-query";
+import { MUTATION_KEYS as checkoutMutationKey } from "@/features/checkout/constants";
 
 type Props = {
   item: CartItem;
   onClose?: () => void;
+  isLocked: boolean;
 };
 
 const MAX_CART_ITEM_QTY = 99;
 
-export default function CartItemRow({ item, onClose }: Props) {
+export default function CartItemRow({ item, onClose, isLocked }: Props) {
   const updateItem = useUpdateItem();
   const deleteItem = useDeleteItem();
 
+  const checkoutIsCreate =
+    useIsMutating({
+      mutationKey: [checkoutMutationKey.CHECKOUT_CREATE]
+    }) > 0;
+
   const isMutating = updateItem.isPending || deleteItem.isPending;
+
+  const isInteractionDisabled = isMutating || checkoutIsCreate || isLocked;
 
   const isUnavailable = item.warning === "UNAVAILABLE";
   const isOutOfStock = item.warning === "OUT_OF_STOCK";
   const isInsufficient = item.warning === "INSUFFICIENT_STOCK";
   const isLowStock = item.warning === "LOW_STOCK";
 
-  const disableIncrease = item.quantity >= item.stock || item.quantity >= MAX_CART_ITEM_QTY || isUnavailable || isOutOfStock || isMutating;
+  const disableIncrease = item.quantity >= item.stock || item.quantity >= MAX_CART_ITEM_QTY || isUnavailable || isOutOfStock || isInteractionDisabled;
 
-  const disableDecrease = item.quantity <= 1 || isUnavailable || isOutOfStock || isMutating;
+  const disableDecrease = item.quantity <= 1 || isUnavailable || isOutOfStock || isInteractionDisabled;
 
   const handleIncrease = () => {
     updateItem.mutate({
@@ -107,7 +117,7 @@ export default function CartItemRow({ item, onClose }: Props) {
           size="icon"
           variant="ghost"
           className="h-7 w-7 text-muted-foreground hover:text-destructive"
-          disabled={isMutating}
+          disabled={isInteractionDisabled}
           onClick={handleDelete}
         >
           <Trash2 className="h-4 w-4" />

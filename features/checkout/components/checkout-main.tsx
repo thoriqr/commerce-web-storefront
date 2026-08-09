@@ -10,6 +10,7 @@ import { SectionCard } from "../../../components/section-card";
 import { ShippingSection } from "./shipping-section";
 import CheckoutMainSkeleton from "./skeletons/checkout-main-skeleton";
 import CheckoutOrigin from "./checkout-origin";
+import { useState } from "react";
 
 type Props = {
   sessionId: number;
@@ -17,6 +18,7 @@ type Props = {
 
 export function CheckoutMain({ sessionId }: Props) {
   const { data, isLoading, error } = useCheckoutSession(sessionId);
+  const [isLocked, setIsLocked] = useState(false);
 
   if (isLoading) {
     return <CheckoutMainSkeleton />;
@@ -37,7 +39,7 @@ export function CheckoutMain({ sessionId }: Props) {
         </SectionCard>
 
         <SectionCard>
-          <AddressSection sessionId={data.sessionId} address={data.address} />
+          <AddressSection sessionId={data.sessionId} address={data.address} isLocked={isLocked} />
         </SectionCard>
 
         <SectionCard>
@@ -45,14 +47,14 @@ export function CheckoutMain({ sessionId }: Props) {
         </SectionCard>
 
         <SectionCard>
-          <ShippingSection sessionId={data.sessionId} disabled={!data.address} />
+          <ShippingSection key={data.address?.id ?? "no-address"} sessionId={data.sessionId} disabled={!data.address} isLocked={isLocked} />
         </SectionCard>
       </div>
 
       {/* RIGHT SIDE */}
       <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-6 h-fit">
         <SectionCard>
-          <OrderSummary data={data} sessionId={data.sessionId} />
+          <OrderSummary data={data} sessionId={data.sessionId} isLocked={isLocked} onLockChange={setIsLocked} />
         </SectionCard>
       </div>
     </div>

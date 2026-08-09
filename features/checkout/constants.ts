@@ -19,3 +19,8 @@ export const reasonMap: Record<CheckoutBlockReason, string> = {
 export const QUERY_KEYS = {
   CHECKOUT_SESSION: "checkout-session"
 } as const;
+
+export const MUTATION_KEYS = {
+  CHECKOUT_CREATE: "checkout-create",
+  CHECKOUT_SET_SHIPPING: "checkout-set-shipping"
+} as const;

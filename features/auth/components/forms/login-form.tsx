@@ -18,12 +18,18 @@ import { invalidateUserScope } from "@/shared/utils/invalidate";
 import { toast } from "sonner";
 import { getSafeRedirect } from "@/shared/utils/get-safe-redirect";
 import { LoginFormSchema, loginSchema } from "../../schema";
+import { useEffect, useState } from "react";
+import { useMe } from "../../hooks/use-me";
+import AuthSessionLoading from "../auth-session-loading";
 
 export default function LoginForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const passwordToggle = usePasswordToggle();
+  const [isLocked, setIsLocked] = useState(false);
+
+  const { data: user, isLoading: isCheckingSession } = useMe();
 
   const form = useForm<LoginFormSchema>({
     resolver: standardSchemaResolver(loginSchema),
@@ -34,7 +40,11 @@ export default function LoginForm() {
   });
 
   const loginMutation = useLogin({
+    onMutate() {
+      setIsLocked(true);
+    },
     onError: (err) => {
+      setIsLocked(false);
       handleFormError(err, form);
     },
     onSuccess: () => {
@@ -53,6 +63,16 @@ export default function LoginForm() {
 
   const mutationIsPending = loginMutation.isPending;
 
+  useEffect(() => {
+    if (user) {
+      router.replace("/");
+    }
+  }, [user, router]);
+
+  if (isCheckingSession || user) {
+    return <AuthSessionLoading />;
+  }
+
   function onSubmit(values: LoginFormSchema) {
     loginMutation.mutate(values);
   }
@@ -67,7 +87,7 @@ export default function LoginForm() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
-              <GoogleLoginButton />
+              <GoogleLoginButton isLocked={isLocked} onLockChange={setIsLocked} />
             </Field>
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or continue with</FieldSeparator>
 
@@ -83,7 +103,7 @@ export default function LoginForm() {
                     aria-invalid={fieldState.invalid}
                     placeholder="me@example.com"
                     autoComplete="username"
-                    disabled={mutationIsPending}
+                    disabled={mutationIsPending || isLocked}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -109,7 +129,7 @@ export default function LoginForm() {
                       aria-invalid={fieldState.invalid}
                       type={passwordToggle.inputType}
                       autoComplete="new-password"
-                      disabled={mutationIsPending}
+                      disabled={mutationIsPending || isLocked}
                     />
 
                     <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
@@ -123,7 +143,7 @@ export default function LoginForm() {
             {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
             <Field>
-              <Button type="submit" disabled={mutationIsPending} className="w-full">
+              <Button type="submit" disabled={mutationIsPending || isLocked} className="w-full">
                 {mutationIsPending ? "Logging in..." : "Login"}
               </Button>
               <FieldDescription className="text-center">

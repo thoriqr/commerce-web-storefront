@@ -1,4 +1,4 @@
-import { UserAddresses, User, UpsertAddressPayload, AddressDetail } from "./types";
+import { UserAddresses, User, UpsertAddressPayload, AddressDetail, CreateAddressResult } from "./types";
 import { authRequest } from "@/shared/lib/auth-request";
 
 const BASE_URL = "/user";
@@ -33,7 +33,7 @@ export function getAddress(addressId: number) {
 }
 
 export function createAddress(payload: UpsertAddressPayload) {
-  return authRequest<void>({
+  return authRequest<CreateAddressResult>({
     url: `${BASE_URL}/addresses`,
     method: "POST",
     data: payload

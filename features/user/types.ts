@@ -62,3 +62,7 @@ export type AddressDetail = {
   isDefault: boolean;
   postalCode: string;
 };
+
+export type CreateAddressResult = {
+  addressId: number;
+};

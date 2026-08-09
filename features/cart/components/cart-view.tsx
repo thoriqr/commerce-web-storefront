@@ -10,8 +10,10 @@ import { CartEmpty } from "./cart-empty";
 import { useMe } from "@/features/auth/hooks/use-me";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function CartView() {
+  const [isLocked, setIsLocked] = useState(false);
   const { data: user, isLoading: userLoading } = useMe();
 
   const { data, isLoading } = useCart(!!user);
@@ -26,10 +28,10 @@ export default function CartView() {
       <div className="max-w-5xl mx-auto px-4">
         <SectionCard>
           <div className="flex flex-col items-center py-16 gap-4">
-            <p className="text-sm text-muted-foreground">Sign in to access your cart.</p>
+            <p className="text-sm text-muted-foreground">Login to access your cart.</p>
 
             <Button asChild>
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">Login</Link>
             </Button>
           </div>
         </SectionCard>
@@ -57,7 +59,7 @@ export default function CartView() {
               <h2 className="text-sm font-medium">Items</h2>
 
               {data.items.map((item) => (
-                <CartItemRow key={item.variantId} item={item} />
+                <CartItemRow key={item.variantId} item={item} isLocked={isLocked} />
               ))}
             </div>
           </SectionCard>
@@ -66,7 +68,7 @@ export default function CartView() {
         {/* RIGHT */}
         <div className="lg:sticky lg:top-20 h-fit">
           <SectionCard>
-            <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} />
+            <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} isLocked={isLocked} onLockChange={setIsLocked} />
           </SectionCard>
         </div>
       </div>

@@ -11,23 +11,33 @@ import { formatRupiah } from "@/shared/utils/formatter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { handleCheckoutError } from "../util";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   sessionId: number;
   disabled?: boolean;
+  isLocked: boolean;
 };
 
 function isValidService(opt: { service: string; cost: number; etd: string }) {
   return opt.service && opt.cost > 0 && opt.etd && opt.etd.trim() !== "";
 }
 
-export function ShippingSection({ sessionId, disabled }: Props) {
+export function ShippingSection({ sessionId, disabled, isLocked }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [courier, setCourier] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const shippingMutation = useShippingCost({ onError: (error) => handleCheckoutError(error, router) });
+  const shippingMutation = useShippingCost({
+    onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
+  });
 
   const setShippingMutation = useSetShipping({
     onSuccess: () => {
@@ -35,13 +45,24 @@ export function ShippingSection({ sessionId, disabled }: Props) {
         queryKey: [QUERY_KEYS.CHECKOUT_SESSION, sessionId]
       });
     },
-    onError: (error) => handleCheckoutError(error, router)
+    onError: (error) => {
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
   });
 
   const data = shippingMutation.data;
-  const loading = shippingMutation.isPending;
+  const isLoadingShipping = shippingMutation.isPending;
+  const isCourierDisabled = disabled || isLoadingShipping || isLocked;
+  const isServiceDisabled = setShippingMutation.isPending || isLocked;
 
   function handleSelectCourier(code: string) {
+    if (isCourierDisabled) {
+      return;
+    }
     setCourier(code);
     setSelectedService(null);
 
@@ -68,20 +89,20 @@ export function ShippingSection({ sessionId, disabled }: Props) {
             size="sm"
             variant={courier === c.value ? "default" : "outline"}
             onClick={() => handleSelectCourier(c.value)}
-            disabled={disabled || loading}
+            disabled={isCourierDisabled}
           >
             {c.label}
           </Button>
         ))}
       </div>
 
-      {/* EMPTY STATE (belum pilih courier) */}
-      {!loading && courier === null && !disabled && (
+      {/* EMPTY STATE (Courier not yet selected) */}
+      {!isLoadingShipping && courier === null && !disabled && (
         <div className="text-xs text-muted-foreground border border-dashed rounded-md p-3">Choose a courier to see available shipping options.</div>
       )}
 
       {/* LOADING */}
-      {loading && (
+      {isLoadingShipping && (
         <div className="space-y-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="border rounded-md p-3">
@@ -99,7 +120,7 @@ export function ShippingSection({ sessionId, disabled }: Props) {
       )}
 
       {/* SERVICES */}
-      {!loading && services.length > 0 && (
+      {!isLoadingShipping && services.length > 0 && (
         <div className="space-y-2">
           {services.map((opt) => {
             const isValid = isValidService(opt);
@@ -109,7 +130,7 @@ export function ShippingSection({ sessionId, disabled }: Props) {
               <div
                 key={opt.service}
                 onClick={async () => {
-                  if (!isValid || !courier || setShippingMutation.isPending) return;
+                  if (!isValid || !courier || isLocked || setShippingMutation.isPending) return;
 
                   setSelectedService(opt.service);
 
@@ -129,7 +150,7 @@ export function ShippingSection({ sessionId, disabled }: Props) {
                   "border rounded-md p-3 transition",
                   isValid ? "cursor-pointer hover:border-primary" : "opacity-50 cursor-not-allowed",
                   isSelected && isValid && "border-primary bg-primary/5",
-                  setShippingMutation.isPending && "opacity-60 pointer-events-none"
+                  isServiceDisabled && "opacity-60 pointer-events-none"
                 )}
               >
                 <div className="flex justify-between text-sm gap-3">
@@ -154,7 +175,7 @@ export function ShippingSection({ sessionId, disabled }: Props) {
       )}
 
       {/* NO RESULT */}
-      {!loading && courier && data?.services?.length === 0 && (
+      {!isLoadingShipping && courier && data?.services?.length === 0 && (
         <div className="text-xs text-muted-foreground border border-dashed rounded-md p-3">No shipping options available for this courier.</div>
       )}
     </div>

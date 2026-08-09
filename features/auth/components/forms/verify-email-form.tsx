@@ -12,6 +12,7 @@ import { Controller, useForm } from "react-hook-form";
 import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { VerifyEmailFormSchema, verifyEmailSchema } from "../../schema";
+import { useState } from "react";
 
 type Props = {
   token: string;
@@ -21,6 +22,8 @@ export default function VerifyEmailForm({ token }: Props) {
   const router = useRouter();
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
+
+  const [isLocked, setIsLocked] = useState(false);
 
   const form = useForm<VerifyEmailFormSchema>({
     resolver: standardSchemaResolver(verifyEmailSchema),
@@ -32,7 +35,11 @@ export default function VerifyEmailForm({ token }: Props) {
   });
 
   const verifyMutation = useVerifyEmail({
+    onMutate() {
+      setIsLocked(true);
+    },
     onError: (err) => {
+      setIsLocked(false);
       handleFormError(err, form);
     },
     onSuccess: () => {
@@ -40,7 +47,7 @@ export default function VerifyEmailForm({ token }: Props) {
     }
   });
 
-  const mutationIsPending = verifyMutation.isPending;
+  const isDisabled = verifyMutation.isPending || isLocked;
 
   function onSubmit(values: VerifyEmailFormSchema) {
     verifyMutation.mutate({ displayName: values.displayName, password: values.password, token });
@@ -61,7 +68,7 @@ export default function VerifyEmailForm({ token }: Props) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Display Name</FieldLabel>
-                  <Input {...field} id={field.name} aria-invalid={fieldState.invalid} placeholder="John Doe" disabled={mutationIsPending} />
+                  <Input {...field} id={field.name} aria-invalid={fieldState.invalid} placeholder="John Doe" disabled={isDisabled} />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -81,7 +88,7 @@ export default function VerifyEmailForm({ token }: Props) {
                       aria-invalid={fieldState.invalid}
                       type={passwordToggle.inputType}
                       autoComplete="new-password"
-                      disabled={mutationIsPending}
+                      disabled={isDisabled}
                     />
 
                     <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
@@ -106,7 +113,7 @@ export default function VerifyEmailForm({ token }: Props) {
                       aria-invalid={fieldState.invalid}
                       type={confirmPasswordToggle.inputType}
                       autoComplete="new-password"
-                      disabled={mutationIsPending}
+                      disabled={isDisabled}
                     />
 
                     <PasswordToggleButton visible={confirmPasswordToggle.visible} onToggle={confirmPasswordToggle.toggle} />
@@ -120,8 +127,8 @@ export default function VerifyEmailForm({ token }: Props) {
             {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
             <Field>
-              <Button type="submit" disabled={mutationIsPending}>
-                {mutationIsPending ? "Setting up..." : "Complete Setup"}
+              <Button type="submit" disabled={isDisabled}>
+                {isDisabled ? "Setting up..." : "Complete Setup"}
               </Button>
             </Field>
           </FieldGroup>

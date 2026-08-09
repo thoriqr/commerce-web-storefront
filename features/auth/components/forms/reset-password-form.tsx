@@ -12,6 +12,7 @@ import { usePasswordToggle } from "@/shared/hooks/use-password-toggle";
 import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { handleFormError } from "@/shared/utils/form";
 import { ResetPasswordFormSchema, resetPasswordSchema } from "../../schema";
+import { useState } from "react";
 
 type Props = {
   token: string;
@@ -22,6 +23,8 @@ export default function ResetPasswordForm({ token }: Props) {
   const passwordToggle = usePasswordToggle();
   const confirmPasswordToggle = usePasswordToggle();
 
+  const [isLocked, setIsLocked] = useState(false);
+
   const form = useForm<ResetPasswordFormSchema>({
     resolver: standardSchemaResolver(resetPasswordSchema),
     defaultValues: {
@@ -31,7 +34,11 @@ export default function ResetPasswordForm({ token }: Props) {
   });
 
   const resetMutation = useResetPassword({
+    onMutate() {
+      setIsLocked(true);
+    },
     onError: (err) => {
+      setIsLocked(false);
       handleFormError(err, form);
     },
     onSuccess: () => {
@@ -39,7 +46,7 @@ export default function ResetPasswordForm({ token }: Props) {
     }
   });
 
-  const mutationIsPending = resetMutation.isPending;
+  const isDisabled = resetMutation.isPending || isLocked;
 
   function onSubmit(values: ResetPasswordFormSchema) {
     resetMutation.mutate({ password: values.password, token });
@@ -68,7 +75,7 @@ export default function ResetPasswordForm({ token }: Props) {
                       aria-invalid={fieldState.invalid}
                       type={passwordToggle.inputType}
                       autoComplete="new-password"
-                      disabled={mutationIsPending}
+                      disabled={isDisabled}
                     />
 
                     <PasswordToggleButton visible={passwordToggle.visible} onToggle={passwordToggle.toggle} />
@@ -93,7 +100,7 @@ export default function ResetPasswordForm({ token }: Props) {
                       aria-invalid={fieldState.invalid}
                       type={confirmPasswordToggle.inputType}
                       autoComplete="new-password"
-                      disabled={mutationIsPending}
+                      disabled={isDisabled}
                     />
 
                     <PasswordToggleButton visible={confirmPasswordToggle.visible} onToggle={confirmPasswordToggle.toggle} />
@@ -107,8 +114,8 @@ export default function ResetPasswordForm({ token }: Props) {
             {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
             <Field>
-              <Button type="submit" disabled={mutationIsPending}>
-                {mutationIsPending ? "Resetting..." : "Reset Password"}
+              <Button type="submit" disabled={isDisabled}>
+                {isDisabled ? "Resetting..." : "Reset Password"}
               </Button>
             </Field>
           </FieldGroup>

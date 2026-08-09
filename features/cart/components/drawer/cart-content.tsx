@@ -1,3 +1,5 @@
+"use client";
+
 import { MeResponse } from "@/features/auth/types";
 import { useCartMutations } from "../../hooks/use-cart-mutations";
 import { Cart } from "../../types";
@@ -6,6 +8,7 @@ import CartSummary from "../cart-summary";
 import CartSkeleton from "./cart-content-skeleton";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 type Props = {
   user: MeResponse | undefined;
@@ -16,12 +19,13 @@ type Props = {
 
 export default function CartContent({ data, isLoading, onClose, user }: Props) {
   const router = useRouter();
+  const [isLocked, setIsLocked] = useState(false);
   const { isMutating } = useCartMutations();
 
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <p className="text-sm text-muted-foreground">Sign in to view your cart.</p>
+        <p className="text-sm text-muted-foreground">Login to view your cart.</p>
 
         <Button
           onClick={() => {
@@ -29,7 +33,7 @@ export default function CartContent({ data, isLoading, onClose, user }: Props) {
             router.push("/login");
           }}
         >
-          Sign In
+          Login
         </Button>
       </div>
     );
@@ -58,12 +62,12 @@ export default function CartContent({ data, isLoading, onClose, user }: Props) {
       {/* Scrollable items */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 pb-28">
         {cart.items.map((item) => (
-          <CartItemRow key={item.variantId} item={item} onClose={onClose} />
+          <CartItemRow key={item.variantId} item={item} onClose={onClose} isLocked={isLocked} />
         ))}
       </div>
 
       {/* Sticky summary */}
-      <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} />
+      <CartSummary summary={data.summary} isMutating={isMutating} items={data.items} isLocked={isLocked} onLockChange={setIsLocked} />
     </div>
   );
 }

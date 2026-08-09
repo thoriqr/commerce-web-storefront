@@ -14,6 +14,7 @@ import { PasswordToggleButton } from "@/components/password-toggle-button";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_QUERY_KEYS } from "@/shared/constants/query-keys";
 import { ResetPasswordFormSchema, resetPasswordSchema } from "../../schema";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   onClose: () => void;
@@ -35,6 +36,10 @@ export default function SetPasswordForm({ onClose }: Props) {
 
   const setMutation = useSetPassword({
     onError: (err) => {
+      if (handleSessionError(err, queryClient)) {
+        return;
+      }
+
       handleFormError(err, form);
     },
     onSuccess: () => {

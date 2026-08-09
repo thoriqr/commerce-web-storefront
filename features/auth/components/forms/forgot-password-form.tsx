@@ -11,9 +11,12 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { handleFormError } from "@/shared/utils/form";
 import { EmailFormSchema, emailSchema } from "../../schema";
+import { useState } from "react";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();
+  const [isLocked, setIsLocked] = useState(false);
+
   const form = useForm<EmailFormSchema>({
     resolver: standardSchemaResolver(emailSchema),
     defaultValues: {
@@ -22,7 +25,11 @@ export default function ForgotPasswordForm() {
   });
 
   const resetMutation = usePasswordResetRequest({
+    onMutate() {
+      setIsLocked(true);
+    },
     onError: (err) => {
+      setIsLocked(false);
       handleFormError(err, form);
     },
     onSuccess: () => {
@@ -30,7 +37,7 @@ export default function ForgotPasswordForm() {
     }
   });
 
-  const mutationIsPending = resetMutation.isPending;
+  const isDisabled = resetMutation.isPending || isLocked;
 
   function onSubmit(values: EmailFormSchema) {
     resetMutation.mutate(values);
@@ -57,7 +64,7 @@ export default function ForgotPasswordForm() {
                     aria-invalid={fieldState.invalid}
                     placeholder="me@example.com"
                     autoComplete="username"
-                    disabled={mutationIsPending}
+                    disabled={isDisabled}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -67,8 +74,8 @@ export default function ForgotPasswordForm() {
             {form.formState.errors.root && <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
 
             <Field>
-              <Button type="submit" disabled={mutationIsPending}>
-                {mutationIsPending ? "Sending..." : "Reset password"}
+              <Button type="submit" disabled={isDisabled}>
+                {isDisabled ? "Sending..." : "Reset password"}
               </Button>
               <FieldDescription className="text-center">
                 Back to <Link href="/login">Login</Link>

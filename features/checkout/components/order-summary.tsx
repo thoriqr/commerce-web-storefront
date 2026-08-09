@@ -1,28 +1,51 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { CheckoutSession } from "../types";
-import { reasonMap } from "../constants";
-import { useConfirmCheckout } from "../hooks/use-confirm-chekout";
+import { MUTATION_KEYS, reasonMap } from "../constants";
+import { useConfirmCheckout } from "../hooks/use-confirm-checkout";
 import { formatRupiah } from "@/shared/utils/formatter";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleCheckoutError } from "../util";
+import { useIsMutating, useQueryClient } from "@tanstack/react-query";
+import { handleSessionError } from "@/shared/lib/session-error";
 
 type Props = {
   data: CheckoutSession;
   sessionId: number;
+  isLocked: boolean;
+  onLockChange: (locked: boolean) => void;
 };
 
-export function OrderSummary({ data, sessionId }: Props) {
+export function OrderSummary({ data, sessionId, isLocked, onLockChange }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const hasShipping = !!data.courierCode;
+
   const confirmMutation = useConfirmCheckout({
+    onMutate() {
+      onLockChange(true);
+    },
     onSuccess: (data) => {
       router.replace(`/order/${data.orderCode}`);
     },
-    onError: (error) => handleCheckoutError(error, router)
+    onError: (error) => {
+      onLockChange(false);
+      if (handleSessionError(error, queryClient)) {
+        return;
+      }
+
+      handleCheckoutError(error, router);
+    }
   });
 
-  const isDisabled = !data.canPlaceOrder || confirmMutation.isPending;
+  const isSelectingShipping =
+    useIsMutating({
+      mutationKey: [MUTATION_KEYS.CHECKOUT_SET_SHIPPING]
+    }) > 0;
+
+  const isDisabled = !data.canPlaceOrder || confirmMutation.isPending || isLocked || isSelectingShipping;
 
   return (
     <div className="space-y-4 text-sm">
@@ -60,13 +83,13 @@ export function OrderSummary({ data, sessionId }: Props) {
         {/* TOTAL */}
         <div className="border-t pt-3 flex justify-between font-semibold text-base">
           <span>Total</span>
-          <span>{formatRupiah(data.total)}</span>
+          <span>{data.canPlaceOrder ? formatRupiah(data.total) : "—"}</span>
         </div>
       </div>
 
       {/* BUTTON */}
       <Button className="w-full" disabled={isDisabled} onClick={() => confirmMutation.mutate(sessionId)}>
-        {confirmMutation.isPending ? "Processing..." : "Place Order"}
+        {isSelectingShipping ? "Updating shipping..." : confirmMutation.isPending || isLocked ? "Processing..." : "Place Order"}
       </Button>
 
       {/* BLOCK REASON */}

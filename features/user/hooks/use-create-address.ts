@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { createAddress } from "../api";
-import { UpsertAddressPayload } from "../types";
+import { CreateAddressResult, UpsertAddressPayload } from "../types";
 
-export function useCreateAddress(options?: UseMutationOptions<void, unknown, UpsertAddressPayload>) {
+export function useCreateAddress(options?: UseMutationOptions<CreateAddressResult, unknown, UpsertAddressPayload>) {
   return useMutation({
     mutationFn: createAddress,
     ...options
