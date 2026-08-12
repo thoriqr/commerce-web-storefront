@@ -21,8 +21,8 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QUERY_KEYS } from "../constants";
-import { FetchError } from "@/shared/types/api-error";
 import { handleSessionError } from "@/shared/lib/session-error";
+import { showRequestErrorToast } from "@/shared/lib/show-request-error-toast";
 
 type Props = {
   data: OrderDetail;
@@ -59,19 +59,7 @@ export default function OrderStatus({ data, orderCode, refetch }: Props) {
         return;
       }
 
-      if (error instanceof FetchError) {
-        toast.error("Request failed", {
-          description: error.message,
-          duration: 5000
-        });
-
-        return;
-      }
-
-      // fallback
-      toast.error("Something went wrong", {
-        duration: 5000
-      });
+      showRequestErrorToast(error);
     }
   });
 

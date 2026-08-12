@@ -4,7 +4,6 @@ import { toast } from "sonner";
 
 export function handleCheckoutError(error: unknown, router?: AppRouterInstance) {
   if (error instanceof FetchError) {
-    // (redirect)
     if (error.status === 404) {
       toast.error("Session not found or expired");
       router?.replace("/");

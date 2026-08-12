@@ -7,61 +7,11 @@ import Image from "next/image";
 import { OrderStatusBadge } from "../badge/order-status-badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useConfirmDeliver } from "../../hooks/use-confirm-deliver";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "../../constants";
-import { FetchError } from "@/shared/types/api-error";
-import { toast } from "sonner";
 import { navigateProductPage } from "@/shared/utils/navigate-product-page";
+import { MarkReceivedDialog } from "../mark-received-dialog";
 
 export function OrderRow({ order }: { order: Order }) {
-  const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
   const imageUrl = order.previewItem.imageKey ? getImageUrl(order.previewItem.imageKey) : null;
-
-  const confirmDeliverMutation = useConfirmDeliver({
-    onSuccess: () => {
-      toast.success("Thanks! Order marked as received 📦");
-      // refetch order
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ORDER, order.orderCode]
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ORDERS]
-      });
-
-      setOpen(false);
-    },
-
-    onError: (error) => {
-      if (error instanceof FetchError) {
-        // generic API error
-        toast.error("Request failed", {
-          description: error.message,
-          duration: 5000
-        });
-
-        return;
-      }
-
-      // fallback
-      toast.error("Something went wrong", {
-        duration: 5000
-      });
-    }
-  });
 
   return (
     <div className="rounded-md border p-3 hover:bg-muted/50 transition space-y-3">
@@ -107,32 +57,7 @@ export function OrderRow({ order }: { order: Order }) {
         </Link>
 
         {/* CONFIRM */}
-        {order.canConfirm && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">Mark as Received</Button>
-            </DialogTrigger>
-
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Mark this order as received?</DialogTitle>
-                <DialogDescription>Make sure you have received the package before confirming.</DialogDescription>
-              </DialogHeader>
-
-              <DialogFooter>
-                {/* CLOSE */}
-                <DialogClose asChild>
-                  <Button variant="ghost">Not yet</Button>
-                </DialogClose>
-
-                {/* CONFIRM */}
-                <Button size="sm" disabled={confirmDeliverMutation.isPending} onClick={() => confirmDeliverMutation.mutate(order.orderCode)}>
-                  {confirmDeliverMutation.isPending ? "Processing..." : "Yes, I've received it"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+        {order.canConfirm && <MarkReceivedDialog orderCode={order.orderCode} />}
       </div>
     </div>
   );

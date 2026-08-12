@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSnapToken } from "../api";
-import { FetchError } from "@/shared/types/api-error";
-import { toast } from "sonner";
 import { handleSessionError } from "@/shared/lib/session-error";
+import { showRequestErrorToast } from "@/shared/lib/show-request-error-toast";
 
 export function useSnapToken() {
   const queryClient = useQueryClient();
@@ -15,17 +14,7 @@ export function useSnapToken() {
         return;
       }
 
-      if (error instanceof FetchError) {
-        toast.error("Failed to initiate payment", {
-          description: error.message,
-          duration: 5000
-        });
-        return;
-      }
-
-      toast.error("Something went wrong", {
-        duration: 5000
-      });
+      showRequestErrorToast(error, "Failed to initiate payment");
     }
   });
 }
