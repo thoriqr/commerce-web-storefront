@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "id.web.commerce.store",
+      "sha256_cert_fingerprints": ["2D:13:E7:32:80:E4:9B:2A:61:05:1B:BC:21:5E:04:A0:AA:2D:D0:04:0D:F5:C7:E5:54:C3:5B:31:31:C7:56:86"]
+    }
+  }
+]

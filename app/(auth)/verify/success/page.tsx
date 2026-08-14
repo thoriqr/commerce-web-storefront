@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export const metadata: Metadata = {
   title: "Email verified",
-  description: "Your account has been verified successfully"
+  description: "Your email has been verified successfully"
 };
 
 export default function VerifySuccessPage() {
@@ -16,15 +16,22 @@ export default function VerifySuccessPage() {
         <CardHeader className="text-center">
           <CardTitle>Email verified</CardTitle>
 
-          <CardDescription>Your account has been verified successfully. You can now sign in and start using your account.</CardDescription>
+          <CardDescription>Your email has been verified successfully. You can now log in and start using your account.</CardDescription>
         </CardHeader>
-
-        <CardContent>
+        <CardContent className="space-y-4">
           <Button asChild className="w-full">
             <Link href="/login" replace>
-              Continue to sign in
+              Continue to Login
             </Link>
           </Button>
+
+          <div className="text-center">
+            <p className="mb-2 text-sm text-muted-foreground">Already using the mobile app?</p>
+
+            <Button asChild variant="outline" className="w-full">
+              <a href="https://store.commerce.web.id/login">Open the app</a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -43,8 +43,10 @@ authClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Only an expired access token can trigger a refresh.
-    if (apiError.code !== ERROR_CODES.accessTokenExpired) {
+    // Only these error codes can trigger a refresh.
+    const shouldRefresh = apiError.code === ERROR_CODES.accessTokenExpired || apiError.code === ERROR_CODES.unauthorized;
+
+    if (!shouldRefresh) {
       return Promise.reject(error);
     }
 
